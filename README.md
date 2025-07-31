@@ -30,11 +30,9 @@ gcloud services enable \
   cloudresourcemanager.googleapis.com \
   cloudbuild.googleapis.com \
   secretmanager.googleapis.com \
-  run.googleapis.com \
   logging.googleapis.com \
   storage-component.googleapis.com \
-  aiplatform.googleapis.com \
-  iap.googleapis.com
+  aiplatform.googleapis.com
 
 # Make sure we're on the Prod/CICD project...
 gcloud config set project $GOOGLE_CLOUD_PRD_PROJECT
