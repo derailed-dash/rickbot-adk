@@ -88,9 +88,9 @@ steps:
       - "run"
       - "deploy-rickbot-adk"
       - "--region"
-      - "$LOCATION"
-      - "--project"
       - "${_CB_REGION}"
+      - "--project"
+      - "$PROJECT_ID"
       - "--sha"
       - $COMMIT_SHA
 

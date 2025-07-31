@@ -72,8 +72,8 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
   substitutions = {
     _STAGING_PROJECT_ID            = var.staging_project_id
     _BUCKET_NAME_LOAD_TEST_RESULTS = resource.google_storage_bucket.bucket_load_test_results.name
-    _REGION                        = var.cb_region
-
+    _CB_REGION                     = var.cb_region
+    _REGION                        = var.region
 
     # Your other CD Pipeline substitutions
   }
