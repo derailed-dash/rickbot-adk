@@ -21,7 +21,7 @@ resource "google_cloudbuild_trigger" "pr_checks" {
   service_account = resource.google_service_account.cicd_runner_sa.id
 
   repository_event_config {
-    repository = "projects/${var.cicd_runner_project_id}/locations/${var.region}/connections/${var.host_connection_name}/repositories/${var.repository_name}"
+    repository = "projects/${var.cicd_runner_project_id}/locations/${var.cb_region}/connections/${var.host_connection_name}/repositories/${var.repository_name}"
     pull_request {
       branch = "main"
     }
@@ -90,11 +90,11 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
 resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
   name            = "deploy-${var.project_name}"
   project         = var.cicd_runner_project_id
-  location        = var.region
+  location        = var.cb_region
   description     = "Trigger for deployment to production"
   service_account = resource.google_service_account.cicd_runner_sa.id
   repository_event_config {
-    repository = "projects/${var.cicd_runner_project_id}/locations/${var.region}/connections/${var.host_connection_name}/repositories/${var.repository_name}"
+    repository = "projects/${var.cicd_runner_project_id}/locations/${var.cb_region}/connections/${var.host_connection_name}/repositories/${var.repository_name}"
   }
   filename = ".cloudbuild/deploy-to-prod.yaml"
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
@@ -103,7 +103,7 @@ resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
   }
   substitutions = {
     _PROD_PROJECT_ID             = var.prod_project_id
-    _REGION                      = var.region
+    _REGION                      = var.cb_region
 
 
     # Your other Deploy to Prod Pipeline substitutions
