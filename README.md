@@ -20,8 +20,9 @@ uv sync
 ### Run from project's root folder
 
 # Make sure we're on the Dev project...
-gcloud config set project $GOOGLE_CLOUD_STAGING_PROJECT
-gcloud auth application-default set-quota-project $GOOGLE_CLOUD_STAGING_PROJECT
+export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
 gcloud config list project
 
 # Enable APIs
@@ -35,8 +36,9 @@ gcloud services enable \
   aiplatform.googleapis.com
 
 # Make sure we're on the Prod/CICD project...
-gcloud config set project $GOOGLE_CLOUD_PRD_PROJECT
-gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PRD_PROJECT
+export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PRD_PROJECT
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
 gcloud config list project
 
 gcloud services enable \
