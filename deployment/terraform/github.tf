@@ -53,7 +53,7 @@ data "google_secret_manager_secret" "github_pat" {
 resource "google_cloudbuildv2_connection" "github_connection" {
   count      = var.create_cb_connection ? 0 : 1
   project    = var.cicd_runner_project_id
-  location   = var.region
+  location   = var.cb_region
   name       = var.host_connection_name
 
   github_config {
@@ -68,7 +68,7 @@ resource "google_cloudbuildv2_connection" "github_connection" {
 
 resource "google_cloudbuildv2_repository" "repo" {
   project  = var.cicd_runner_project_id
-  location = var.region
+  location = var.cb_region
   name     = var.repository_name
   
   # Use existing connection ID when it exists, otherwise use the created connection

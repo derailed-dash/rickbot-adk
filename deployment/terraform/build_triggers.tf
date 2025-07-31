@@ -16,7 +16,7 @@
 resource "google_cloudbuild_trigger" "pr_checks" {
   name            = "pr-${var.project_name}"
   project         = var.cicd_runner_project_id
-  location        = var.region
+  location        = var.cb_region
   description     = "Trigger for PR checks"
   service_account = resource.google_service_account.cicd_runner_sa.id
 
@@ -49,12 +49,12 @@ resource "google_cloudbuild_trigger" "pr_checks" {
 resource "google_cloudbuild_trigger" "cd_pipeline" {
   name            = "cd-${var.project_name}"
   project         = var.cicd_runner_project_id
-  location        = var.region
+  location        = var.cb_region
   service_account = resource.google_service_account.cicd_runner_sa.id
   description     = "Trigger for CD pipeline"
 
   repository_event_config {
-    repository = "projects/${var.cicd_runner_project_id}/locations/${var.region}/connections/${var.host_connection_name}/repositories/${var.repository_name}"
+    repository = "projects/${var.cicd_runner_project_id}/locations/${var.cb_region}/connections/${var.host_connection_name}/repositories/${var.repository_name}"
     push {
       branch = "main"
     }
@@ -72,7 +72,7 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
   substitutions = {
     _STAGING_PROJECT_ID            = var.staging_project_id
     _BUCKET_NAME_LOAD_TEST_RESULTS = resource.google_storage_bucket.bucket_load_test_results.name
-    _REGION                        = var.region
+    _REGION                        = var.cb_region
 
 
     # Your other CD Pipeline substitutions
