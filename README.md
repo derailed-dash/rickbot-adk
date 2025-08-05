@@ -99,8 +99,8 @@ gcloud auth login --update-adc
 export STAGING_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_STAGING_PROJECT --format="value(projectNumber)")
 export PROD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PRD_PROJECT --format="value(projectNumber)")
 
-source .venv/bin/activate
 uv sync --dev --extra jupyter # Or we can use make install, from Agent Starter Kit
+source .venv/bin/activate
 ```
 
 ## Deploying Infra Commands
