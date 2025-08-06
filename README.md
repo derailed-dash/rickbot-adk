@@ -1,13 +1,28 @@
 # Rickbot-ADK
 
-A multi-personality chatbot build using Google Gemini, the Agent Development Kit (ADK) and the Google Agent-Starter-Pack.
+## Repo Metadata
 
-## Using Agent Starter Kit
+Author: Darren Lester
+
+## Repo Overview
+
+_Rickbot_ is a multi-personality chatbot built using Google Gemini, the Agent Development Kit (ADK), Gemini CLI, and the Google Agent-Starter-Pack. It has many personalities, such as Rick Sanchez (Rick and Morty), Yoda, The Donald, Jack Burton (Big Trouble in Little China), and Dazbot.
+
+The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot). The intent with this repo is to demonstrate leveraging some additional tools in order to evolve the first _Rickbot_ iteration. In particular:
+
+- Adding the Google [Agent Development Kit (ADK)](https://google.github.io/adk-docs/)
+- Creating the initial project folder using the [Agent-Starter-Pack](https://googlecloudplatform.github.io/agent-starter-pack/).
+- Using [Gemini CLI](https://medium.com/google-cloud/give-gemini-cli-the-ability-to-generate-images-and-video-work-with-github-repos-and-use-other-482172571f99) to help with the evolution.
+
+## Using Agent Starter Kit for Initial Project Setup
 
 ### Pre-Reqs
 
-- Dev and Prod GCP projects created and attached to a billing account.
-- Your user is the owner of both projects.
+- Dev and Prod GCP projects created and attached to a billing account and your user is the owner of both projects.
+- GitHub CLI (gh) installed and authenticated
+- uv (Python package manager) installed
+- [Google Cloud CLI](https://medium.com/r/?url=https%3A%2F%2Fcloud.google.com%2Fsdk%2Fdocs%2Finstall-sdk) installed
+- Terraform installed
 
 ### Before Creating Project with Agent Starter Kit
 
@@ -43,10 +58,65 @@ gcloud services enable \
 uvx agent-starter-pack create rickbot-adk
 ```
 
+Let's use:
+
+- `adk_base` as our ADK template application.
+- Google Vertex AI Agent Engine as our agent hosting service
+- Google Cloud Build for our CI/CD pipeline
+
+After running, we now have:
+
+```text
+rickbot-adk/
+├── GEMINI.md
+├── Makefile
+├── README.md
+├── app
+│   ├── __init__.py
+│   ├── agent.py
+│   ├── agent_engine_app.py
+│   └── utils
+│       ├── gcs.py
+│       ├── tracing.py
+│       └── typing.py
+├── deployment
+│   ├── README.md
+│   └── terraform
+│       ├── apis.tf
+│       ├── build_triggers.tf
+│       ├── dev
+│       ├── github.tf
+│       ├── iam.tf
+│       ├── locals.tf
+│       ├── log_sinks.tf
+│       ├── providers.tf
+│       ├── service_accounts.tf
+│       ├── storage.tf
+│       ├── variables.tf
+│       └── vars
+├── deployment_metadata.json
+├── notebooks
+│   ├── adk_app_testing.ipynb
+│   ├── evaluating_adk_agent.ipynb
+│   └── intro_agent_engine.ipynb
+├── pyproject.toml
+├── tests
+│   ├── integration
+│   │   ├── test_agent.py
+│   │   └── test_agent_engine_app.py
+│   ├── load_test
+│   │   ├── README.md
+│   │   └── load_test.py
+│   └── unit
+│       └── test_dummy.py
+└── uv.lock
+```
+
 ### After Creating Project with Agent Starter Kit
 
 - Update `pyproject.toml`.
 - Create `.env`.
+- Update `README.md` (this file)
 
 ### Creating CI/CD Pipeline
 
