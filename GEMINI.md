@@ -1,4 +1,82 @@
-Coding Agent guidance:
+# Project: Rickbot-ADK
+
+## Overview
+
+This project, "Rickbot-ADK," is a multi-personality chatbot built using Google Gemini, the Agent Development Kit (ADK), Gemini CLI, and the Google Agent-Starter-Pack. It's an evolution of the original "Rickbot" project, aiming to leverage more advanced tools for a more robust and scalable implementation. In particular:
+
+- Adding the Google [Agent Development Kit (ADK)](https://google.github.io/adk-docs/)
+- Creating the initial project folder using the [Agent-Starter-Pack](https://googlecloudplatform.github.io/agent-starter-pack/).
+- Using [Gemini CLI](https://medium.com/google-cloud/give-gemini-cli-the-ability-to-generate-images-and-video-work-with-github-repos-and-use-other-482172571f99) to help with the evolution.
+
+We start with the sample `adk_base` template from the Agent-Starter-Pack and then incorporate the Rickbot logic.
+
+## Building and Running
+
+### Dependencies
+
+- **uv:** Python package manager
+- **Google Cloud SDK:** For interacting with GCP services
+- **Terraform:** For infrastructure as code
+- **make:** For running common development tasks
+
+### Local Development
+
+1.  **Install dependencies:**
+    ```bash
+    make install
+    ```
+    This command uses `uv` to sync the development dependencies specified in `pyproject.toml`.
+
+2.  **Run the agent locally:**
+    -   **CLI:**
+        ```bash
+        uv run adk run app
+        ```
+    -   **Web UI (Playground):**
+        ```bash
+        make playground
+        ```
+
+### Testing
+
+-   **Run all tests (unit and integration):**
+    ```bash
+    make test
+    ```
+-   **Run linters and code quality checks:**
+    ```bash
+    make lint
+    ```
+
+### Deployment
+
+The project is set up for automated deployment to a staging and production environment on Google Cloud.
+
+1.  **Set up development environment resources:**
+    ```bash
+    make setup-dev-env
+    ```
+    This uses Terraform to provision the necessary infrastructure in your development project.
+
+2.  **Deploy the agent to Agent Engine:**
+    ```bash
+    make backend
+    ```
+    This command exports the project dependencies to a `requirements.txt` file and then runs the `app/agent_engine_app.py` script to deploy the agent to Vertex AI Agent Engine.
+
+3.  **CI/CD:**
+    The project is configured with a CI/CD pipeline using Google Cloud Build. The pipeline is defined in the `.cloudbuild/` directory and is triggered by pull requests and merges to the main branch. The `setup-cicd` command from the `agent-starter-pack` can be used to automate the setup of the CI/CD pipeline.
+
+## Development Conventions
+
+-   **Dependencies:** Project dependencies are managed in `pyproject.toml`. The `[project]` section defines the main dependencies, and the `[dependency-groups]` section defines development and optional dependencies.
+-   **Testing:** The `tests/` directory contains unit and integration tests. Tests are written using `pytest` and `pytest-asyncio`.
+-   **Linting:** The project uses `ruff` for linting and formatting, `mypy` for static type checking, and `codespell` for checking for common misspellings. The configuration for these tools can be found in `pyproject.toml`.
+-   **Infrastructure:** Infrastructure is managed with Terraform. The Terraform configuration is located in the `deployment/terraform/` directory.
+-   **Agent Logic:** TBC.
+-   **Deployment Logic:** The logic for deploying the agent to Vertex AI Agent Engine is in `app/agent_engine_app.py`. This script handles creating or updating the agent engine, setting environment variables, and managing requirements.
+-   **AI-Assisted Development:** The `GEMINI.md` file provides context for AI tools like Gemini CLI to assist with development.
+
 # Google Agent Development Kit (ADK) Python Cheatsheet
 
 This document serves as a long-form, comprehensive reference for building, orchestrating, and deploying AI agents using the Python Agent Development Kit (ADK). It aims to cover every significant aspect with greater detail, more code examples, and in-depth best practices.

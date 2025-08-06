@@ -21,7 +21,7 @@ The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot).
 - Dev and Prod GCP projects created and attached to a billing account and your user is the owner of both projects.
 - GitHub CLI (gh) installed and authenticated
 - uv (Python package manager) installed
-- [Google Cloud CLI](https://medium.com/r/?url=https%3A%2F%2Fcloud.google.com%2Fsdk%2Fdocs%2Finstall-sdk) installed
+- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install-sdk) installed
 - Terraform installed
 
 ### Before Creating Project with Agent Starter Kit
