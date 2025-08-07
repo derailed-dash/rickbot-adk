@@ -1,12 +1,16 @@
 # Project: Rickbot-ADK
 
-## Overview
+## Project Overview
 
-This project, "Rickbot-ADK," is a multi-personality chatbot built using Google Gemini, the Agent Development Kit (ADK), Gemini CLI, and the Google Agent-Starter-Pack. It's an evolution of the original "Rickbot" project, aiming to leverage more advanced tools for a more robust and scalable implementation. In particular:
+This project is "Rickbot-ADK," a multi-personality chatbot built using Google Gemini, the Agent Development Kit (ADK), and the Google Agent-Starter-Pack. It is an evolution of the original Rickbot, aiming to leverage the ADK for more advanced capabilities. The chatbot can adopt various personalities, such as Rick Sanchez, Yoda, and others.
+
+In particular:
 
 - Adding the Google [Agent Development Kit (ADK)](https://google.github.io/adk-docs/)
 - Creating the initial project folder using the [Agent-Starter-Pack](https://googlecloudplatform.github.io/agent-starter-pack/).
 - Using [Gemini CLI](https://medium.com/google-cloud/give-gemini-cli-the-ability-to-generate-images-and-video-work-with-github-repos-and-use-other-482172571f99) to help with the evolution.
+
+The project was initialized using the `agent-starter-pack`, which provides a base structure for building and deploying agents to Google Cloud.
 
 We start with the sample `adk_base` template from the Agent-Starter-Pack and then incorporate the Rickbot logic.
 
@@ -19,62 +23,61 @@ We start with the sample `adk_base` template from the Agent-Starter-Pack and the
 - **Terraform:** For infrastructure as code
 - **make:** For running common development tasks
 
+Project dependencies are managed in `pyproject.toml` and can be installed using `uv`:
+
+```bash
+# Install all dependencies
+make install
+```
+
 ### Local Development
 
-1.  **Install dependencies:**
-    ```bash
-    make install
-    ```
-    This command uses `uv` to sync the development dependencies specified in `pyproject.toml`.
+To run the agent locally for development and testing, use the following command:
 
-2.  **Run the agent locally:**
-    -   **CLI:**
-        ```bash
-        uv run adk run app
-        ```
-    -   **Web UI (Playground):**
-        ```bash
-        make playground
-        ```
+```bash
+# Launch the Streamlit web interface
+make playground
+```
+
+Alternatively, you can run the agent directly from the command line:
+
+```bash
+# Run the agent in the console
+uv run adk run app
+```
 
 ### Testing
 
--   **Run all tests (unit and integration):**
-    ```bash
-    make test
-    ```
--   **Run linters and code quality checks:**
-    ```bash
-    make lint
-    ```
+The project includes unit and integration tests that can be run with:
 
-### Deployment
+```bash
+make test
+```
 
-The project is set up for automated deployment to a staging and production environment on Google Cloud.
+Linting and code quality checks can be run with:
 
-1.  **Set up development environment resources:**
-    ```bash
-    make setup-dev-env
-    ```
-    This uses Terraform to provision the necessary infrastructure in your development project.
+```bash
+make lint
+```
 
-2.  **Deploy the agent to Agent Engine:**
-    ```bash
-    make backend
-    ```
-    This command exports the project dependencies to a `requirements.txt` file and then runs the `app/agent_engine_app.py` script to deploy the agent to Vertex AI Agent Engine.
+## Deployment
 
-3.  **CI/CD:**
-    The project is configured with a CI/CD pipeline using Google Cloud Build. The pipeline is defined in the `.cloudbuild/` directory and is triggered by pull requests and merges to the main branch. The `setup-cicd` command from the `agent-starter-pack` can be used to automate the setup of the CI/CD pipeline.
+The application is designed for deployment to Google Cloud's Vertex AI Agent Engine. The deployment process is managed via Terraform and Google Cloud Build.
+
+-   **Development Environment:** The `make setup-dev-env` command sets up the necessary Google Cloud resources for a development environment.
+-   **CI/CD:** The `.cloudbuild/` directory contains configurations for CI/CD pipelines using Google Cloud Build. The `uvx agent-starter-pack setup-cicd` command is used to set up the full CI/CD pipeline.
+-   **Backend Deployment:** The `make backend` command deploys the agent to the Vertex AI Agent Engine.
 
 ## Development Conventions
 
+-   **Configuration:** Project dependencies and metadata are defined in `pyproject.toml`.
 -   **Dependencies:** Project dependencies are managed in `pyproject.toml`. The `[project]` section defines the main dependencies, and the `[dependency-groups]` section defines development and optional dependencies.
 -   **Testing:** The `tests/` directory contains unit and integration tests. Tests are written using `pytest` and `pytest-asyncio`.
 -   **Linting:** The project uses `ruff` for linting and formatting, `mypy` for static type checking, and `codespell` for checking for common misspellings. The configuration for these tools can be found in `pyproject.toml`.
--   **Infrastructure:** Infrastructure is managed with Terraform. The Terraform configuration is located in the `deployment/terraform/` directory.
--   **Agent Logic:** TBC.
+-   **Agent Logic:** The core agent logic is located in `app/agent.py`.
 -   **Deployment Logic:** The logic for deploying the agent to Vertex AI Agent Engine is in `app/agent_engine_app.py`. This script handles creating or updating the agent engine, setting environment variables, and managing requirements.
+-   **Infrastructure as Code:** Infrastructure is defined using Terraform in the `deployment/terraform/` directory.
+-   **Notebooks:** The `notebooks/` directory contains Jupyter notebooks for prototyping, testing, and evaluating the agent.
 -   **AI-Assisted Development:** The `GEMINI.md` file provides context for AI tools like Gemini CLI to assist with development.
 
 # Google Agent Development Kit (ADK) Python Cheatsheet

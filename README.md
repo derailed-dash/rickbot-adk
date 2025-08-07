@@ -10,9 +10,10 @@ _Rickbot_ is a multi-personality chatbot built using Google Gemini, the Agent De
 
 The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot). The intent with this repo is to demonstrate leveraging some additional tools in order to evolve the first _Rickbot_ iteration. In particular:
 
-- Adding the Google [Agent Development Kit (ADK)](https://google.github.io/adk-docs/)
-- Creating the initial project folder using the [Agent-Starter-Pack](https://googlecloudplatform.github.io/agent-starter-pack/).
-- Using [Gemini CLI](https://medium.com/google-cloud/give-gemini-cli-the-ability-to-generate-images-and-video-work-with-github-repos-and-use-other-482172571f99) to help with the evolution.
+- Updating the original Rickbot to make use of the [Google Agent Development Kit (ADK)](https://google.github.io/adk-docs/)
+- Creating the initial project folder, GitHub repo and CI/CD using the [Agent-Starter-Pack](https://googlecloudplatform.github.io/agent-starter-pack/).
+- Adding new capabilities to Rickbot.
+- Using [Gemini CLI](https://medium.com/google-cloud/give-gemini-cli-the-ability-to-generate-images-and-video-work-with-github-repos-and-use-other-482172571f99) to help with the overall migration journey.
 
 ## Using Agent Starter Kit for Initial Project Setup
 
