@@ -10,6 +10,8 @@ dependencies = [
     "opentelemetry-exporter-gcp-trace~=1.9.0",
     "google-cloud-logging~=3.11.4",
     "google-cloud-aiplatform[evaluation,agent-engines]~=1.103.0",
+    "pyyaml>=6.0.2",
+    "google-cloud-secret-manager",
 ]
 
 requires-python = ">=3.10,<3.13"
@@ -88,4 +90,4 @@ pythonpath = "."
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.hatch.build.targets.wheel]
-packages = ["app","frontend"]
+packages = ["rickbot_agent","frontend"]
