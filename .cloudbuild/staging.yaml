@@ -30,7 +30,7 @@ steps:
       - "-c"
       - |
         uv export --no-hashes --no-sources --no-header --no-dev --no-emit-project --no-annotate --locked > .requirements.txt
-        uv run app/agent_engine_app.py \
+        uv run rickbot_agent/agent_engine_app.py \
           --project ${_STAGING_PROJECT_ID} \
           --location ${_REGION} \
           --set-env-vars="COMMIT_SHA=${COMMIT_SHA}"
