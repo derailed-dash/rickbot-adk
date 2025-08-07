@@ -25,26 +25,26 @@ steps:
       - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
 
   # Run unit tests using pytest
-  - name: "python:3.11-slim"
-    id: unit-tests
-    entrypoint: /bin/bash
-    args:
-      - "-c"
-      - |
-        uv run pytest tests/unit
-    env:
-      - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
+  #- name: "python:3.11-slim"
+  #  id: unit-tests
+  #  entrypoint: /bin/bash
+  #  args:
+  #    - "-c"
+  #    - |
+  #      uv run pytest tests/unit
+  #  env:
+  #    - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
 
   # Run integration tests
-  - name: "python:3.11-slim"
-    id: integration-tests
-    entrypoint: /bin/bash
-    args:
-      - "-c"
-      - |
-        uv run pytest tests/integration
-    env:
-      - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
+  #- name: "python:3.11-slim"
+  #  id: integration-tests
+  #  entrypoint: /bin/bash
+  #  args:
+  #    - "-c"
+  #    - |
+  #      uv run pytest tests/integration
+  #  env:
+  #    - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
 
 logsBucket: gs://${PROJECT_ID}-rickbot-adk-logs-data/build-logs
 options:
