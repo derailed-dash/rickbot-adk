@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 import yaml  # pyyaml
-from .utils import retrieve_secret, logger
+from .secret_utils import retrieve_secret, logger
 
 # Use Path for directory references to ensure cross-platform compatibility
 SCRIPT_DIR = Path(__file__).parent.resolve()
