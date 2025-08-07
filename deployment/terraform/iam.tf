@@ -68,6 +68,15 @@ resource "google_project_iam_member" "vertex_ai_sa_permissions" {
   depends_on  = [resource.google_project_service.deploy_project_services, resource.google_project_service_identity.vertex_sa]
 }
 
+resource "google_secret_manager_secret_iam_member" "dazbo_system_prompt_access" {
+  for_each = local.deploy_project_ids
+  project = each.value
+  secret_id = "dazbo-system-prompt"
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:service-${data.google_project.projects[each.key].number}@gcp-sa-aiplatform-re.iam.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.dazbo_system_prompt]
+}
+
 
 # Special assignment: Allow the CICD SA to create tokens
 resource "google_service_account_iam_member" "cicd_run_invoker_token_creator" {
