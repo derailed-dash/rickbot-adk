@@ -4,6 +4,7 @@ This is the main entry point for the Rickbot Streamlit application.
 
 import asyncio
 from pathlib import Path
+
 import streamlit as st
 from chat import render_chat
 from config import get_config, logger
@@ -46,7 +47,9 @@ def main():
         # --- Page Configuration ---
         st.set_page_config(
             page_title="Rickbot",
-            page_icon=str(ROOT_DIR / "rickbot_agent/media/rickbot-trans.png"),  # Rickbot logo
+            page_icon=str(
+                ROOT_DIR / "rickbot_agent/media/rickbot-trans.png"
+            ),  # Rickbot logo
             layout="wide",
             initial_sidebar_state="expanded",
         )
