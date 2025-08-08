@@ -3,7 +3,7 @@ This is the main entry point for the Rickbot Streamlit application.
 """
 
 import asyncio
-
+from pathlib import Path
 import streamlit as st
 from chat import render_chat
 from config import get_config, logger
@@ -15,6 +15,9 @@ from rickbot_agent.agent import (
     root_agent as initial_root_agent,  # Import the base agent
 )
 from rickbot_agent.personality import personalities
+
+# Define the root path of the project
+ROOT_DIR = Path(__file__).parent.parent
 
 
 async def initialize_adk_runner(personality_name: str):
@@ -43,7 +46,7 @@ def main():
         # --- Page Configuration ---
         st.set_page_config(
             page_title="Rickbot",
-            page_icon="/home/darren/localdev/Python/rickbot-adk/rickbot_agent/media/rickbot-trans.png",  # Rickbot logo
+            page_icon=str(ROOT_DIR / "rickbot_agent/media/rickbot-trans.png"),  # Rickbot logo
             layout="wide",
             initial_sidebar_state="expanded",
         )

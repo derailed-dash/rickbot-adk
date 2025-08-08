@@ -3,14 +3,17 @@ This module contains the chat interface for the Rickbot Streamlit application.
 """
 
 import asyncio
+from pathlib import Path
 from typing import Any
 
 import streamlit as st
-from google.genai.types import Content, Part
+from google.genai.types import Blob, Content, Part
 
 from rickbot_agent.personality import personalities
 
-USER_AVATAR = "/home/darren/localdev/Python/rickbot-adk/rickbot_agent/media/morty.png"
+# Define the root path of the project
+ROOT_DIR = Path(__file__).parent.parent
+USER_AVATAR = str(ROOT_DIR / "rickbot_agent/media/morty.png")
 
 
 async def get_adk_response(runner, prompt: str, uploaded_file: Any):
@@ -29,9 +32,13 @@ async def get_adk_response(runner, prompt: str, uploaded_file: Any):
     # Prepare the message for the ADK
     message_parts = [Part(text=prompt)]
     if uploaded_file:
-        # This part would need to be adapted if you want to handle file uploads
-        # For now, we'll just pass the text
-        pass
+        message_parts.append(
+            Part(
+                inline_data=Blob(
+                    data=uploaded_file.getvalue(), mime_type=uploaded_file.type
+                )
+            )
+        )
 
     new_message = Content(role="user", parts=message_parts)
 
@@ -99,11 +106,9 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner):
 
         st.info(st.session_state.current_personality.overview)
 
-        # --- File Uploader (placeholder for now) ---
         uploaded_file = st.file_uploader(
             "Upload a file.",
             type=["png", "jpg", "jpeg", "pdf", "mp3", "mp4", "mov", "webm"],
-            disabled=True,  # Disabled until file upload is fully integrated with ADK
         )
 
         if st.button("Clear Chat History", use_container_width=True):
@@ -132,4 +137,4 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner):
 
     # Handle new user input
     if prompt := st.chat_input(st.session_state.current_personality.prompt_question):
-        asyncio.run(get_adk_response(adk_runner, prompt, None))
+        asyncio.run(get_adk_response(adk_runner, prompt, uploaded_file))

@@ -64,6 +64,12 @@ Install required packages and launch the local development environment:
 make install && make playground
 ```
 
+### Streamlit UI
+
+```bash
+uv run streamlit run frontend/app.py
+```
+
 ### ADK
 
 #### Testing Locally
