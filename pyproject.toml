@@ -38,6 +38,9 @@ lint = [
     "types-pyyaml~=6.0.12.20240917",
     "types-requests~=2.32.0.20240914",
 ]
+load-test = [
+    "locust==2.31.1",
+]
 
 [tool.ruff]
 line-length = 88

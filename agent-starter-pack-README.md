@@ -1,14 +1,9 @@
-# rickbot-adk
+# Sample ADK Agent
 
-A base ReAct agent built with Google's Agent Development Kit (ADK)
-Agent generated with [`googleCloudPlatform/agent-starter-pack`](https://github.com/GoogleCloudPlatform/agent-starter-pack) version `0.10.1`
-
-## Project Structure
-
-This project is organized as follows:
+After initially deploying the project with the [agent-starter-pack](https://github.com/GoogleCloudPlatform/agent-starter-pack), we have deployed a sample base ReAct ADK agent.
 
 ```
-rickbot-adk/
+project/
 ├── app/                 # Core application code
 │   ├── agent.py         # Main agent logic
 │   ├── agent_engine_app.py # Agent Engine application logic
@@ -21,15 +16,6 @@ rickbot-adk/
 ├── GEMINI.md            # AI-assisted development guide
 └── pyproject.toml       # Project dependencies and configuration
 ```
-
-## Requirements
-
-Before you begin, ensure you have:
-- **uv**: Python package manager - [Install](https://docs.astral.sh/uv/getting-started/installation/)
-- **Google Cloud SDK**: For GCP services - [Install](https://cloud.google.com/sdk/docs/install)
-- **Terraform**: For infrastructure deployment - [Install](https://developer.hashicorp.com/terraform/downloads)
-- **make**: Build automation tool - [Install](https://www.gnu.org/software/make/) (pre-installed on most Unix-based systems)
-
 
 ## Quick Start (Local Testing)
 
@@ -53,7 +39,6 @@ make install && make playground
 
 For full command options and usage, refer to the [Makefile](Makefile).
 
-
 ## Usage
 
 This template follows a "bring your own agent" approach - you focus on your business logic, and the template handles everything else (UI, infrastructure, deployment, monitoring).
@@ -65,7 +50,6 @@ This template follows a "bring your own agent" approach - you focus on your busi
 5. **Monitor:** Track performance and gather insights using Cloud Logging, Tracing, and the Looker Studio dashboard to iterate on your application.
 
 The project includes a `GEMINI.md` file that provides context for AI tools like Gemini CLI when asking questions about your template.
-
 
 ## Deployment
 
@@ -86,7 +70,6 @@ See [deployment/README.md](deployment/README.md) for instructions.
 ### Production Deployment
 
 The repository includes a Terraform configuration for the setup of a production Google Cloud project. Refer to [deployment/README.md](deployment/README.md) for detailed instructions on how to deploy the infrastructure and application.
-
 
 ## Monitoring and Observability
 > You can use [this Looker Studio dashboard](https://lookerstudio.google.com/reporting/46b35167-b38b-4e44-bd37-701ef4307418/page/tEnnC

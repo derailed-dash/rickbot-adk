@@ -14,11 +14,11 @@ Follow these steps to execute load tests:
    make backend
    ```
 
-**2. Create a Virtual Environment for Locust:**
-   It's recommended to use a separate terminal tab and create a virtual environment for Locust to avoid conflicts with your application's Python environment.
+**2. Install Load Testing Dependencies:**
+   Install the required `locust` package into your project's virtual environment by running:
 
    ```bash
-   python3 -m venv .locust_env && source .locust_env/bin/activate && pip install locust==2.31.1
+   uv sync --extra load-test
    ```
 
 **3. Execute the Load Test:**
@@ -26,12 +26,11 @@ Follow these steps to execute load tests:
 
    ```bash
    export _AUTH_TOKEN=$(gcloud auth print-access-token -q)
-   locust -f tests/load_test/load_test.py \
-   --headless \
-   -t 30s -u 5 -r 2 \
-   --csv=tests/load_test/.results/results \
-   --html=tests/load_test/.results/report.html
+   uv run locust -f tests/load_test/load_test.py \
+     --headless \
+     -t 30s -u 2 -r 0.5 \
+     --csv=tests/load_test/.results/results \
+     --html=tests/load_test/.results/report.html
    ```
 
-   This command initiates a 30-second load test, simulating 2 users spawning per second, reaching a maximum of 10 concurrent users.
-
+   This command initiates a 30-second load test, simulating 0.5 users spawning per second, reaching a maximum of 2 concurrent users.

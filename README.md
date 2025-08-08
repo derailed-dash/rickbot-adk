@@ -15,12 +15,91 @@ The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot).
 - Adding new capabilities to Rickbot.
 - Using [Gemini CLI](https://medium.com/google-cloud/give-gemini-cli-the-ability-to-generate-images-and-video-work-with-github-repos-and-use-other-482172571f99) to help with the overall migration journey.
 
+## Table of Contents
+
+- [Associated Articles](#associated-articles)
+- [Per Dev Session (Once One-Time Setup Tasks Have Been Completed)](#per-dev-session-once-one-time-setup-tasks-have-been-completed)
+- [For Local Dev and Testing](#for-local-dev-and-testing)
+  - [ADK](#adk)
+- [Make Commands](#make-commands)
+- [Using Agent Starter Kit for Initial Project Setup](#using-agent-starter-kit-for-initial-project-setup)
+  - [Pre-Reqs](#pre-reqs)
+  - [Before Creating Project with Agent Starter Kit](#before-creating-project-with-agent-starter-kit)
+  - [Create Project with Agent Starter Kit](#create-project-with-agent-starter-kit)
+  - [After Creating Project with Agent Starter Kit](#after-creating-project-with-agent-starter-kit)
+  - [Creating CI/CD Pipeline](#creating-ci-cd-pipeline)
+- [Deploying Infra Commands](#deploying-infra-commands)
+
 ## Associated Articles
 
 See my Medium articles which are intended to supplement this repo:
 
 1. [Enhancing the Rickbot Multi-Personality Agentic Application - using Gemini CLI, Google Agent-Starter-Pack and the Agent Development Kit (ADK)](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24)
 1. Updating the Rickbot Multi-Personality Agentic Application - Integrate Agent Development Kit (ADK) using Gemini CLI
+
+## Per Dev Session (Once One-Time Setup Tasks Have Been Completed)
+
+```bash
+# From rickbot-adk project folder
+source .env
+
+gcloud auth login --update-adc
+export STAGING_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_STAGING_PROJECT --format="value(projectNumber)")
+export PROD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PRD_PROJECT --format="value(projectNumber)")
+export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
+
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
+gcloud config list project
+
+uv sync --dev --extra jupyter # Or we can use make install, from Agent Starter Kit
+source .venv/bin/activate
+```
+
+## For Local Dev and Testing
+
+Install required packages and launch the local development environment:
+
+```bash
+make install && make playground
+```
+
+### ADK
+
+#### Testing Locally
+
+With CLI:
+
+```bash
+uv run adk run rickbot_agent
+```
+
+With GUI:
+
+```bash
+uv run adk web
+
+# Or we can use the Agent Starter Git make aliases
+make install && make playground
+```
+
+#### Testing Remote
+
+Use the `adk_app_testing.ipynb` notebook.
+
+## Make Commands
+
+| Command | Description |
+| ------- | ----------- |
+| `make install`       | Install all required dependencies using uv |
+| `make playground`    | Launch Streamlit interface for testing agent locally and remotely |
+| `make backend`       | Deploy agent to Agent Engine |
+| `make test`          | Run unit and integration tests |
+| `make lint`          | Run code quality checks (codespell, ruff, mypy)  |
+| `make setup-dev-env` | Set up development environment resources using Terraform   |
+| `uv run jupyter lab` | Launch Jupyter notebook  |
+
+For full command options and usage, refer to the [Makefile](Makefile).
 
 ## Using Agent Starter Kit for Initial Project Setup
 
@@ -170,25 +249,6 @@ The following is just for my own quota issue. May not apply to others! Update th
 - variables.tf
 - env.tfvars (x2)
 
-## Per Dev Session
-
-```bash
-# From rickbot-adk project folder
-source .env
-
-gcloud auth login --update-adc
-export STAGING_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_STAGING_PROJECT --format="value(projectNumber)")
-export PROD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PRD_PROJECT --format="value(projectNumber)")
-export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
-
-gcloud config set project $GOOGLE_CLOUD_PROJECT
-gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
-gcloud config list project
-
-uv sync --dev --extra jupyter # Or we can use make install, from Agent Starter Kit
-source .venv/bin/activate
-```
-
 ## Deploying Infra Commands
 
 If we need to redeploy...
@@ -204,26 +264,3 @@ terraform plan -var-file="vars/env.tfvars" -out out.tfplan
 # Check the TF plan then apply
 terraform apply "out.tfplan"
 ```
-
-## ADK
-
-### Testing Locally
-
-With CLI:
-
-```bash
-uv run adk run rickbot_agent
-```
-
-With GUI:
-
-```bash
-uv run adk web
-
-# Or we can use the Agent Starter Git make aliases
-make install && make playground
-```
-
-### Testing Remote
-
-Use the `adk_app_testing.ipynb` notebook.

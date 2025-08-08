@@ -1,16 +1,8 @@
-# Copyright 2025 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+"""
+For deploying rickbot-adk to Vertex AI Agent Engine.
+
+Wraps the core agent logic - defined in rickbot_agent/agent.py - into a deployable application.
+"""
 
 # mypy: disable-error-code="attr-defined,arg-type"
 import copy
@@ -36,6 +28,11 @@ from rickbot_agent.utils.typing import Feedback
 
 
 class AgentEngineApp(AdkApp):
+    """
+    Aplication Wrapper.
+    This is the standard way to make an ADK agent compatible with the Vertex AI Agent Engine.
+    """
+
     def set_up(self) -> None:
         """Set up logging and tracing for the agent engine app."""
         super().set_up()
@@ -84,10 +81,20 @@ def deploy_agent_engine_app(
     location: str,
     agent_name: str | None = None,
     requirements_file: str = ".requirements.txt",
-    extra_packages: list[str] = ["./app"],
-    env_vars: dict[str, str] = {},
+    extra_packages: list[str] | None = None,
+    env_vars: dict[str, str] | None = None,
 ) -> agent_engines.AgentEngine:
-    """Deploy the agent engine app to Vertex AI."""
+    """Deploy the agent engine app to Vertex AI.
+    Creates the necessary Google Cloud Storage (GCS) buckets for staging the application code and storing artifacts
+    (like files used in conversations).
+
+    After a successful deployment it saves the agent's unique resource name to a deployment_metadata.json
+    for other tools or scripts to reference.
+    """
+    if extra_packages is None:
+        extra_packages = ["./rickbot_agent"]
+    if env_vars is None:
+        env_vars = {}
 
     staging_bucket_uri = f"gs://{project}-agent-engine"
     artifacts_bucket_name = f"{project}-rickbot-adk-logs-data"
@@ -101,7 +108,7 @@ def deploy_agent_engine_app(
     vertexai.init(project=project, location=location, staging_bucket=staging_bucket_uri)
 
     # Read requirements
-    with open(requirements_file) as f:
+    with open(requirements_file, encoding="utf-8") as f:
         requirements = f.read().strip().split("\n")
 
     agent_engine = AgentEngineApp(
@@ -118,22 +125,22 @@ def deploy_agent_engine_app(
     agent_config = {
         "agent_engine": agent_engine,
         "display_name": agent_name,
-        "description": "A base ReAct agent built with Google's Agent Development Kit (ADK)",
+        "description": "A multi-personality chatbot built using Google Gemini and the Agent Development Kit (ADK)",
         "extra_packages": extra_packages,
         "env_vars": env_vars,
     }
-    logging.info(f"Agent config: {agent_config}")
+    logging.info("Agent config: %s", agent_config)
     agent_config["requirements"] = requirements
 
     # Check if an agent with this name already exists
     existing_agents = list(agent_engines.list(filter=f"display_name={agent_name}"))
     if existing_agents:
         # Update the existing agent with new configuration
-        logging.info(f"Updating existing agent: {agent_name}")
+        logging.info("Updating existing agent: %s", agent_name)
         remote_agent = existing_agents[0].update(**agent_config)
     else:
         # Create a new agent if none exists
-        logging.info(f"Creating new agent: {agent_name}")
+        logging.info("Creating new agent: %s", agent_name)
         remote_agent = agent_engines.create(**agent_config)
 
     config = {
@@ -142,10 +149,10 @@ def deploy_agent_engine_app(
     }
     config_file = "deployment_metadata.json"
 
-    with open(config_file, "w") as f:
+    with open(config_file, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2)
 
-    logging.info(f"Agent Engine ID written to {config_file}")
+    logging.info("Agent Engine ID written to %s", config_file)
 
     return remote_agent
 
@@ -177,7 +184,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--extra-packages",
         nargs="+",
-        default=["./app"],
+        default=["./rickbot_agent"],
         help="Additional packages to include",
     )
     parser.add_argument(
@@ -196,13 +203,17 @@ if __name__ == "__main__":
     if not args.project:
         _, args.project = google.auth.default()
 
-    print("""
+    print(
+        """
     ╔═══════════════════════════════════════════════════════════╗
     ║                                                           ║
     ║   🤖 DEPLOYING AGENT TO VERTEX AI AGENT ENGINE 🤖         ║
     ║                                                           ║
     ╚═══════════════════════════════════════════════════════════╝
-    """)
+    """
+    )
+
+    print(args)
 
     deploy_agent_engine_app(
         project=args.project,
