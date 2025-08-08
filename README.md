@@ -76,23 +76,22 @@ After running, we now have:
 
 ```text
 rickbot-adk/
-├── GEMINI.md
-├── Makefile
-├── README.md
-├── app
+├── app/
 │   ├── __init__.py
 │   ├── agent.py
 │   ├── agent_engine_app.py
-│   └── utils
+│   └── utils/
 │       ├── gcs.py
 │       ├── tracing.py
 │       └── typing.py
-├── deployment
+|
+├── deployment/
 │   ├── README.md
-│   └── terraform
+│   └── terraform/
+│       ├── dev/
+│       ├── vars/
 │       ├── apis.tf
 │       ├── build_triggers.tf
-│       ├── dev
 │       ├── github.tf
 │       ├── iam.tf
 │       ├── locals.tf
@@ -100,23 +99,27 @@ rickbot-adk/
 │       ├── providers.tf
 │       ├── service_accounts.tf
 │       ├── storage.tf
-│       ├── variables.tf
-│       └── vars
-├── deployment_metadata.json
-├── notebooks
+│       └── variables.tf
+│
+├── notebooks/
 │   ├── adk_app_testing.ipynb
 │   ├── evaluating_adk_agent.ipynb
 │   └── intro_agent_engine.ipynb
-├── pyproject.toml
-├── tests
-│   ├── integration
+|
+├── tests/
+│   ├── integration/
 │   │   ├── test_agent.py
 │   │   └── test_agent_engine_app.py
-│   ├── load_test
+│   ├── load_test/
 │   │   ├── README.md
 │   │   └── load_test.py
-│   └── unit
+│   └── unit/
 │       └── test_dummy.py
+|
+├── GEMINI.md
+├── Makefile
+├── pyproject.toml
+├── README.md
 └── uv.lock
 ```
 
@@ -176,6 +179,11 @@ source .env
 gcloud auth login --update-adc
 export STAGING_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_STAGING_PROJECT --format="value(projectNumber)")
 export PROD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PRD_PROJECT --format="value(projectNumber)")
+export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
+
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
+gcloud config list project
 
 uv sync --dev --extra jupyter # Or we can use make install, from Agent Starter Kit
 source .venv/bin/activate
@@ -204,7 +212,7 @@ terraform apply "out.tfplan"
 With CLI:
 
 ```bash
-uv run adk run app
+uv run adk run rickbot_agent
 ```
 
 With GUI:
