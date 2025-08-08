@@ -2,24 +2,28 @@
 This is the main entry point for the Rickbot Streamlit application.
 """
 
+import asyncio
+
 import streamlit as st
-from config import get_config, logger
-from utils import RateLimiter
 from chat import render_chat
+from config import get_config, logger
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
-import asyncio
-from rickbot_agent.agent import root_agent as initial_root_agent # Import the base agent
+from utils import RateLimiter
+
+from rickbot_agent.agent import (
+    root_agent as initial_root_agent,  # Import the base agent
+)
 from rickbot_agent.personality import personalities
 
 
 async def initialize_adk_runner(personality_name: str):
     current_personality = personalities[personality_name]
-    
+
     # Create a new agent instance with the selected personality's instruction
     # We need to create a new Agent instance because the instruction is set at initialization
-    adk_agent = initial_root_agent # Start with the base agent
-    adk_agent.instruction = current_personality.system_instruction # Update instruction
+    adk_agent = initial_root_agent  # Start with the base agent
+    adk_agent.instruction = current_personality.system_instruction  # Update instruction
 
     session_service = InMemorySessionService()
     session_id = st.session_state.get("session_id", "test_session")
@@ -57,15 +61,24 @@ def main():
         # --- Session State Initialization ---
         if "current_personality_name" not in st.session_state:
             st.session_state.current_personality_name = "Rick"
-        
+
         # Re-initialize ADK runner if personality changes or not yet initialized
-        if "adk_runner" not in st.session_state or \
-           st.session_state.get("last_personality_name") != st.session_state.current_personality_name:
-            st.session_state.adk_runner = asyncio.run(initialize_adk_runner(st.session_state.current_personality_name))
-            st.session_state.last_personality_name = st.session_state.current_personality_name
+        if (
+            "adk_runner" not in st.session_state
+            or st.session_state.get("last_personality_name")
+            != st.session_state.current_personality_name
+        ):
+            st.session_state.adk_runner = asyncio.run(
+                initialize_adk_runner(st.session_state.current_personality_name)
+            )
+            st.session_state.last_personality_name = (
+                st.session_state.current_personality_name
+            )
 
         # --- Render Chat Interface ---
-        render_chat(config, rate_limiter, config.rate_limit, st.session_state.adk_runner)
+        render_chat(
+            config, rate_limiter, config.rate_limit, st.session_state.adk_runner
+        )
 
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
