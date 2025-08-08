@@ -4,8 +4,10 @@ This module contains the chat interface for the Rickbot Streamlit application.
 
 import asyncio
 from typing import Any
+
 import streamlit as st
 from google.genai.types import Content, Part
+
 from rickbot_agent.personality import personalities
 
 USER_AVATAR = "/home/darren/localdev/Python/rickbot-adk/rickbot_agent/media/morty.png"
@@ -34,7 +36,9 @@ async def get_adk_response(runner, prompt: str, uploaded_file: Any):
     new_message = Content(role="user", parts=message_parts)
 
     # Generate and display the ADK agent's response
-    with st.chat_message("assistant", avatar=st.session_state.current_personality.avatar):
+    with st.chat_message(
+        "assistant", avatar=st.session_state.current_personality.avatar
+    ):
         response_placeholder = st.empty()
         full_response = ""
         async for event in runner.run_async(
@@ -53,7 +57,9 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner):
     """
     Renders the main chat interface, including sidebar and chat history.
     """
-    st.session_state.current_personality = personalities[st.session_state.current_personality_name]
+    st.session_state.current_personality = personalities[
+        st.session_state.current_personality_name
+    ]
 
     # --- Title and Introduction ---
     header_col1, header_col2 = st.columns([0.3, 0.7])
@@ -76,7 +82,9 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner):
         selected_menu_name = st.selectbox(
             "Choose your bot personality:",
             options=personality_menu_names,
-            index=personality_menu_names.index(st.session_state.current_personality.menu_name),
+            index=personality_menu_names.index(
+                st.session_state.current_personality.menu_name
+            ),
         )
 
         # Find the corresponding personality object based on the selected menu_name
@@ -95,7 +103,7 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner):
         uploaded_file = st.file_uploader(
             "Upload a file.",
             type=["png", "jpg", "jpeg", "pdf", "mp3", "mp4", "mov", "webm"],
-            disabled=True # Disabled until file upload is fully integrated with ADK
+            disabled=True,  # Disabled until file upload is fully integrated with ADK
         )
 
         if st.button("Clear Chat History", use_container_width=True):
@@ -115,7 +123,9 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner):
     # Display previous messages from history
     for message in st.session_state.messages:
         avatar = (
-            USER_AVATAR if message["role"] == "user" else st.session_state.current_personality.avatar
+            USER_AVATAR
+            if message["role"] == "user"
+            else st.session_state.current_personality.avatar
         )
         with st.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"])
