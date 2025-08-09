@@ -46,6 +46,8 @@ source .env
 gcloud auth login --update-adc
 export STAGING_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_STAGING_PROJECT --format="value(projectNumber)")
 export PROD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PRD_PROJECT --format="value(projectNumber)")
+
+# Set to $GOOGLE_CLOUD_STAGING_PROJECT or $GOOGLE_CLOUD_PRD_PROJECT as required
 export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
 
 gcloud config set project $GOOGLE_CLOUD_PROJECT
@@ -56,13 +58,25 @@ uv sync --dev --extra jupyter # Or we can use make install, from Agent Starter K
 source .venv/bin/activate
 ```
 
-## For Local Dev and Testing
+## Make Commands
 
 Install required packages and launch the local development environment:
 
 ```bash
 make install && make playground
 ```
+
+| Command              | Description                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| `make install`       | Install all required dependencies using uv                                                  |
+| `make playground`    | Launch Streamlit interface for testing agent locally and remotely                           |
+| `make backend`       | Deploy agent to Cloud Run (use `IAP=true` to enable Identity-Aware Proxy)                   |
+| `make test`          | Run unit and integration tests                                                              |
+| `make lint`          | Run code quality checks (codespell, ruff, mypy)                                             |
+| `make setup-dev-env` | Set up development environment resources using Terraform                                    |
+| `uv run jupyter lab` | Launch Jupyter notebook                                                                     |
+
+For full command options and usage, refer to the [Makefile](Makefile).
 
 ### Streamlit UI
 
@@ -92,20 +106,6 @@ make install && make playground
 #### Testing Remote
 
 Use the `adk_app_testing.ipynb` notebook.
-
-## Make Commands
-
-| Command | Description |
-| ------- | ----------- |
-| `make install`       | Install all required dependencies using uv |
-| `make playground`    | Launch Streamlit interface for testing agent locally and remotely |
-| `make backend`       | Deploy agent to Agent Engine |
-| `make test`          | Run unit and integration tests |
-| `make lint`          | Run code quality checks (codespell, ruff, mypy)  |
-| `make setup-dev-env` | Set up development environment resources using Terraform   |
-| `uv run jupyter lab` | Launch Jupyter notebook  |
-
-For full command options and usage, refer to the [Makefile](Makefile).
 
 ## Using Agent Starter Kit for Initial Project Setup
 

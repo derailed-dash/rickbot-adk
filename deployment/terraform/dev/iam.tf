@@ -32,18 +32,29 @@ resource "google_project_iam_member" "default_compute_sa_storage_object_creator"
   depends_on = [resource.google_project_service.services]
 }
 
+# Agent service account
+resource "google_service_account" "app_sa" {
+  account_id   = "${var.project_name}-app"
+  display_name = "${var.project_name} Agent Service Account"
+  project      = var.dev_project_id
+  depends_on   = [resource.google_project_service.services]
+}
 
-# Grant required permissions to Vertex AI service account
-resource "google_project_iam_member" "vertex_ai_sa_permissions" {
+# Grant application SA the required permissions to run the application
+resource "google_project_iam_member" "app_sa_roles" {
   for_each = {
-    for pair in setproduct(keys(local.project_ids), var.agentengine_sa_roles) :
-    join(",", pair) => pair[1]
+    for pair in setproduct(keys(local.project_ids), var.app_sa_roles) :
+    join(",", pair) => {
+      project = local.project_ids[pair[0]]
+      role    = pair[1]
+    }
   }
 
-  project = var.dev_project_id
-  role    = each.value
-  member  = google_project_service_identity.vertex_sa.member
+  project    = each.value.project
+  role       = each.value.role
+  member     = "serviceAccount:${google_service_account.app_sa.email}"
   depends_on = [resource.google_project_service.services]
 }
+
 
 

@@ -33,6 +33,11 @@ locals {
     "serviceusage.googleapis.com",
     "logging.googleapis.com",
     "cloudtrace.googleapis.com",
+    "compute.googleapis.com",
+    "servicenetworking.googleapis.com",
+    "alloydb.googleapis.com",
+    "secretmanager.googleapis.com",
+    "dns.googleapis.com"
   ]
 
   deploy_project_ids = {

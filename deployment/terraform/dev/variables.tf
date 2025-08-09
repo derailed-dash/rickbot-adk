@@ -41,17 +41,17 @@ variable "feedback_logs_filter" {
   default     = "jsonPayload.log_type=\"feedback\" jsonPayload.service_name=\"rickbot-adk\""
 }
 
-
-variable "agentengine_sa_roles" {
-  description = "List of roles to assign to the Agent Engine app service account"
-
+variable "app_sa_roles" {
+  description = "List of roles to assign to the application service account"
   type        = list(string)
   default = [
+    "roles/secretmanager.secretAccessor",
     "roles/aiplatform.user",
     "roles/discoveryengine.editor",
     "roles/logging.logWriter",
     "roles/cloudtrace.agent",
-    "roles/storage.admin"
+    "roles/storage.admin",
+    "roles/serviceusage.serviceUsageConsumer",
   ]
 }
 

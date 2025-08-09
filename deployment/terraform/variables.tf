@@ -68,17 +68,17 @@ variable "feedback_logs_filter" {
   default     = "jsonPayload.log_type=\"feedback\""
 }
 
-
-variable "agentengine_sa_roles" {
-  description = "List of roles to assign to the Agent Engine service account"
-
+variable "app_sa_roles" {
+  description = "List of roles to assign to the application service account"
   type        = list(string)
   default = [
+    "roles/secretmanager.secretAccessor",
     "roles/aiplatform.user",
     "roles/discoveryengine.editor",
     "roles/logging.logWriter",
     "roles/cloudtrace.agent",
-    "roles/storage.admin"
+    "roles/storage.admin",
+    "roles/serviceusage.serviceUsageConsumer",
   ]
 }
 
@@ -86,6 +86,7 @@ variable "cicd_roles" {
   description = "List of roles to assign to the CICD runner service account in the CICD project"
   type        = list(string)
   default = [
+    "roles/run.invoker",
     "roles/storage.admin",
     "roles/aiplatform.user",
     "roles/discoveryengine.editor",
@@ -99,7 +100,8 @@ variable "cicd_roles" {
 variable "cicd_sa_deployment_required_roles" {
   description = "List of roles to assign to the CICD runner service account for the Staging and Prod projects."
   type        = list(string)
-  default = [    
+  default = [
+    "roles/run.developer",    
     "roles/iam.serviceAccountUser",
     "roles/aiplatform.user",
     "roles/storage.admin"

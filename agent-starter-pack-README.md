@@ -1,12 +1,12 @@
 # Sample ADK Agent
 
-After initially deploying the project with the [agent-starter-pack](https://github.com/GoogleCloudPlatform/agent-starter-pack), we have deployed a sample base ReAct ADK agent.
+The sample agent has been deployed with the [agent-starter-pack](https://github.com/GoogleCloudPlatform/agent-starter-pack) version `0.11.2`. It has deployed a sample base ReAct ADK agent:
 
 ```
 project/
 ├── app/                 # Core application code
 │   ├── agent.py         # Main agent logic
-│   ├── agent_engine_app.py # Agent Engine application logic
+│   ├── server.py        # FastAPI Backend server
 │   └── utils/           # Utility functions and helpers
 ├── .cloudbuild/         # CI/CD pipeline configurations for Google Cloud Build
 ├── deployment/          # Infrastructure and deployment scripts
@@ -30,11 +30,11 @@ make install && make playground
 | Command              | Description                                                                                 |
 | -------------------- | ------------------------------------------------------------------------------------------- |
 | `make install`       | Install all required dependencies using uv                                                  |
-| `make playground`    | Launch Streamlit interface for testing agent locally and remotely |
-| `make backend`       | Deploy agent to Agent Engine |
+| `make playground`    | Launch Streamlit interface for testing agent locally and remotely                           |
+| `make backend`       | Deploy agent to Cloud Run (use `IAP=true` to enable Identity-Aware Proxy)                   |
 | `make test`          | Run unit and integration tests                                                              |
 | `make lint`          | Run code quality checks (codespell, ruff, mypy)                                             |
-| `make setup-dev-env` | Set up development environment resources using Terraform                         |
+| `make setup-dev-env` | Set up development environment resources using Terraform                                    |
 | `uv run jupyter lab` | Launch Jupyter notebook                                                                     |
 
 For full command options and usage, refer to the [Makefile](Makefile).
