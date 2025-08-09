@@ -49,7 +49,7 @@ resource "google_cloudbuild_trigger" "pr_checks" {
 resource "google_cloudbuild_trigger" "cd_pipeline" {
   name            = "cd-${var.project_name}"
   project         = var.cicd_runner_project_id
-  location        = var.cb_region
+  location        = var.cb_region # Cloud Build has quota restrictions in certain regions
   service_account = resource.google_service_account.cicd_runner_sa.id
   description     = "Trigger for CD pipeline"
 

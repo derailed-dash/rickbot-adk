@@ -138,3 +138,7 @@ variable "create_repository" {
   default     = false
 }
 
+variable "artifact_repo_name" {
+  description = "The name for the Artifact Registry repository."
+  type        = string
+}
