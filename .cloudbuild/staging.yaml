@@ -88,7 +88,7 @@ steps:
       - "run"
       - "deploy-rickbot-adk"
       - "--region"
-      - "${_CB_REGION}"
+      - "$LOCATION"
       - "--project"
       - "$PROJECT_ID"
       - "--sha"
