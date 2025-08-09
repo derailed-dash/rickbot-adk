@@ -15,11 +15,12 @@
 steps:
   # Build and Push
   - name: "gcr.io/cloud-builders/docker"
+    id: build-and-push  
     args:
       [
         "build",
         "-t",
-        "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME",
+        "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA",
         "--build-arg",
         "COMMIT_SHA=$COMMIT_SHA",
         ".",
@@ -28,7 +29,7 @@ steps:
     args:
       [
         "push",
-        "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME",
+        "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA",
       ]
 
   # Deploy to Staging
@@ -38,13 +39,17 @@ steps:
     args:
       - "run"
       - "deploy"
-      - "rickbot-adk"
+      - "$_SERVICE_NAME"
       - "--image"
-      - "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME"
+      - "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_SERVICE_NAME"
       - "--region"
       - "${_REGION}"
       - "--project"
       - "${_STAGING_PROJECT_ID}"
+      - '--max-instances=$_MAX_INSTANCES'
+      - '--cpu-boost'
+      - '--set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_REGION=$_REGION,LOG_LEVEL=$_LOG_LEVEL,AUTH_REQUIRED=$_AUTH_REQUIRED,RATE_LIMIT=$_RATE_LIMIT'
+      - '--service-account=$_SERVICE_NAME-app-sa@$_STAGING_PROJECT_ID.iam.gserviceaccount.com'
 
   # Fetch Staging Service URL
   - name: "gcr.io/cloud-builders/gcloud"
@@ -129,8 +134,17 @@ steps:
 substitutions:
   _STAGING_PROJECT_ID: YOUR_STAGING_PROJECT_ID
   _REGION: europe-west4
+  _ARTIFACT_REPO_NAME: rickbot-adk
+  _SERVICE_NAME: rickbot-adk
+  _LOG_LEVEL: INFO
+  _AUTH_REQUIRED: "True"
+  _RATE_LIMIT: "120"  
+  _MAX_INSTANCES: "1"
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - rickbot-adk  
 
-logsBucket: gs://${PROJECT_ID}-rickbot-adk-logs-data/build-logs
+logsBucket: gs://${_STAGING_PROJECT_ID}-logs-data/build-logs
 options:
   substitutionOption: ALLOW_LOOSE
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET

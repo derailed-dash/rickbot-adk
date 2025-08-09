@@ -1,17 +1,3 @@
-# Copyright 2025 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 variable "project_name" {
   type        = string
   description = "Project name used as a base for resource naming"
@@ -33,6 +19,11 @@ variable "cicd_runner_project_id" {
   description = "Google Cloud Project ID where CI/CD pipelines will execute."
 }
 
+variable "my_org" {
+  description = "Your organization's domain (e.g., example.com)."
+  type        = string
+}
+
 variable "region" {
   type        = string
   description = "Google Cloud region for resource deployment."
@@ -43,6 +34,17 @@ variable "cb_region" {
   description = "The Google Cloud region where Cloud Build will run."
   type        = string
   default     = "europe-west1"
+}
+
+variable "service_name" {
+  description = "The name for the Cloud Run service and related resources."
+  type        = string
+}
+
+variable "log_level" {
+  description = "Logging level."
+  type        = string
+  default     = "INFO"
 }
 
 variable "host_connection_name" {

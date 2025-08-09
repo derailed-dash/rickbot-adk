@@ -54,6 +54,7 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
   description     = "Trigger for CD pipeline"
 
   repository_event_config {
+    # GitHub repo connection
     repository = "projects/${var.cicd_runner_project_id}/locations/${var.cb_region}/connections/${var.host_connection_name}/repositories/${var.repository_name}"
     push {
       branch = "main"
@@ -74,9 +75,15 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     _BUCKET_NAME_LOAD_TEST_RESULTS = resource.google_storage_bucket.bucket_load_test_results.name
     _CB_REGION                     = var.cb_region
     _REGION                        = var.region
-
-    # Your other CD Pipeline substitutions
+    _ORG                           = var.my_org
+    _SERVICE_NAME                  = var.service_name
+    _ARTIFACT_REPO_NAME            = var.artifact_repo_name
+    _MAX_INSTANCES                 = "1"
+    _LOG_LEVEL                     = var.log_level
+    _AUTH_REQUIRED                 = "True"
+    _RATE_LIMIT                    = "120"    
   }
+
   depends_on = [
     resource.google_project_service.cicd_services, 
     resource.google_project_service.deploy_project_services, 
