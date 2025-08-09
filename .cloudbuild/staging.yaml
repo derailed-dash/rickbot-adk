@@ -17,20 +17,18 @@ steps:
   - name: "gcr.io/cloud-builders/docker"
     id: build  
     args:
-      [
-        "build",
-        "-t",
-        "$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA",
-        # "--build-arg=COMMIT_SHA=$COMMIT_SHA", # Pass commit SHA as a build-arg
-        ".",
-      ]
+      - build
+      - "-t"
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA
+      # - '--build-arg=COMMIT_SHA=$COMMIT_SHA', # Pass commit SHA as a build-arg
+      - "."
   - name: "gcr.io/cloud-builders/docker"
     id: push
     args:
-      [
-        "push",
-        "$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA",
-      ]
+      - push
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA
 
   # Deploy to Staging
   - name: "gcr.io/cloud-builders/gcloud"
