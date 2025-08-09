@@ -51,11 +51,6 @@ variable "host_connection_name" {
   default     = "rickbot-adk-github-connection"
 }
 
-variable "repository_name" {
-  description = "Name of the repository you'd like to connect to Cloud Build"
-  type        = string
-}
-
 variable "telemetry_logs_filter" {
   type        = string
   description = "Log Sink filter for capturing telemetry data. Captures logs with the `traceloop.association.properties.log_type` attribute set to `tracing`."
@@ -108,6 +103,10 @@ variable "cicd_sa_deployment_required_roles" {
   ]
 }
 
+variable "repository_name" {
+  description = "The name for the Artifact Registry repository."
+  type        = string
+}
 
 variable "repository_owner" {
   description = "Owner of the Git repository - username or organization"

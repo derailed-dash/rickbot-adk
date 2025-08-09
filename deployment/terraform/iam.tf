@@ -44,19 +44,28 @@ resource "google_project_iam_member" "other_projects_roles" {
   member     = "serviceAccount:${resource.google_service_account.cicd_runner_sa.email}"
   depends_on = [resource.google_project_service.cicd_services, resource.google_project_service.deploy_project_services]
 }
+
+locals {
+  # Create a flattened list of all project/role bindings for the application service accounts.
+  # This makes the resource block below much easier to read and understand.
+  app_sa_bindings = flatten([
+    for proj_key, proj_id in local.deploy_project_ids : [
+      for role in var.app_sa_roles : {
+        binding_key = "${proj_key}-${role}"
+        project_id  = proj_id
+        project_key = proj_key
+        role        = role
+      }
+    ]
+  ])
+}
+
 # 3. Grant application SA the required permissions to run the application
 resource "google_project_iam_member" "app_sa_roles" {
-  for_each = {
-    for pair in setproduct(keys(local.deploy_project_ids), var.app_sa_roles) :
-    join(",", pair) => {
-      project = local.deploy_project_ids[pair[0]]
-      role    = pair[1]
-    }
-  }
-
-  project    = each.value.project
+  for_each   = { for binding in local.app_sa_bindings : binding.binding_key => binding }
+  project    = each.value.project_id
   role       = each.value.role
-  member     = "serviceAccount:${google_service_account.app_sa[split(",", each.key)[0]].email}"
+  member     = "serviceAccount:${google_service_account.app_sa[each.value.project_key].email}"
   depends_on = [resource.google_project_service.cicd_services, resource.google_project_service.deploy_project_services]
 }
 
