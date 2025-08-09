@@ -35,7 +35,6 @@ locals {
     "cloudtrace.googleapis.com",
     "compute.googleapis.com",
     "servicenetworking.googleapis.com",
-    "alloydb.googleapis.com",
     "secretmanager.googleapis.com",
     "dns.googleapis.com"
   ]
