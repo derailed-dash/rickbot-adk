@@ -14,12 +14,11 @@
 
 FROM python:3.11-slim
 
-RUN pip install --no-cache-dir uv==0.6.12
+RUN pip install --no-cache-dir uv
 
 WORKDIR /code
 
 COPY ./pyproject.toml ./README.md ./uv.lock* ./
-
 COPY ./app ./app
 
 RUN uv sync --frozen
