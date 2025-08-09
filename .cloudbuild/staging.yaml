@@ -21,7 +21,7 @@ steps:
         "build",
         "-t",
         "$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA",
-        "--build-arg=COMMIT_SHA=$COMMIT_SHA", # Pass commit SHA as a build-arg
+        # "--build-arg=COMMIT_SHA=$COMMIT_SHA", # Pass commit SHA as a build-arg
         ".",
       ]
   - name: "gcr.io/cloud-builders/docker"
@@ -40,7 +40,7 @@ steps:
       - "run"
       - "deploy"
       - "$_SERVICE_NAME"
-      - "--image=$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/$_SERVICE_NAME:$SHORT_SHA"
+      - "--image=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA"
       - "--region=${_REGION}"
       - "--project=${_STAGING_PROJECT_ID}"
       - '--max-instances=$_MAX_INSTANCES'
