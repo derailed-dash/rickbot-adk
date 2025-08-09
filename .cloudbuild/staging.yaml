@@ -110,7 +110,8 @@ steps:
       - "triggers"
       - "run"
       - "deploy-rickbot-adk"
-      - "--region=$LOCATION"
+      # Use the specific region where the Cloud Build trigger is located
+      - "--region=$_CB_REGION"
       - "--project=$PROJECT_ID"
       - "--sha=$COMMIT_SHA"
 
@@ -122,11 +123,12 @@ steps:
       - |
         echo "_________________________________________________________________________"
         echo "Production deployment triggered. View progress and / or approve on the Cloud Build Console:"
-        echo "https://console.cloud.google.com/cloud-build/builds;region=$LOCATION"
+        echo "https://console.cloud.google.com/cloud-build/builds;region=$_CB_REGION"
         echo "_________________________________________________________________________"
 
 substitutions:
   _STAGING_PROJECT_ID: YOUR_STAGING_PROJECT_ID
+  _CB_REGION: europe-west1 # The region where the Cloud Build trigger is located
   _REGION: europe-west4
   _ARTIFACT_REPO_NAME: rickbot-adk
   _SERVICE_NAME: rickbot-adk

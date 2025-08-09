@@ -110,10 +110,14 @@ resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
   }
   substitutions = {
     _PROD_PROJECT_ID             = var.prod_project_id
-    _REGION                      = var.cb_region
-
-
-    # Your other Deploy to Prod Pipeline substitutions
+    # Use the region for the Cloud Run service, not the build trigger
+    _REGION                      = var.region
+    _ARTIFACT_REPO_NAME          = var.artifact_repo_name
+    _SERVICE_NAME                = var.service_name
+    _LOG_LEVEL                   = var.log_level
+    _AUTH_REQUIRED               = "True"
+    _RATE_LIMIT                  = "120"
+    _MAX_INSTANCES               = "1"
   }
   depends_on = [
     resource.google_project_service.cicd_services, 
