@@ -13,7 +13,7 @@
 # limitations under the License.
 
 steps:
-  # Build and Push
+  # Build
   - name: "gcr.io/cloud-builders/docker"
     id: build  
     args:
@@ -21,8 +21,10 @@ steps:
       - "-t"
       - >-
         $_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA
-      # - '--build-arg=COMMIT_SHA=$COMMIT_SHA', # Pass commit SHA as a build-arg
+      - "--build-arg=COMMIT_SHA=$COMMIT_SHA" # Pass commit SHA as a build-arg
       - "."
+    
+  # Push
   - name: "gcr.io/cloud-builders/docker"
     id: push
     args:
@@ -124,9 +126,6 @@ steps:
         echo "https://console.cloud.google.com/cloud-build/builds;region=$_CB_REGION"
         echo "_________________________________________________________________________"
 
-images:
-  - >-
-    $_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA
 logsBucket: gs://${PROJECT_ID}-logs-data/build-logs
 options:
   substitutionOption: ALLOW_LOOSE

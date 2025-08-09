@@ -1,24 +1,24 @@
 # # VPC Network for AlloyDB
-resource "google_compute_network" "default" {
-  name                    = "${var.project_name}-alloydb-network"
-  project                 = var.dev_project_id
-  auto_create_subnetworks = false
-  depends_on = [resource.google_project_service.services]
-}
+# resource "google_compute_network" "default" {
+#   name                    = "${var.project_name}-alloydb-network"
+#   project                 = var.dev_project_id
+#   auto_create_subnetworks = false
+#   depends_on = [resource.google_project_service.services]
+# }
 
 # # Subnet for AlloyDB
-resource "google_compute_subnetwork" "default" {
-  name          = "${var.project_name}-alloydb-network"
-  ip_cidr_range = "10.0.0.0/24"
-  region        = var.region
-  network       = google_compute_network.default.id
-  project       = var.dev_project_id
+# resource "google_compute_subnetwork" "default" {
+#   name          = "${var.project_name}-alloydb-network"
+#   ip_cidr_range = "10.0.0.0/24"
+#   region        = var.region
+#   network       = google_compute_network.default.id
+#   project       = var.dev_project_id
 
-  # This is required for Cloud Run VPC connectors
-  purpose       = "PRIVATE"
+#   # This is required for Cloud Run VPC connectors
+#   purpose       = "PRIVATE"
 
-  private_ip_google_access = true
-}
+#   private_ip_google_access = true
+# }
 
 # # Private IP allocation for AlloyDB
 # resource "google_compute_global_address" "private_ip_alloc" {
