@@ -185,7 +185,7 @@ resource "google_cloud_run_v2_service" "app_staging" {
 
     scaling {
       min_instance_count = 1
-      max_instance_count = 10
+      max_instance_count = 1
     }
 
     session_affinity = true
@@ -256,7 +256,7 @@ resource "google_cloud_run_v2_service" "app_prod" {
 
     scaling {
       min_instance_count = 1
-      max_instance_count = 10
+      max_instance_count = 1
     }
 
     session_affinity = true
