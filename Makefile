@@ -17,21 +17,15 @@ playground:
 # Deploy the agent remotely
 # Usage: make backend [IAP=true] [PORT=8080] - Set IAP=true to enable Identity-Aware Proxy, PORT to specify container port
 backend:
-	# Export dependencies to requirements file using uv export.
-
-	# If using Agent Engine
-	# uv export --no-hashes --no-header --no-dev --no-emit-project --no-annotate > .requirements.txt 2>/dev/null || \
-	# uv export --no-hashes --no-header --no-dev --no-emit-project > .requirements.txt && uv run rickbot_agent/agent_engine_app.py
-
     # Cloud Run
 	PROJECT_ID=$$(gcloud config get-value project) && \
-	gcloud beta run deploy my-project \
+	gcloud run deploy my-project \
 		--source . \
 		--memory "4Gi" \
 		--project $$PROJECT_ID \
 		--region "europe-west4" \
 		--no-allow-unauthenticated \
-		--no-cpu-throttling \
+		--cpu-boost \
 		--labels "created-by=adk" \
 		--set-env-vars \
 		"COMMIT_SHA=$(shell git rev-parse HEAD)" \

@@ -39,6 +39,18 @@ See my Medium articles which are intended to supplement this repo:
 
 ## Per Dev Session (Once One-Time Setup Tasks Have Been Completed)
 
+To configure your shell for a development session, **source** the `setup-env.sh` script. This will handle authentication, set the correct Google Cloud project, install dependencies, and activate the Python virtual environment.
+
+```bash
+# For the Staging/Dev environment (default)
+source ./setup-env.sh
+
+# For the Production environment
+source ./setup-env.sh prod
+```
+
+These scripts run the following setup:
+
 ```bash
 # From rickbot-adk project folder
 source .env

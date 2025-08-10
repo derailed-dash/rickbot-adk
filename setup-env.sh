@@ -1,0 +1,76 @@
+#!/bin/bash
+# This script is meant to be sourced to set up your development environment.
+# It configures gcloud, installs dependencies, and activates the virtualenv.
+#
+# Usage:
+#   source ./setup-env.sh      # For DEV/Staging environment
+#   source ./setup-env.sh prod # For PROD environment
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+# --- Color and Style Definitions ---
+RESET='\033[0m'
+BOLD='\033[1m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+
+# --- Parameter parsing ---
+TARGET_ENV="DEV"
+if [[ "$1" == "prod" ]]; then
+    TARGET_ENV="PROD"
+fi
+
+echo -e "${BLUE}${BOLD}--- ☁️  Configuring Google Cloud environment ---${RESET}"
+
+# 1. Check for .env file
+if [ ! -f .env ]; then
+	echo -e "${RED}❌ Error: .env file not found.${RESET}"
+	echo "Please create a .env file with your project variables and run this command again."
+	echo "An example .env.example file has been created for you:"
+	echo -e "${YELLOW}GOOGLE_CLOUD_STAGING_PROJECT=your-staging-project-id\nGOOGLE_CLOUD_PRD_PROJECT=your-prod-project-id${RESET}" > .env.example
+	return 1
+fi
+
+# 2. Source environment variables and export them
+echo -e "Sourcing variables from ${BLUE}.env${RESET} file..."
+set -a # automatically export all variables (allexport = on)
+source .env
+set +a # disable allexport mode
+
+# 3. Set the target project based on the parameter
+if [ "$TARGET_ENV" = "PROD" ]; then
+    echo -e "Setting environment to ${YELLOW}PROD${RESET} ($GOOGLE_CLOUD_PRD_PROJECT)..."
+    export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PRD_PROJECT
+else
+    echo -e "Setting environment to ${YELLOW}DEV/Staging${RESET} ($GOOGLE_CLOUD_STAGING_PROJECT)..."
+    export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
+fi
+
+# 4. Authenticate with gcloud and configure project
+echo -e "\n🔐 Authenticating with gcloud and setting project to ${BOLD}$GOOGLE_CLOUD_PROJECT...${RESET}"
+gcloud auth login --update-adc --launch-browser
+gcloud config set project "$GOOGLE_CLOUD_PROJECT"
+gcloud auth application-default set-quota-project "$GOOGLE_CLOUD_PROJECT"
+echo -e "\n${BLUE}--- Current gcloud project configuration ---${RESET}"
+gcloud config list project
+echo -e "${BLUE}------------------------------------------${RESET}"
+
+# 5. Get project numbers
+echo "Getting project numbers..."
+export STAGING_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_STAGING_PROJECT --format="value(projectNumber)")
+export PROD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PRD_PROJECT --format="value(projectNumber)")
+echo -e "${BOLD}STAGING_PROJECT_NUMBER:${RESET} $STAGING_PROJECT_NUMBER"
+echo -e "${BOLD}PROD_PROJECT_NUMBER:${RESET}  $PROD_PROJECT_NUMBER"
+echo -e "${BLUE}------------------------------------------${RESET}"
+
+# 6. Sync Python dependencies and activate venv
+echo "Syncing python dependencies with uv..."
+uv sync --dev --extra jupyter
+
+echo "Activating Python virtual environment..."
+source .venv/bin/activate
+
+echo -e "\n${GREEN}✅ Environment setup complete for ${BOLD}$TARGET_ENV${RESET}${GREEN} with project ${BOLD}$GOOGLE_CLOUD_PROJECT${RESET}${GREEN}. Your shell is now configured.${RESET}"
