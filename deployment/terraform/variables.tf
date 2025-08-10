@@ -101,10 +101,12 @@ variable "cicd_sa_deployment_required_roles" {
   description = "List of roles to assign to the CICD runner service account for the Staging and Prod projects."
   type        = list(string)
   default = [
-    "roles/run.developer",    
+    "roles/run.admin",    
     "roles/iam.serviceAccountUser",
     "roles/aiplatform.user",
-    "roles/storage.admin"
+    "roles/storage.admin",
+    "roles/iap.admin",
+    "roles/iam.serviceAccountAdmin"
   ]
 }
 
