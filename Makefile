@@ -14,24 +14,6 @@ playground:
 	@echo "==============================================================================="
 	uv run adk web --port 8501
 
-# Deploy the agent remotely
-# Usage: make backend [IAP=true] [PORT=8080] - Set IAP=true to enable Identity-Aware Proxy, PORT to specify container port
-backend:
-    # Cloud Run
-	PROJECT_ID=$$(gcloud config get-value project) && \
-	gcloud run deploy my-project \
-		--source . \
-		--memory "4Gi" \
-		--project $$PROJECT_ID \
-		--region "europe-west4" \
-		--no-allow-unauthenticated \
-		--cpu-boost \
-		--labels "created-by=adk" \
-		--set-env-vars \
-		"COMMIT_SHA=$(shell git rev-parse HEAD)" \
-		$(if $(IAP),--iap) \
-		$(if $(PORT),--port=$(PORT))
-
 # Launch local development server with hot-reload
 local-backend:
 	uv run uvicorn app.server:app --host 0.0.0.0 --port 8000 --reload

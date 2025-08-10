@@ -82,8 +82,7 @@ make install && make playground
 | ----------------------- | ------------------------------------------------------------------------------- |
 | `source ./setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production |
 | `make install`          | Install all required dependencies using uv                                      |
-| `make playground`       | Launch Streamlit interface for testing agent locally and remotely. This will run `uv run adk web` |
-| `make backend`          | Deploy agent to Cloud Run (use `IAP=true` to enable Identity-Aware Proxy)       |
+| `make playground`       | Launch UI for testing agent locally and remotely. This runs `uv run adk web`    |
 | `make test`             | Run unit and integration tests                                                  |
 | `make lint`             | Run code quality checks (codespell, ruff, mypy)                                 |
 | `uv run jupyter lab`    | Launch Jupyter notebook                                                         |

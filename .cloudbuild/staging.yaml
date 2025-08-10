@@ -33,6 +33,8 @@ steps:
       - '--cpu-boost'
       - '--set-env-vars=GOOGLE_CLOUD_PROJECT=$_STAGING_PROJECT_ID,GOOGLE_CLOUD_REGION=$_REGION,LOG_LEVEL=$_LOG_LEVEL,AUTH_REQUIRED=$_AUTH_REQUIRED,RATE_LIMIT=$_RATE_LIMIT'
       - '--service-account=$_SERVICE_NAME-app-sa@$_STAGING_PROJECT_ID.iam.gserviceaccount.com'
+      - '--allow-unauthenticated' # Allow unauthenticated invocations
+      - '--iap' # Enable direct IAP
 
   # Fetch Staging Service URL
   - name: "gcr.io/cloud-builders/gcloud"

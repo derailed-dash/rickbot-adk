@@ -83,14 +83,17 @@ variable "cicd_roles" {
   description = "List of roles to assign to the CICD runner service account in the CICD project"
   type        = list(string)
   default = [
+    "roles/run.admin",
     "roles/run.invoker",
+    "roles/iam.serviceAccountAdmin",    
     "roles/storage.admin",
     "roles/aiplatform.user",
     "roles/discoveryengine.editor",
     "roles/logging.logWriter",
     "roles/cloudtrace.agent",
     "roles/artifactregistry.writer",
-    "roles/cloudbuild.builds.builder"
+    "roles/cloudbuild.builds.builder",
+    "roles/iap.admin"
   ]
 }
 

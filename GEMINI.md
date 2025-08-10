@@ -64,21 +64,25 @@ make lint
 
 The application is designed for deployment to Google Cloud's Vertex AI Agent Engine. The deployment process is managed via Terraform and Google Cloud Build.
 
--   **Development Environment:** The `make setup-dev-env` command sets up the necessary Google Cloud resources for a development environment.
--   **CI/CD:** The `.cloudbuild/` directory contains configurations for CI/CD pipelines using Google Cloud Build. The `uvx agent-starter-pack setup-cicd` command is used to set up the full CI/CD pipeline.
--   **Backend Deployment:** The `make backend` command deploys the agent to the Vertex AI Agent Engine.
+- **CI/CD:** The `.cloudbuild/` directory contains configurations for CI/CD pipelines using Google Cloud Build. The `uvx agent-starter-pack setup-cicd` command is used to set up the full CI/CD pipeline.
+- **Backend Deployment:** The `make backend` command deploys the agent to the Google Cloud Run.
+
+## Application
+
+- **Agent Logic:** The core agent logic is located in `app/agent.py`.
+
+## Infra
+
+- **Infrastructure as Code:** Infrastructure is defined using Terraform in the `deployment/terraform/` directory.
 
 ## Development Conventions
 
--   **Configuration:** Project dependencies and metadata are defined in `pyproject.toml`.
--   **Dependencies:** Project dependencies are managed in `pyproject.toml`. The `[project]` section defines the main dependencies, and the `[dependency-groups]` section defines development and optional dependencies.
--   **Testing:** The `tests/` directory contains unit and integration tests. Tests are written using `pytest` and `pytest-asyncio`.
--   **Linting:** The project uses `ruff` for linting and formatting, `mypy` for static type checking, and `codespell` for checking for common misspellings. The configuration for these tools can be found in `pyproject.toml`.
--   **Agent Logic:** The core agent logic is located in `app/agent.py`.
--   **Deployment Logic:** The logic for deploying the agent to Vertex AI Agent Engine is in `app/agent_engine_app.py`. This script handles creating or updating the agent engine, setting environment variables, and managing requirements.
--   **Infrastructure as Code:** Infrastructure is defined using Terraform in the `deployment/terraform/` directory.
--   **Notebooks:** The `notebooks/` directory contains Jupyter notebooks for prototyping, testing, and evaluating the agent.
--   **AI-Assisted Development:** The `GEMINI.md` file provides context for AI tools like Gemini CLI to assist with development.
+- **Configuration:** Project dependencies and metadata are defined in `pyproject.toml`.
+- **Dependencies:** Project dependencies are managed in `pyproject.toml`. The `[project]` section defines the main dependencies, and the `[dependency-groups]` section defines development and optional dependencies.
+- **Testing:** The `tests/` directory contains unit and integration tests. Tests are written using `pytest` and `pytest-asyncio`.
+- **Linting:** The project uses `ruff` for linting and formatting, `mypy` for static type checking, and `codespell` for checking for common misspellings. The configuration for these tools can be found in `pyproject.toml`.
+- **Notebooks:** The `notebooks/` directory contains Jupyter notebooks for prototyping, testing, and evaluating the agent.
+- **AI-Assisted Development:** The `GEMINI.md` file provides context for AI tools like Gemini CLI to assist with development.
 
 # Google Agent Development Kit (ADK) Python Cheatsheet
 
