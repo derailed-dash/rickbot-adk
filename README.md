@@ -4,6 +4,23 @@
 
 Author: Darren Lester
 
+## Table of Contents
+
+- [Repo Overview](#repo-overview)
+- [Associated Articles](#associated-articles)
+- [Per Dev Session (Once One-Time Setup Tasks Have Been Completed)](#per-dev-session-once-one-time-setup-tasks-have-been-completed)
+- [Useful Commands](#useful-commands)
+  - [Streamlit UI](#streamlit-ui)
+  - [ADK](#adk)
+  - [Running in a Local Container](#running-in-a-local-container)
+- [Using Agent Starter Kit for Initial Project Setup](#using-agent-starter-kit-for-initial-project-setup)
+  - [Pre-Reqs](#pre-reqs)
+  - [Before Creating Project with Agent Starter Kit](#before-creating-project-with-agent-starter-kit)
+  - [Create Project with Agent Starter Kit](#create-project-with-agent-starter-kit)
+  - [After Creating Project with Agent Starter Kit](#after-creating-project-with-agent-starter-kit)
+  - [Creating CI/CD Pipeline](#creating-ci-cd-pipeline)
+- [Deploying Infra Commands](#deploying-infra-commands)
+
 ## Repo Overview
 
 _Rickbot_ is a multi-personality chatbot built using Google Gemini, the Agent Development Kit (ADK), Gemini CLI, and the Google Agent-Starter-Pack. It has many personalities, such as Rick Sanchez (Rick and Morty), Yoda, The Donald, Jack Burton (Big Trouble in Little China), and Dazbot.
@@ -14,21 +31,6 @@ The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot).
 - Creating the initial project folder, GitHub repo and CI/CD using the [Agent-Starter-Pack](https://googlecloudplatform.github.io/agent-starter-pack/).
 - Adding new capabilities to Rickbot.
 - Using [Gemini CLI](https://medium.com/google-cloud/give-gemini-cli-the-ability-to-generate-images-and-video-work-with-github-repos-and-use-other-482172571f99) to help with the overall migration journey.
-
-## Table of Contents
-
-- [Associated Articles](#associated-articles)
-- [Per Dev Session (Once One-Time Setup Tasks Have Been Completed)](#per-dev-session-once-one-time-setup-tasks-have-been-completed)
-- [For Local Dev and Testing](#for-local-dev-and-testing)
-  - [ADK](#adk)
-- [Make Commands](#make-commands)
-- [Using Agent Starter Kit for Initial Project Setup](#using-agent-starter-kit-for-initial-project-setup)
-  - [Pre-Reqs](#pre-reqs)
-  - [Before Creating Project with Agent Starter Kit](#before-creating-project-with-agent-starter-kit)
-  - [Create Project with Agent Starter Kit](#create-project-with-agent-starter-kit)
-  - [After Creating Project with Agent Starter Kit](#after-creating-project-with-agent-starter-kit)
-  - [Creating CI/CD Pipeline](#creating-ci-cd-pipeline)
-- [Deploying Infra Commands](#deploying-infra-commands)
 
 ## Associated Articles
 
@@ -115,7 +117,27 @@ uv run adk web
 make install && make playground
 ```
 
-#### Testing Remote
+### Running in a Local Container
+
+```bash
+# Get a unique version to tag our image
+export VERSION=$(git rev-parse --short HEAD)
+
+# To build as a container image
+docker build -t $SERVICE_NAME:$VERSION .
+
+# To run as a local container
+# We need to pass environment variables to the container
+# and the Google Application Default Credentials (ADC)
+docker run --rm -p 8080:8080 \
+  -e GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT -e GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION \
+  -e LOG_LEVEL=$LOG_LEVEL \
+  -e GOOGLE_APPLICATION_CREDENTIALS="/app/.config/gcloud/application_default_credentials.json" \
+  --mount type=bind,source=${HOME}/.config/gcloud,target=/app/.config/gcloud \
+   $SERVICE_NAME:$VERSION
+```
+
+### Testing Remote
 
 Use the `adk_app_testing.ipynb` notebook.
 
