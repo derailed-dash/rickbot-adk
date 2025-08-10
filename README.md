@@ -70,7 +70,7 @@ uv sync --dev --extra jupyter # Or we can use make install, from Agent Starter K
 source .venv/bin/activate
 ```
 
-## Make Commands
+## Useful Commands
 
 Install required packages and launch the local development environment:
 
@@ -78,15 +78,16 @@ Install required packages and launch the local development environment:
 make install && make playground
 ```
 
-| Command              | Description                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------- |
-| `make install`       | Install all required dependencies using uv                                                  |
-| `make playground`    | Launch Streamlit interface for testing agent locally and remotely                           |
-| `make backend`       | Deploy agent to Cloud Run (use `IAP=true` to enable Identity-Aware Proxy)                   |
-| `make test`          | Run unit and integration tests                                                              |
-| `make lint`          | Run code quality checks (codespell, ruff, mypy)                                             |
-| `make setup-dev-env` | Set up development environment resources using Terraform                                    |
-| `uv run jupyter lab` | Launch Jupyter notebook                                                                     |
+| Command                 | Description                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------- |
+| `source ./setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production |
+| `make install`          | Install all required dependencies using uv                                      |
+| `make playground`       | Launch Streamlit interface for testing agent locally and remotely. This will run `uv run adk web` |
+| `make backend`          | Deploy agent to Cloud Run (use `IAP=true` to enable Identity-Aware Proxy)       |
+| `make test`             | Run unit and integration tests                                                  |
+| `make lint`             | Run code quality checks (codespell, ruff, mypy)                                 |
+| `uv run jupyter lab`    | Launch Jupyter notebook                                                         |
+| `uv run streamlit run frontend/app.py` | Launch Streamlit frontend                                        |
 
 For full command options and usage, refer to the [Makefile](Makefile).
 

@@ -6,9 +6,6 @@
 #   source ./setup-env.sh      # For DEV/Staging environment
 #   source ./setup-env.sh prod # For PROD environment
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
-
 # --- Color and Style Definitions ---
 RESET='\033[0m'
 BOLD='\033[1m'
