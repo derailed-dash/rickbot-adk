@@ -59,7 +59,7 @@ resource "google_cloud_run_v2_service" "app_staging" {
     max_instance_request_concurrency = 40
 
     scaling {
-      min_instance_count = 1
+      min_instance_count = 0
       max_instance_count = 1
     }
 
@@ -109,7 +109,7 @@ resource "google_cloud_run_v2_service" "app_prod" {
     max_instance_request_concurrency = 40
 
     scaling {
-      min_instance_count = 1
+      min_instance_count = 0
       max_instance_count = 1
     }
 
