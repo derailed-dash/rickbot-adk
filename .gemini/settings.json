@@ -1,5 +1,5 @@
 {
-  "selectedAuthType": "vertex-ai",
+  // "selectedAuthType": "vertex-ai",
   "excludedProjectEnvVars": ["DEBUG", "DEBUG_MODE", "NODE_ENV"],
   "includeDirectories": ["../rickbot", "../../gcp/adk-docs"],
   "loadMemoryFromIncludeDirectories": true

@@ -62,10 +62,10 @@ export STAGING_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_STAGING_P
 export PROD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PRD_PROJECT --format="value(projectNumber)")
 
 # Set to $GOOGLE_CLOUD_STAGING_PROJECT or $GOOGLE_CLOUD_PRD_PROJECT as required
-export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
+export GCP_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
 
-gcloud config set project $GOOGLE_CLOUD_PROJECT
-gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
+gcloud config set project $GCP_PROJECT
+gcloud auth application-default set-quota-project $GCP_PROJECT
 gcloud config list project
 
 uv sync --dev --extra jupyter # Or we can use make install, from Agent Starter Kit
@@ -130,7 +130,7 @@ docker build -t $SERVICE_NAME:$VERSION .
 # We need to pass environment variables to the container
 # and the Google Application Default Credentials (ADC)
 docker run --rm -p 8080:8080 \
-  -e GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT -e GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION \
+  -e GOOGLE_CLOUD_PROJECT=$GCP_PROJECT -e GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION \
   -e LOG_LEVEL=$LOG_LEVEL \
   -e GOOGLE_APPLICATION_CREDENTIALS="/app/.config/gcloud/application_default_credentials.json" \
   --mount type=bind,source=${HOME}/.config/gcloud,target=/app/.config/gcloud \
@@ -162,9 +162,9 @@ export GOOGLE_CLOUD_STAGING_PROJECT="your-dev-project"
 export GOOGLE_CLOUD_PRD_PROJECT="your-prod-project"
 
 # Make sure we're on the Dev / Staging project...
-export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
-gcloud config set project $GOOGLE_CLOUD_PROJECT
-gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
+export GCP_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
+gcloud config set project $GCP_PROJECT
+gcloud auth application-default set-quota-project $GCP_PROJECT
 gcloud config list project
 
 # Now let's enable some Google Cloud APIs in the project
@@ -254,9 +254,9 @@ First, one-time setup for Prod project. (To workaround issues I found with the `
 
 ```bash
 # Make sure we're on the Prod/CICD project...
-export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PRD_PROJECT
-gcloud config set project $GOOGLE_CLOUD_PROJECT
-gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
+export GCP_PROJECT=$GOOGLE_CLOUD_PRD_PROJECT
+gcloud config set project $GCP_PROJECT
+gcloud auth application-default set-quota-project $GCP_PROJECT
 gcloud config list project
 
 gcloud services enable \

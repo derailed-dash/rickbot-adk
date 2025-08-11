@@ -40,17 +40,17 @@ set +a # disable allexport mode
 # 3. Set the target project based on the parameter
 if [ "$TARGET_ENV" = "PROD" ]; then
     echo -e "Setting environment to ${YELLOW}PROD${RESET} ($GOOGLE_CLOUD_PRD_PROJECT)..."
-    export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PRD_PROJECT
+    export GCP_PROJECT=$GOOGLE_CLOUD_PRD_PROJECT
 else
     echo -e "Setting environment to ${YELLOW}DEV/Staging${RESET} ($GOOGLE_CLOUD_STAGING_PROJECT)..."
-    export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
+    export GCP_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
 fi
 
 # 4. Authenticate with gcloud and configure project
-echo -e "\n🔐 Authenticating with gcloud and setting project to ${BOLD}$GOOGLE_CLOUD_PROJECT...${RESET}"
+echo -e "\n🔐 Authenticating with gcloud and setting project to ${BOLD}$GCP_PROJECT...${RESET}"
 gcloud auth login --update-adc --launch-browser
-gcloud config set project "$GOOGLE_CLOUD_PROJECT"
-gcloud auth application-default set-quota-project "$GOOGLE_CLOUD_PROJECT"
+gcloud config set project "$GCP_PROJECT"
+gcloud auth application-default set-quota-project "$GCP_PROJECT"
 echo -e "\n${BLUE}--- Current gcloud project configuration ---${RESET}"
 gcloud config list project
 echo -e "${BLUE}------------------------------------------${RESET}"
@@ -70,4 +70,4 @@ uv sync --dev --extra jupyter
 echo "Activating Python virtual environment..."
 source .venv/bin/activate
 
-echo -e "\n${GREEN}✅ Environment setup complete for ${BOLD}$TARGET_ENV${RESET}${GREEN} with project ${BOLD}$GOOGLE_CLOUD_PROJECT${RESET}${GREEN}. Your shell is now configured.${RESET}"
+echo -e "\n${GREEN}✅ Environment setup complete for ${BOLD}$TARGET_ENV${RESET}${GREEN} with project ${BOLD}$GCP_PROJECT${RESET}${GREEN}. Your shell is now configured.${RESET}"
