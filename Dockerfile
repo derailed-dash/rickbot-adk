@@ -14,6 +14,9 @@
 
 FROM python:3.11-slim
 
+# Update OS packages to patch security vulnerabilities
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
 RUN pip install --no-cache-dir uv
 
 WORKDIR /app
