@@ -1,17 +1,3 @@
-# Copyright 2025 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import json
 import logging
 import os
@@ -31,6 +17,7 @@ from requests.exceptions import RequestException
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+APP_ENTRYPOINT = "adk_sample_app.server:app"
 BASE_URL = "http://127.0.0.1:8000/"
 STREAM_URL = BASE_URL + "run_sse"
 FEEDBACK_URL = BASE_URL + "feedback"
@@ -50,7 +37,7 @@ def start_server() -> subprocess.Popen[str]:
         sys.executable,
         "-m",
         "uvicorn",
-        "app.server:app",
+        APP_ENTRYPOINT,
         "--host",
         "0.0.0.0",
         "--port",
@@ -183,9 +170,9 @@ def test_chat_stream_error_handling(server_fixture: subprocess.Popen[str]) -> No
         STREAM_URL, headers=HEADERS, json=data, stream=True, timeout=10
     )
 
-    assert response.status_code == 422, (
-        f"Expected status code 422, got {response.status_code}"
-    )
+    assert (
+        response.status_code == 422
+    ), f"Expected status code 422, got {response.status_code}"
     logger.info("Error handling test completed successfully")
 
 

@@ -99,8 +99,7 @@ steps:
       - "triggers"
       - "run"
       - "deploy-rickbot-adk"
-      # Use the specific region where the Cloud Build trigger is located
-      - "--region=$_CB_REGION"
+      - "--region=$_CB_REGION" # Use the specific region where the Cloud Build trigger is located
       - "--project=$PROJECT_ID"
       - "--sha=$COMMIT_SHA"
 

@@ -16,10 +16,11 @@ FROM python:3.11-slim
 
 RUN pip install --no-cache-dir uv
 
-WORKDIR /code
+WORKDIR /app
 
-COPY ./pyproject.toml ./README.md ./uv.lock* ./
-COPY ./app ./app
+# Copy to /code/ in its own layer
+COPY ./pyproject.toml ./uv.lock* ./ 
+COPY ./adk_sample_app ./adk_sample_app
 
 RUN uv sync --frozen
 
@@ -28,4 +29,4 @@ ENV COMMIT_SHA=${COMMIT_SHA}
 
 EXPOSE 8080
 
-CMD ["uv", "run", "uvicorn", "app.server:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uv", "run", "uvicorn", "adk_sample_app.server:app", "--host", "0.0.0.0", "--port", "8080"]

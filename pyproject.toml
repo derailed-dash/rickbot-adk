@@ -70,7 +70,7 @@ select = [
 ignore = ["E501", "C901"] # ignore line too long, too complex
 
 [tool.ruff.lint.isort]
-known-first-party = ["app", "frontend"]
+known-first-party = ["adk_sample_app", "frontend"]
 
 [tool.mypy]
 disallow_untyped_calls = true

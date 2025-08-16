@@ -10,18 +10,18 @@ playground:
 	@echo "|                                                                             |"
 	@echo "| 💡 Try asking: What's the weather in San Francisco?                         |"
 	@echo "|                                                                             |"
-	@echo "| 🔍 IMPORTANT: Select the 'app' folder to interact with your agent.          |"
+	@echo "| 🔍 IMPORTANT: Select the 'adk_sample_app' folder to interact with your agent.          |"
 	@echo "==============================================================================="
 	uv run adk web --port 8501
 
 # Launch local development server with hot-reload
 local-backend:
-	uv run uvicorn app.server:app --host 0.0.0.0 --port 8000 --reload
+	uv run uvicorn adk_sample_app.server:app --host 0.0.0.0 --port 8000 --reload
 
 # Set up development environment resources using Terraform
 setup-dev-env:
-	PROJECT_ID=$$(gcloud config get-value project) && \
-	(cd deployment/terraform/dev && terraform init && terraform apply --var-file vars/env.tfvars --var dev_project_id=$$PROJECT_ID --auto-approve)
+	PROJECT_ID=$(gcloud config get-value project) && \
+	(cd deployment/terraform/dev && terraform init && terraform apply --var-file vars/env.tfvars --var dev_project_id=$PROJECT_ID --auto-approve)
 
 # Run unit and integration tests
 test:
