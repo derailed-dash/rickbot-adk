@@ -39,8 +39,7 @@ dev = [
 
 jupyter = [
     "jupyter~=1.0.0",
-    "ipython>=8.37.0",
-    "google-auth"
+    "ipython>=8.37.0"
 ]
 lint = [
     "ruff>=0.4.6",
