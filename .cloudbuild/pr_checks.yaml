@@ -31,7 +31,7 @@ steps:
     args:
       - "-c"
       - |
-        uv run pytest tests/unit
+        uv run pytest src/tests/unit
     env:
       - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
 
@@ -42,7 +42,7 @@ steps:
     args:
       - "-c"
       - |
-        uv run pytest tests/integration
+        uv run pytest src/tests/integration
     env:
       - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
 

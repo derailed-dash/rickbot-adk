@@ -70,7 +70,7 @@ select = [
 ignore = ["E501", "C901"] # ignore line too long, too complex
 
 [tool.ruff.lint.isort]
-known-first-party = ["adk_sample_app", "frontend"]
+known-first-party = ["src"]
 
 [tool.mypy]
 disallow_untyped_calls = true
@@ -92,7 +92,7 @@ exclude = [".venv"]
 
 [tool.codespell]
 ignore-words-list = "rouge"
-skip = "./locust_env/*,uv.lock,.venv,./frontend,**/*.ipynb"
+skip = "./locust_env/*,uv.lock,.venv,./src/frontend,**/*.ipynb"
 
 
 [build-system]
@@ -105,4 +105,4 @@ pythonpath = "."
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.hatch.build.targets.wheel]
-packages = ["rickbot_agent","frontend"]
+packages = ["src/adk_sample_app", "src/frontend"]

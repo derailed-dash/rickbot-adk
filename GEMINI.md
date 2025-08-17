@@ -43,6 +43,7 @@ Alternatively, you can run the agent directly from the command line:
 
 ```bash
 # Run the agent in the console
+cd src
 uv run adk run app
 ```
 

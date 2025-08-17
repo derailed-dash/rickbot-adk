@@ -23,7 +23,7 @@ WORKDIR /app
 
 # Copy to /code/ in its own layer
 COPY ./pyproject.toml ./uv.lock* ./ 
-COPY ./adk_sample_app ./adk_sample_app
+COPY ./src/adk_sample_app ./adk_sample_app
 
 RUN uv sync --frozen
 

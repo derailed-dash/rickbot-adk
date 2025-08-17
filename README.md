@@ -54,7 +54,7 @@ source ./setup-env.sh prod
 These scripts run the following setup:
 
 ```bash
-# From rickbot-adk project folder
+# From rickbot-adk project root folder
 source .env
 
 gcloud auth login --update-adc
@@ -88,14 +88,15 @@ make install && make playground
 | `make test`             | Run unit and integration tests                                                  |
 | `make lint`             | Run code quality checks (codespell, ruff, mypy)                                 |
 | `uv run jupyter lab`    | Launch Jupyter notebook                                                         |
-| `uv run streamlit run frontend/app.py` | Launch Streamlit frontend                                        |
+| `uv run streamlit run frontend/app.py` | Launch Streamlit frontend               |
 
 For full command options and usage, refer to the [Makefile](Makefile).
 
 ### Streamlit UI
 
 ```bash
-uv run streamlit run frontend/app.py
+# from src folder
+uv run streamlit run src/frontend/streamlit_app.py
 ```
 
 ### ADK
@@ -105,13 +106,15 @@ uv run streamlit run frontend/app.py
 With CLI:
 
 ```bash
-uv run adk run rickbot_agent
+uv run adk run src/adk_sample_app
+uv run adk run src/rickbot_agent
 ```
 
 With GUI:
 
 ```bash
-uv run adk web
+# Last param is the location of the agents
+uv run adk web src
 
 # Or we can use the Agent Starter Git make aliases
 make install && make playground
@@ -120,6 +123,8 @@ make install && make playground
 ### Running in a Local Container
 
 ```bash
+# from project root directory
+
 # Get a unique version to tag our image
 export VERSION=$(git rev-parse --short HEAD)
 
@@ -139,7 +144,7 @@ docker run --rm -p 8080:8080 \
 
 ### Testing Remote
 
-Use the `adk_app_testing.ipynb` notebook.
+Use the `src/notebooks/adk_app_testing.ipynb` notebook.
 
 ## Using Agent Starter Kit for Initial Project Setup
 

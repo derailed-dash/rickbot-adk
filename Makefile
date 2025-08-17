@@ -5,18 +5,18 @@ install:
 
 # Launch local dev playground
 playground:
-	@echo "==============================================================================="
-	@echo "| 🚀 Starting your agent playground...                                        |"
-	@echo "|                                                                             |"
-	@echo "| 💡 Try asking: What's the weather in San Francisco?                         |"
-	@echo "|                                                                             |"
-	@echo "| 🔍 IMPORTANT: Select the 'adk_sample_app' folder to interact with your agent.          |"
-	@echo "==============================================================================="
-	uv run adk web --port 8501
+	@echo "================================================================================="
+	@echo "| 🚀 Starting your agent playground...                                          |"
+	@echo "|                                                                               |"
+	@echo "| 💡 Try asking: What's the weather in San Francisco?                           |"
+	@echo "|                                                                               |"
+	@echo "| 🔍 IMPORTANT: Select the 'adk_sample_app' folder to interact with your agent. |"
+	@echo "================================================================================="
+	uv run adk web --port 8501 src
 
 # Launch local development server with hot-reload
 local-backend:
-	uv run uvicorn adk_sample_app.server:app --host 0.0.0.0 --port 8000 --reload
+	uv run uvicorn adk_sample_app.server:app --app-dir src --host 0.0.0.0 --port 8000 --reload
 
 # Set up development environment resources using Terraform
 setup-dev-env:
@@ -25,7 +25,7 @@ setup-dev-env:
 
 # Run unit and integration tests
 test:
-	uv run pytest tests/unit && uv run pytest tests/integration
+	uv run pytest src/tests/unit && uv run pytest src/tests/integration
 
 # Run code quality checks (codespell, ruff, mypy)
 lint:
