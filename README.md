@@ -41,14 +41,14 @@ See my Medium articles which are intended to supplement this repo:
 
 ## Per Dev Session (Once One-Time Setup Tasks Have Been Completed)
 
-To configure your shell for a development session, **source** the `setup-env.sh` script. This will handle authentication, set the correct Google Cloud project, install dependencies, and activate the Python virtual environment.
+To configure your shell for a development session, **source** the `scripts/setup-env.sh` script. This will handle authentication, set the correct Google Cloud project, install dependencies, and activate the Python virtual environment.
 
 ```bash
 # For the Staging/Dev environment (default)
-source ./setup-env.sh
+source scripts/setup-env.sh
 
 # For the Production environment
-source ./setup-env.sh prod
+source scripts/setup-env.sh prod
 ```
 
 These scripts run the following setup:
@@ -62,10 +62,10 @@ export STAGING_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_STAGING_P
 export PROD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PRD_PROJECT --format="value(projectNumber)")
 
 # Set to $GOOGLE_CLOUD_STAGING_PROJECT or $GOOGLE_CLOUD_PRD_PROJECT as required
-export GCP_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
+export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
 
-gcloud config set project $GCP_PROJECT
-gcloud auth application-default set-quota-project $GCP_PROJECT
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
 gcloud config list project
 
 uv sync --dev --extra jupyter # Or we can use make install, from Agent Starter Kit
@@ -80,15 +80,16 @@ Install required packages and launch the local development environment:
 make install && make playground
 ```
 
-| Command                 | Description                                                                     |
-| ----------------------- | ------------------------------------------------------------------------------- |
-| `source ./setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production |
-| `make install`          | Install all required dependencies using uv                                      |
-| `make playground`       | Launch UI for testing agent locally and remotely. This runs `uv run adk web`    |
-| `make test`             | Run unit and integration tests                                                  |
-| `make lint`             | Run code quality checks (codespell, ruff, mypy)                                 |
-| `uv run jupyter lab`    | Launch Jupyter notebook                                                         |
-| `uv run streamlit run frontend/app.py` | Launch Streamlit frontend               |
+| Command                 | Description                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| `source scripts/setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production |
+| `make install`          | Install all required dependencies using uv                                            |
+| `make playground`       | Launch UI for testing agent locally and remotely. This runs `uv run adk web`          |
+| `make test`             | Run unit and integration tests                                                        |
+| `make lint`             | Run code quality checks (codespell, ruff, mypy)                                       |
+| `uv run scripts/test_rickbot_agent.py` | Run standalone rickbot_agent test script                               |
+| `uv run jupyter lab`    | Launch Jupyter notebook                                                               |
+| `uv run streamlit run src/frontend/app.py` | Launch Streamlit frontend                                          |
 
 For full command options and usage, refer to the [Makefile](Makefile).
 
@@ -135,7 +136,7 @@ docker build -t $SERVICE_NAME:$VERSION .
 # We need to pass environment variables to the container
 # and the Google Application Default Credentials (ADC)
 docker run --rm -p 8080:8080 \
-  -e GOOGLE_CLOUD_PROJECT=$GCP_PROJECT -e GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION \
+  -e GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT -e GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION \
   -e LOG_LEVEL=$LOG_LEVEL \
   -e GOOGLE_APPLICATION_CREDENTIALS="/app/.config/gcloud/application_default_credentials.json" \
   --mount type=bind,source=${HOME}/.config/gcloud,target=/app/.config/gcloud \
@@ -167,9 +168,9 @@ export GOOGLE_CLOUD_STAGING_PROJECT="your-dev-project"
 export GOOGLE_CLOUD_PRD_PROJECT="your-prod-project"
 
 # Make sure we're on the Dev / Staging project...
-export GCP_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
-gcloud config set project $GCP_PROJECT
-gcloud auth application-default set-quota-project $GCP_PROJECT
+export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
 gcloud config list project
 
 # Now let's enable some Google Cloud APIs in the project
@@ -259,9 +260,9 @@ First, one-time setup for Prod project. (To workaround issues I found with the `
 
 ```bash
 # Make sure we're on the Prod/CICD project...
-export GCP_PROJECT=$GOOGLE_CLOUD_PRD_PROJECT
-gcloud config set project $GCP_PROJECT
-gcloud auth application-default set-quota-project $GCP_PROJECT
+export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PRD_PROJECT
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
 gcloud config list project
 
 gcloud services enable \

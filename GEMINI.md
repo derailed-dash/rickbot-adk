@@ -38,7 +38,9 @@ make lint
 
 ### Environment
 
-Google Cloud configuration is achieved through a combination of `.env` and the `setup-env.sh` script.
+Google Cloud configuration is achieved through a combination of `.env` and the `scripts/setup-env.sh` script. 
+- If the environment var GOOGLE_CLOUD_PROJECT is set then it is likely that we have already run `scripts/setup-env.sh`.
+- If the environment var GOOGLE_CLOUD_PROJECT is not set, we will need to run `scripts/setup-env.sh` before performing any other actions.
 
 ## Deployment
 
@@ -64,9 +66,15 @@ The application is designed for deployment to Google Cloud's Vertex AI Agent Eng
 
 ## Documentation and Information
 
-Always consider the following sources of truth:
+- Always consider the following sources of truth:
+  - For ADK: https://google.github.io/adk-docs/
 
-- For ADK: https://google.github.io/adk-docs/
+- When completing todo actions:
+  1. Mark the action as complete.
+  2. Move the action to the TOP of the **Completed Steps** section.
+  3. Update the **Current Stage** section accordingly.
+
+---
 
 # Google Agent Development Kit (ADK) Python Cheatsheet
 

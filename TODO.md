@@ -2,13 +2,13 @@
 
 ## Current Stage
 
-Create new `rickbot_agent` agent as an ADK agent, ready to migrate existing `rickbot` functionality.
+Migrate `rickbot` Streamlit UI as `streamlit_fe`.
 
 ## Next Steps
 
-- [ ] Create `rickbot_agent` agent.
-- [ ] Migrate `rickbot` functionality to `rickbot_agent` ensuring that session, short-term memory multi-turn conversations are handled by ADK.
-- [ ] Migrate `rickbot` Streamlit UI as `streamlit_fe`
+- [ ] Migrate `rickbot` Streamlit UI as `streamlit_fe`.
+- [ ] Perform UI test for all personalities.
+- [ ] Remove sample `frontend`.
 - [ ] Create new React UI.
 - [ ] Implement OAuth login, potentially as sidecar container.
 - [ ] Ensure React UI works on mobile.
@@ -18,6 +18,9 @@ Create new `rickbot_agent` agent as an ADK agent, ready to migrate existing `ric
 
 ## Completed Steps
 
+- [x] Create unit test for multi-turn Rickbot conversation.
+- [x] Migrate `rickbot` functionality to `rickbot_agent` ensuring that session, short-term memory multi-turn conversations are handled by ADK.
+- [x] Create `rickbot_agent`.
 - [x] Refactor application into the `/src` folder
 - [x] Refactor sample agent `app` to `adk_sample_app`
 - [x] Add `setup-env.sh` to configure Google environment.

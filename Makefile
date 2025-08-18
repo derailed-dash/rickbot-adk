@@ -33,3 +33,7 @@ lint:
 	uv run ruff check . --diff
 	uv run ruff format . --check --diff
 	uv run mypy .
+
+# Run the programmatic test script
+test-rickbot-standalone:
+	uv run python scripts/test_rickbot_agent.py

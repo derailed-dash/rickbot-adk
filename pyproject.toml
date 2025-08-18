@@ -24,6 +24,8 @@ dependencies = [
     "langchain-core",
     "streamlit-feedback",
     "langchain-google-vertexai",
+    "Authlib==1.6.0",
+    "limits",
 ]
 
 requires-python = ">=3.10,<3.13"
@@ -53,7 +55,7 @@ load-test = [
 ]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py310"
 
 [tool.ruff.lint]
