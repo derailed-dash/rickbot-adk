@@ -4,15 +4,12 @@
 
 This project is "Rickbot-ADK," a multi-personality chatbot built using Google Gemini, the Agent Development Kit (ADK), and the Google Agent-Starter-Pack. It is an evolution of the original Rickbot, aiming to leverage the ADK for more advanced capabilities. The chatbot can adopt various personalities, such as Rick Sanchez, Yoda, and others.
 
-In particular:
+In particular, this project aims to evolve my previous Rickbot project by:
 
-- Adding the Google [Agent Development Kit (ADK)](https://google.github.io/adk-docs/)
-- Creating the initial project folder using the [Agent-Starter-Pack](https://googlecloudplatform.github.io/agent-starter-pack/).
+- Creating the initial project folder using the [Agent-Starter-Pack](https://googlecloudplatform.github.io/agent-starter-pack/). This includes deployment of the sample `adk_base` template from the Agent-Starter-Pack.
 - Using [Gemini CLI](https://medium.com/google-cloud/give-gemini-cli-the-ability-to-generate-images-and-video-work-with-github-repos-and-use-other-482172571f99) to help with the evolution.
-
-The project was initialized using the `agent-starter-pack`, which provides a base structure for building and deploying agents to Google Cloud.
-
-We start with the sample `adk_base` template from the Agent-Starter-Pack and then incorporate the Rickbot logic.
+- Harvesting the [Rickbot] application from my original repo [here](https://github.com/derailed-dash/rickbot).
+- Incorporating the Google [Agent Development Kit (ADK)](https://google.github.io/adk-docs/)
 
 ## Building and Running
 
@@ -23,29 +20,7 @@ We start with the sample `adk_base` template from the Agent-Starter-Pack and the
 - **Terraform:** For infrastructure as code
 - **make:** For running common development tasks
 
-Project dependencies are managed in `pyproject.toml` and can be installed using `uv`:
-
-```bash
-# Install all dependencies
-make install
-```
-
-### Local Development
-
-To run the agent locally for development and testing, use the following command:
-
-```bash
-# Launch the Streamlit web interface
-make playground
-```
-
-Alternatively, you can run the agent directly from the command line:
-
-```bash
-# Run the agent in the console
-cd src
-uv run adk run app
-```
+Project dependencies are managed in `pyproject.toml` and can be installed using `uv`. The `make` commands streamline many `uv` and `adk` commands:
 
 ### Testing
 
@@ -61,16 +36,16 @@ Linting and code quality checks can be run with:
 make lint
 ```
 
+### Environment
+
+Google Cloud configuration is achieved through a combination of `.env` and the `setup-env.sh` script.
+
 ## Deployment
 
 The application is designed for deployment to Google Cloud's Vertex AI Agent Engine. The deployment process is managed via Terraform and Google Cloud Build.
 
 - **CI/CD:** The `.cloudbuild/` directory contains configurations for CI/CD pipelines using Google Cloud Build. The `uvx agent-starter-pack setup-cicd` command is used to set up the full CI/CD pipeline.
 - **Backend Deployment:** The `make backend` command deploys the agent to the Google Cloud Run.
-
-## Application
-
-- **Agent Logic:** The core agent logic is located in `app/agent.py`.
 
 ## Infra
 
@@ -80,10 +55,18 @@ The application is designed for deployment to Google Cloud's Vertex AI Agent Eng
 
 - **Configuration:** Project dependencies and metadata are defined in `pyproject.toml`.
 - **Dependencies:** Project dependencies are managed in `pyproject.toml`. The `[project]` section defines the main dependencies, and the `[dependency-groups]` section defines development and optional dependencies.
+- **Source code:** Lives the `/src/` directory. This includes agents, frontends, notebooks and tests.
 - **Testing:** The `tests/` directory contains unit and integration tests. Tests are written using `pytest` and `pytest-asyncio`.
 - **Linting:** The project uses `ruff` for linting and formatting, `mypy` for static type checking, and `codespell` for checking for common misspellings. The configuration for these tools can be found in `pyproject.toml`.
 - **Notebooks:** The `notebooks/` directory contains Jupyter notebooks for prototyping, testing, and evaluating the agent.
+- **Agents:** The ADK agents will live in the `src/` directory.
 - **AI-Assisted Development:** The `GEMINI.md` file provides context for AI tools like Gemini CLI to assist with development.
+
+## Documentation and Information
+
+Always consider the following sources of truth:
+
+- For ADK: https://google.github.io/adk-docs/
 
 # Google Agent Development Kit (ADK) Python Cheatsheet
 
