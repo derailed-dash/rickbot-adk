@@ -37,7 +37,7 @@ The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot).
 See my Medium articles which are intended to supplement this repo:
 
 1. [Enhancing the Rickbot Multi-Personality Agentic Application - using Gemini CLI, Google Agent-Starter-Pack and the Agent Development Kit (ADK)](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24)
-1. Updating the Rickbot Multi-Personality Agentic Application - Integrate Agent Development Kit (ADK) using Gemini CLI
+1. [Updating the Rickbot Multi-Personality Agentic Application - Integrate Agent Development Kit (ADK) using Gemini CLI](https://medium.com/google-cloud/updating-the-rickbot-multi-personality-agentic-application-part-2-integrate-agent-development-ad39203e66ad)
 
 ## Per Dev Session (Once One-Time Setup Tasks Have Been Completed)
 

@@ -51,8 +51,6 @@ echo -e "${BLUE}${BOLD}--- ☁️  Configuring Google Cloud environment ---${RES
 if [ ! -f .env ]; then
 	echo -e "${RED}❌ Error: .env file not found.${RESET}"
 	echo "Please create a .env file with your project variables and run this command again."
-	echo "An example .env.example file has been created for you:"
-	echo -e "${YELLOW}GOOGLE_CLOUD_STAGING_PROJECT=your-staging-project-id\nGOOGLE_CLOUD_PRD_PROJECT=your-prod-project-id${RESET}" > .env.example
 	return 1
 fi
 
