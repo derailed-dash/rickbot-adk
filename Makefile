@@ -20,10 +20,6 @@ playground:
 local-backend:
 	uv run uvicorn adk_sample_app.server:app --app-dir src --host 0.0.0.0 --port 8000 --reload
 
-# Set up development environment resources using Terraform
-setup-env:
-	source scripts/setup-env.sh
-
 # Run unit and integration tests
 test:
 	uv run pytest src/tests/unit && uv run pytest src/tests/integration
