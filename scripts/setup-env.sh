@@ -94,10 +94,10 @@ echo -e "${BOLD}PROD_PROJECT_NUMBER:${RESET}  $PROD_PROJECT_NUMBER"
 echo -e "${BLUE}------------------------------------------${RESET}"
 
 # 6. Sync Python dependencies and activate venv
-echo "Syncing python dependencies with uv..."
-uv sync --dev --extra jupyter
-
 echo "Activating Python virtual environment..."
 source .venv/bin/activate
+
+echo "Syncing python dependencies with uv..."
+uv sync --dev --extra jupyter
 
 echo -e "\n${GREEN}✅ Environment setup complete for ${BOLD}$TARGET_ENV${RESET}${GREEN} with project ${BOLD}$GOOGLE_CLOUD_PROJECT${RESET}${GREEN}. Your shell is now configured.${RESET}"
