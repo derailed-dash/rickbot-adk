@@ -5,8 +5,11 @@ import os
 from dataclasses import dataclass
 
 import google.auth
+from dotenv import load_dotenv
 
 agent_name = os.environ.setdefault("AGENT_NAME", "rickbot_agent")
+
+load_dotenv()
 
 
 def setup_logger() -> logging.Logger:

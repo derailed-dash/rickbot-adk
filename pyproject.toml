@@ -11,13 +11,13 @@ dependencies = [
     "google-cloud-logging~=3.11.4",
     "google-cloud-aiplatform[evaluation]~=1.106.0",
     "google-cloud-secret-manager",
+    "python-dotenv",
     # Web framework
     "fastapi~=0.115.8",
     "uvicorn~=0.34.0",    
     "pyyaml>=6.0.2",
     # Frontend
     "streamlit",
-    "python-dotenv",
     "psycopg2-binary>=2.9.10",
     # Required for the sample Streamlit UI from agent-starter-pack
     "langchain",
