@@ -1,3 +1,5 @@
-from rickbot_agent.agent import root_agent
+"""Includes all shared libraries for the agent."""
 
-__all__ = ["root_agent"]
+from . import agent
+
+__all__ = ["agent"]

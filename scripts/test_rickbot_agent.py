@@ -6,13 +6,13 @@ printing the agent's final response to the console. This is useful for quick,
 programmatic validation of the agent's logic.
 """
 
+# pylint: disable=wrong-import-position
 import asyncio
 import os
 import sys
 
-# Add the project root to the Python path to allow imports from 'src'.
+# Add this folder to the Python path to allow imports from 'src'.
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
@@ -22,7 +22,9 @@ from src.rickbot_agent.agent import root_agent
 
 
 async def main():
-    """Runs the agent with a sample query."""
+    """
+    Tests the agent's ability to maintain context across a two-turn conversation.
+    """
     session_service = InMemorySessionService()
     await session_service.create_session(
         app_name="rickbot_agent", user_id="test_user", session_id="test_session"
@@ -41,7 +43,11 @@ async def main():
             ),
         ):
             if event.is_final_response():
-                if event.content and event.content.parts and len(event.content.parts) > 0:
+                if (
+                    event.content
+                    and event.content.parts
+                    and len(event.content.parts) > 0
+                ):
                     print(event.content.parts[0].text)
 
 

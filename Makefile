@@ -10,9 +10,7 @@ playground:
 	@echo "================================================================================="
 	@echo "| 🚀 Starting your agent playground...                                          |"
 	@echo "|                                                                               |"
-	@echo "| 💡 Try asking: What's the weather in San Francisco?                           |"
-	@echo "|                                                                               |"
-	@echo "| 🔍 IMPORTANT: Select the 'adk_sample_app' folder to interact with your agent. |"
+	@echo "| 🔍 Select your required agent and then interact                               |"
 	@echo "================================================================================="
 	uv run adk web --port 8501 src
 
