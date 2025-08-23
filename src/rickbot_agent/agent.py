@@ -1,3 +1,10 @@
+"""This module defines the main agent for the Rickbot-ADK application.
+
+It initializes a Google Gemini-powered agent with a specific personality (Rick)
+and equips it with tools for interaction. The agent's behavior is determined
+by a system instruction retrieved from the personality configuration.
+"""
+
 import os
 
 import google.auth

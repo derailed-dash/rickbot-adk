@@ -1,4 +1,10 @@
-"""Configure personalities for Rickbot"""
+"""
+Configure personalities for Rickbot
+
+We read a YAML file (data/personalities.yaml) to get the list of available characters.
+For each character, dynamically load the corresponding system instruction, first by looking for a local text file and then,
+if not found, by attempting to fetch it from Google Secret Manager.
+"""
 
 import logging
 import os
@@ -19,7 +25,26 @@ def get_avatar(name: str) -> str:
 
 @dataclass(unsafe_hash=True)
 class Personality:
-    """Configuration for a given personality"""
+    """Represents a distinct chatbot personality, encapsulating its configuration.
+
+    This dataclass holds all the attributes that define how a specific
+    personality (e.g., Rick, Yoda) looks, behaves, and responds. It includes
+    user-facing text, behavioral settings for the LLM, and paths to media assets.
+    The system instruction is loaded dynamically upon initialization.
+
+    Attributes:
+        name: The internal identifier for the personality (e.g., 'rick').
+        menu_name: The user-facing name for UI menus (e.g., 'Rick Sanchez').
+        title: The title displayed at the top of the chat window.
+        overview: A brief, user-facing description of the character.
+        welcome: The initial greeting message from the agent.
+        prompt_question: A sample question to prompt the user for input.
+        temperature: The creativity setting for the LLM response generation.
+        avatar: The file path to the personality's avatar image. This is
+            auto-generated during initialization.
+        system_instruction: The core prompt defining the agent's persona,
+            loaded from a file or Google Secret Manager.
+    """
 
     name: str
     menu_name: str
