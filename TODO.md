@@ -1,11 +1,8 @@
 # Rickbot-ADK To-Do List
 
-## Current Stage
-
-Migrate `rickbot` Streamlit UI as `streamlit_fe`.
-
 ## Next Steps
 
+- [ ] Evaluate frontend UI options, e.g. Streamlit and React.
 - [ ] Migrate `rickbot` Streamlit UI as `streamlit_fe`.
 - [ ] Perform UI test for all personalities.
 - [ ] Remove sample `frontend`.
