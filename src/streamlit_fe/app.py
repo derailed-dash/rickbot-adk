@@ -3,12 +3,14 @@ This is the main entry point for the Rickbot Streamlit application.
 """
 
 import asyncio
+import uuid
 from pathlib import Path
 
 import streamlit as st
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from streamlit.errors import StreamlitAPIException
+from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 from rickbot_agent.agent import get_agent  # Import the agent getter
 from rickbot_agent.personality import Personality, get_avatar, personalities
@@ -26,11 +28,10 @@ async def initialize_adk_runner(personality: Personality):
     rickbot_agent = get_agent(personality.name)
 
     session_service = InMemorySessionService()
-    session_id = st.session_state.get("session_id", "test_session")
     await session_service.create_session(
         app_name=config.app_name,
-        user_id="test_user",
-        session_id=session_id
+        user_id=st.session_state.user_id,
+        session_id=st.session_state.session_id,
     )
     return Runner(
         agent=rickbot_agent,
@@ -63,6 +64,20 @@ def main():
         rate_limiter = initialize_rate_limiter()
 
         # --- Session State Initialization ---
+        if "user_id" not in st.session_state:
+            if config.auth_required and st.user.is_logged_in:
+                st.session_state.user_id = st.user.email
+            else:
+                # No user logged in so get use Streamlit unique session ID as a stand-in for user_id
+                ctx = get_script_run_ctx()
+                st.session_state.user_id = ctx.session_id if ctx else "anonymous_user"
+
+            logger.debug(f"User ID: {st.session_state.user_id}")
+
+        if "session_id" not in st.session_state:
+            st.session_state.session_id = str(uuid.uuid4())
+            logger.debug(f"Session ID: {st.session_state.session_id}")
+
         if "current_personality" not in st.session_state:
             st.session_state.current_personality = personalities[DEFAULT_PERSONALITY]
 

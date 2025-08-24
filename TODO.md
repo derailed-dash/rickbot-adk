@@ -2,7 +2,6 @@
 
 ## Next Steps
 
-- [ ] Set session information - like user - appropriately.
 - [ ] Check for any missing logic in the original Rickbot - like rate limiting.
 - [ ] Perform UI test for all personalities.
 - [ ] Remove sample `frontend`.
@@ -15,6 +14,7 @@
 
 ## Completed Steps
 
+- [x] Set session information - like user - appropriately.
 - [x] Add GenerateContentConfig
 - [x] Evaluate frontend UI options, e.g. Streamlit and React.
 - [x] Migrate `rickbot` Streamlit UI as `streamlit_fe`.

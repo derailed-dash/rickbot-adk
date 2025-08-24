@@ -58,8 +58,8 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, ra
 
         # Call the agent runner
         async for event in runner.run_async(
-            user_id="test_user", 
-            session_id="test_session",
+            user_id=st.session_state.user_id,
+            session_id=st.session_state.session_id,
             new_message=new_message
         ):
             if event.is_final_response() and event.content and event.content.parts:
