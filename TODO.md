@@ -2,8 +2,8 @@
 
 ## Next Steps
 
-- [ ] Evaluate frontend UI options, e.g. Streamlit and React.
-- [ ] Migrate `rickbot` Streamlit UI as `streamlit_fe`.
+- [ ] Set session information - like user - appropriately.
+- [ ] Check for any missing logic in the original Rickbot - like rate limiting.
 - [ ] Perform UI test for all personalities.
 - [ ] Remove sample `frontend`.
 - [ ] Create new React UI.
@@ -15,6 +15,8 @@
 
 ## Completed Steps
 
+- [x] Evaluate frontend UI options, e.g. Streamlit and React.
+- [x] Migrate `rickbot` Streamlit UI as `streamlit_fe`.
 - [x] Create unit test for multi-turn Rickbot conversation.
 - [x] Migrate `rickbot` functionality to `rickbot_agent` ensuring that session, short-term memory multi-turn conversations are handled by ADK.
 - [x] Create `rickbot_agent`.
