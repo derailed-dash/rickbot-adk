@@ -11,7 +11,6 @@ agent_name = os.environ.setdefault("AGENT_NAME", "rickbot_agent")
 
 load_dotenv()
 
-
 def setup_logger() -> logging.Logger:
     """Sets up and configures a logger for the application."""
     log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
@@ -34,9 +33,7 @@ def setup_logger() -> logging.Logger:
 
     return app_logger
 
-
 logger = setup_logger()
-
 
 @dataclass
 class Config:
@@ -47,7 +44,6 @@ class Config:
     location: str
     model: str
     genai_use_vertexai: bool
-
 
 def get_config() -> Config:
     """Return a dictionary of the current config."""

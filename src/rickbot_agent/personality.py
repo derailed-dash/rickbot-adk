@@ -55,9 +55,7 @@ class Personality:
             with open(system_prompt_file, encoding="utf-8") as f:
                 self.system_instruction = f.read()
         else:
-            logger.info(
-                f"Unable to find {system_prompt_file}. Attempting to retrieve from Secret Manager."
-            )
+            logger.debug(f"Unable to find {system_prompt_file}. Attempting to retrieve from Secret Manager.")
             try:
                 google_project = os.environ.get("GOOGLE_CLOUD_PROJECT")
                 secret_name = f"{self.name.lower()}-system-prompt"

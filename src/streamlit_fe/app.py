@@ -8,8 +8,9 @@ from pathlib import Path
 import streamlit as st
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
+from streamlit.errors import StreamlitAPIException
 
-from rickbot_agent.agent import root_agent as initial_root_agent  # Import the base agent
+from rickbot_agent.agent import get_agent  # Import the agent getter
 from rickbot_agent.personality import Personality, personalities
 from streamlit_fe.chat import render_chat
 from streamlit_fe.st_config import config, logger
@@ -20,12 +21,8 @@ ROOT_DIR = Path(__file__).parent.parent
 DEFAULT_PERSONALITY = "Rick"
 
 async def initialize_adk_runner(personality: Personality):
-    current_personality = personality
-
-    # Create a new agent instance with the selected personality's instruction
-    # We need to create a new Agent instance because the instruction is set at initialization
-    adk_agent = initial_root_agent  # Start with the base agent
-    adk_agent.instruction = current_personality.system_instruction  # Update instruction
+    """Initialise the ADK runner with the correct agent personality."""
+    rickbot_agent = get_agent(personality.name)
 
     session_service = InMemorySessionService()
     session_id = st.session_state.get("session_id", "test_session")
@@ -35,16 +32,14 @@ async def initialize_adk_runner(personality: Personality):
         session_id=session_id
     )
     return Runner(
-        agent=adk_agent,
+        agent=rickbot_agent,
         app_name=config.app_name,
         session_service=session_service
     )
 
 
 def main():
-    """
-    Main function to run the Streamlit application.
-    """
+    """ Main function to run the Streamlit application. """
     try:
         # --- Page Configuration ---
         st.set_page_config(
@@ -64,7 +59,6 @@ def main():
 
         # --- Session State Initialization ---
         if "current_personality" not in st.session_state:
-            # st.session_state.current_personality_name = DEFAULT_PERSONALITY
             st.session_state.current_personality = personalities[DEFAULT_PERSONALITY]
 
         # Re-initialize ADK runner if personality changes or not yet initialized
@@ -85,7 +79,7 @@ def main():
             st.session_state.adk_runner
         )
 
-    except Exception as e:
+    except (StreamlitAPIException, KeyError, ValueError, TypeError, RuntimeError) as e:
         st.error(f"An unexpected error occurred: {e}")
         logger.error(f"Application error: {e}", exc_info=True)
 
