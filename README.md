@@ -83,8 +83,8 @@ make install && make playground
 | Command                 | Description                                                                           |
 | ----------------------- | ------------------------------------------------------------------------------------- |
 | `source scripts/setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production |
-| `make install`          | Install all required dependencies using uv                                            |
-| `make playground`       | Launch UI for testing agent locally and remotely. This runs `uv run adk web`          |
+| `make install`          | Install all required dependencies using `uv`                                          |
+| `make playground`       | Launch UI for testing agent locally and remotely. This runs `uv run adk web src`      |
 | `make test`             | Run unit and integration tests                                                        |
 | `make lint`             | Run code quality checks (codespell, ruff, mypy)                                       |
 | `uv run scripts/test_rickbot_agent.py` | Run standalone rickbot_agent test script                               |

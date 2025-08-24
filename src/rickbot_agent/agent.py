@@ -6,7 +6,7 @@ by a system instruction retrieved from the personality configuration.
 """
 
 from google.adk.agents import Agent
-from google.adk.tools import google_search
+from google.adk.tools import google_search  # built-in Google Search tool
 from google.genai.types import GenerateContentConfig
 
 from .config import get_config, logger
@@ -23,9 +23,12 @@ if rick_personality is None:
 
 root_agent = Agent(
     name=config.agent_name,
+    description="Rickbot is a multi-personality chatbot. Select your personality and then start a conversation",
     model=config.model,
     instruction=rick_personality.system_instruction,
     tools=[google_search],
-    # generate_content_config=GenerateContentConfig(),
+    generate_content_config=GenerateContentConfig(
+        temperature=rick_personality.temperature, top_p=1, max_output_tokens=16384
+    ),
 )
 logger.debug("root_agent initialised.")

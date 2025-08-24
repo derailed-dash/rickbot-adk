@@ -22,7 +22,7 @@ USER_AVATAR = str(ROOT_DIR / "rickbot_agent/media/morty.png")
 
 async def get_adk_response(runner: Runner, prompt: str, uploaded_file: Any):
     """
-    Handles user input and generates the bot's response using the ADK.
+    Handles user input and generates the bot's response using the Rickbot ADK agent.
     """
     # This would be a good place to add rate limiting if needed
 
@@ -55,8 +55,10 @@ async def get_adk_response(runner: Runner, prompt: str, uploaded_file: Any):
         async for event in runner.run_async(
             user_id="test_user", session_id="test_session", new_message=new_message
         ):
-            if event.is_final_response() and event.content:
-                full_response += event.content.parts[0].text
+            if event.is_final_response() and event.content and event.content.parts:
+                for part in event.content.parts:
+                    if part.text:
+                        full_response += part.text
                 response_placeholder.markdown(full_response + "▌")
         response_placeholder.markdown(full_response)
 
@@ -68,9 +70,7 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner: Runner):
     """
     Renders the main chat interface, including sidebar and chat history.
     """
-    st.session_state.current_personality = personalities[
-        st.session_state.current_personality_name
-    ]
+    st.session_state.current_personality = st.session_state.current_personality
 
     # --- Title and Introduction ---
     header_col1, header_col2 = st.columns([0.3, 0.7])
@@ -103,8 +103,8 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner: Runner):
             p for p in personalities.values() if p.menu_name == selected_menu_name
         )
 
-        if selected_personality.name != st.session_state.current_personality_name:
-            st.session_state.current_personality_name = selected_personality.name
+        if selected_personality != st.session_state.current_personality:
+            st.session_state.current_personality = selected_personality
             st.session_state.messages = []  # Reset messages on personality change
             st.rerun()
 

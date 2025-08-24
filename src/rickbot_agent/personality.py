@@ -23,7 +23,7 @@ def get_avatar(name: str) -> str:
     return str(SCRIPT_DIR / f"media/{name}.png")
 
 
-@dataclass(unsafe_hash=True)
+@dataclass(unsafe_hash=True) # Allow this to be hashable even though mutated through __post_init__
 class Personality:
     """Represents a distinct chatbot personality, encapsulating its configuration.
 
@@ -31,27 +31,14 @@ class Personality:
     personality (e.g., Rick, Yoda) looks, behaves, and responds. It includes
     user-facing text, behavioral settings for the LLM, and paths to media assets.
     The system instruction is loaded dynamically upon initialization.
-
-    Attributes:
-        name: The internal identifier for the personality (e.g., 'rick').
-        menu_name: The user-facing name for UI menus (e.g., 'Rick Sanchez').
-        title: The title displayed at the top of the chat window.
-        overview: A brief, user-facing description of the character.
-        welcome: The initial greeting message from the agent.
-        prompt_question: A sample question to prompt the user for input.
-        temperature: The creativity setting for the LLM response generation.
-        avatar: The file path to the personality's avatar image. This is
-            auto-generated during initialization.
-        system_instruction: The core prompt defining the agent's persona,
-            loaded from a file or Google Secret Manager.
     """
 
-    name: str
-    menu_name: str
-    title: str
-    overview: str
-    welcome: str
-    prompt_question: str
+    name: str  # The internal identifier for the personality (e.g., 'rick').
+    menu_name: str  # The user-facing name for UI menus (e.g., 'Rick Sanchez').
+    title: str  # The title displayed at the top of the chat window.
+    overview: str  # A brief, user-facing description of the character.
+    welcome: str  # The initial greeting message from the agent
+    prompt_question: str  # A sample question to prompt the user for input.
     temperature: float
     avatar: str = field(init=False)
     system_instruction: str = field(init=False)

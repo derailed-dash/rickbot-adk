@@ -9,20 +9,18 @@ import streamlit as st
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 
-from rickbot_agent.agent import (
-    root_agent as initial_root_agent,  # Import the base agent
-)
-from rickbot_agent.personality import personalities
+from rickbot_agent.agent import root_agent as initial_root_agent  # Import the base agent
+from rickbot_agent.personality import Personality, personalities
 from streamlit_fe.chat import render_chat
 from streamlit_fe.st_config import config, logger
 from streamlit_fe.utils import RateLimiter
 
 # Define the root path of the project
 ROOT_DIR = Path(__file__).parent.parent
+DEFAULT_PERSONALITY = "Rick"
 
-
-async def initialize_adk_runner(personality_name: str):
-    current_personality = personalities[personality_name]
+async def initialize_adk_runner(personality: Personality):
+    current_personality = personality
 
     # Create a new agent instance with the selected personality's instruction
     # We need to create a new Agent instance because the instruction is set at initialization
@@ -32,10 +30,14 @@ async def initialize_adk_runner(personality_name: str):
     session_service = InMemorySessionService()
     session_id = st.session_state.get("session_id", "test_session")
     await session_service.create_session(
-        app_name=config.app_name, user_id="test_user", session_id=session_id
+        app_name=config.app_name,
+        user_id="test_user",
+        session_id=session_id
     )
     return Runner(
-        agent=adk_agent, app_name=config.app_name, session_service=session_service
+        agent=adk_agent,
+        app_name=config.app_name,
+        session_service=session_service
     )
 
 
@@ -47,9 +49,7 @@ def main():
         # --- Page Configuration ---
         st.set_page_config(
             page_title="Rickbot",
-            page_icon=str(
-                ROOT_DIR / "rickbot_agent/media/rickbot-trans.png"
-            ),  # Rickbot logo
+            page_icon=str(ROOT_DIR / "rickbot_agent/media/rickbot-trans.png"),  # Rickbot logo
             layout="wide",
             initial_sidebar_state="expanded",
         )
@@ -63,25 +63,26 @@ def main():
         rate_limiter = RateLimiter(max_requests=5, period_seconds=60)
 
         # --- Session State Initialization ---
-        if "current_personality_name" not in st.session_state:
-            st.session_state.current_personality_name = "Rick"
+        if "current_personality" not in st.session_state:
+            # st.session_state.current_personality_name = DEFAULT_PERSONALITY
+            st.session_state.current_personality = personalities[DEFAULT_PERSONALITY]
 
         # Re-initialize ADK runner if personality changes or not yet initialized
         if (
             "adk_runner" not in st.session_state
-            or st.session_state.get("last_personality_name")
-            != st.session_state.current_personality_name
+            or st.session_state.get("last_personality") != st.session_state.current_personality
         ):
             st.session_state.adk_runner = asyncio.run(
-                initialize_adk_runner(st.session_state.current_personality_name)
+                initialize_adk_runner(st.session_state.current_personality)
             )
-            st.session_state.last_personality_name = (
-                st.session_state.current_personality_name
-            )
+            st.session_state.last_personality = (st.session_state.current_personality)
 
         # --- Render Chat Interface ---
         render_chat(
-            config, rate_limiter, config.rate_limit, st.session_state.adk_runner
+            config,
+            rate_limiter,
+            config.rate_limit,
+            st.session_state.adk_runner
         )
 
     except Exception as e:
