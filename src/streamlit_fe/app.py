@@ -11,7 +11,7 @@ from google.adk.sessions import InMemorySessionService
 from streamlit.errors import StreamlitAPIException
 
 from rickbot_agent.agent import get_agent  # Import the agent getter
-from rickbot_agent.personality import Personality, personalities
+from rickbot_agent.personality import Personality, get_avatar, personalities
 from streamlit_fe.chat import render_chat
 from streamlit_fe.st_config import config, logger
 from streamlit_fe.st_utils import RateLimiter
@@ -19,6 +19,7 @@ from streamlit_fe.st_utils import RateLimiter
 # Define the root path of the project
 ROOT_DIR = Path(__file__).parent.parent
 DEFAULT_PERSONALITY = "Rick"
+RICKBOT_AVATAR = get_avatar("rickbot-trans")
 
 async def initialize_adk_runner(personality: Personality):
     """Initialise the ADK runner with the correct agent personality."""
@@ -37,6 +38,10 @@ async def initialize_adk_runner(personality: Personality):
         session_service=session_service
     )
 
+@st.cache_resource # Ensure this rate limiter is share d across all user sessions and reruns
+def initialize_rate_limiter():
+    """ Initialize the rate limiter. """
+    return RateLimiter(config.rate_limit_qpm)
 
 def main():
     """ Main function to run the Streamlit application. """
@@ -44,7 +49,7 @@ def main():
         # --- Page Configuration ---
         st.set_page_config(
             page_title="Rickbot",
-            page_icon=str(ROOT_DIR / "rickbot_agent/media/rickbot-trans.png"),  # Rickbot logo
+            page_icon=RICKBOT_AVATAR,  # Rickbot logo
             layout="wide",
             initial_sidebar_state="expanded",
         )
@@ -55,7 +60,7 @@ def main():
             st.stop()
 
         # --- Rate Limiting ---
-        rate_limiter = RateLimiter(max_requests=5, period_seconds=60)
+        rate_limiter = initialize_rate_limiter()
 
         # --- Session State Initialization ---
         if "current_personality" not in st.session_state:
@@ -75,14 +80,12 @@ def main():
         render_chat(
             config,
             rate_limiter,
-            config.rate_limit,
             st.session_state.adk_runner
         )
 
     except (StreamlitAPIException, KeyError, ValueError, TypeError, RuntimeError) as e:
         st.error(f"An unexpected error occurred: {e}")
         logger.error(f"Application error: {e}", exc_info=True)
-
 
 if __name__ == "__main__":
     main()

@@ -40,30 +40,27 @@ def setup_logger() -> logging.Logger:
 
 logger = setup_logger()
 
-
 @dataclass
 class Config:
     """Configuration for the application, loaded from environment variables."""
 
     app_name: str
     auth_required: bool
-    rate_limit: int
-
+    rate_limit_qpm: int # queries per minute
 
 @st.cache_resource
 def get_config() -> Config:
     """Returns the application configuration."""
     auth_required = os.environ.get("AUTH_REQUIRED", "false").lower() == "true"
-    rate_limit = int(os.environ.get("RATE_LIMIT", "20"))
+    rate_limit = int(os.environ.get("RATE_LIMIT", "20")) # Set a low rate limit by default
 
     logger.debug(f"Auth required: {auth_required}")
-    logger.debug(f"Rate limit: {rate_limit}")
+    logger.debug(f"Rate limit: {rate_limit} qpm")
 
     return Config(
         app_name=app_name,
         auth_required=auth_required,
-        rate_limit=rate_limit,
+        rate_limit_qpm=rate_limit,
     )
-
 
 config = get_config()

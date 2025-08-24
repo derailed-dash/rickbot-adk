@@ -14,17 +14,24 @@ from google.adk.runners import Runner
 from google.genai.types import Blob, Content, Part
 
 from rickbot_agent.personality import personalities
+from streamlit_fe.st_utils import RateLimiter
 
 # Define the root path of the project
 ROOT_DIR = Path(__file__).parent.parent
 USER_AVATAR = str(ROOT_DIR / "rickbot_agent/media/morty.png")
 
 
-async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any):
+async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, rate_limiter: RateLimiter):
     """
     Handles user input and generates the bot's response using the Rickbot ADK agent.
     """
-    # This would be a good place to add rate limiting if needed
+    # --- Rate Limiting Check ---
+    # Perform this check *before* modifying session state or displaying the user's prompt
+    if not rate_limiter.hit("rickbot"):
+        st.warning(
+            "Whoa, slow down there! Give me a minute."
+        )
+        st.stop()  # Stop execution to prevent the message from being processed
 
     # Append user message to session state
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -68,7 +75,7 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 
-def render_chat(config, rate_limiter, rate_limit, adk_runner: Runner):
+def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
     """
     Renders the main chat interface, including sidebar and chat history.
     """
@@ -143,4 +150,4 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner: Runner):
 
     # Handle new user input
     if prompt := st.chat_input(st.session_state.current_personality.prompt_question):
-        asyncio.run(get_agent_response(adk_runner, prompt, uploaded_file))
+        asyncio.run(get_agent_response(adk_runner, prompt, uploaded_file, rate_limiter))
