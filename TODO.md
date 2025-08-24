@@ -2,6 +2,7 @@
 
 ## Next Steps
 
+- [ ] Add GenerateContentConfig
 - [ ] Set session information - like user - appropriately.
 - [ ] Check for any missing logic in the original Rickbot - like rate limiting.
 - [ ] Perform UI test for all personalities.

@@ -7,6 +7,7 @@ by a system instruction retrieved from the personality configuration.
 
 from google.adk.agents import Agent
 from google.adk.tools import google_search
+from google.genai.types import GenerateContentConfig
 
 from .config import get_config, logger
 from .personality import personalities
@@ -25,5 +26,6 @@ root_agent = Agent(
     model=config.model,
     instruction=rick_personality.system_instruction,
     tools=[google_search],
+    # generate_content_config=GenerateContentConfig(),
 )
 logger.debug("root_agent initialised.")
