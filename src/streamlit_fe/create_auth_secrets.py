@@ -11,7 +11,6 @@ from google.cloud import secretmanager
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 def retrieve_secret(project_id: str, secret_id: str, version_id: str = "latest") -> str:
     """
     Access the payload for the given secret version and return it.
@@ -22,7 +21,6 @@ def retrieve_secret(project_id: str, secret_id: str, version_id: str = "latest")
     response = client.access_secret_version(request={"name": name})
     payload = response.payload.data.decode("UTF-8")
     return payload
-
 
 @st.cache_resource
 def create_secrets_toml(google_project_id: str):
@@ -49,10 +47,9 @@ def create_secrets_toml(google_project_id: str):
             f"Error accessing secret '{secret_name}' from Secret Manager: {e}"
         ) from e
 
-
 if __name__ == "__main__":
-    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
-    if project_id:
-        create_secrets_toml(project_id)
+    prj_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    if prj_id:
+        create_secrets_toml(prj_id)
     else:
         logger.error("GOOGLE_CLOUD_PROJECT environment variable not set.")

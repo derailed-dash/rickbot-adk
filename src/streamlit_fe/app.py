@@ -14,7 +14,7 @@ from rickbot_agent.agent import get_agent  # Import the agent getter
 from rickbot_agent.personality import Personality, personalities
 from streamlit_fe.chat import render_chat
 from streamlit_fe.st_config import config, logger
-from streamlit_fe.utils import RateLimiter
+from streamlit_fe.st_utils import RateLimiter
 
 # Define the root path of the project
 ROOT_DIR = Path(__file__).parent.parent

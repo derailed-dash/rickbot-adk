@@ -1,8 +1,7 @@
-"""This module defines the main agent for the Rickbot-ADK application.
-
-It initializes a Google Gemini-powered agent with a specific personality (Rick)
-and equips it with tools for interaction. The agent's behavior is determined
-by a system instruction retrieved from the personality configuration.
+"""
+This module defines the main agent for the Rickbot-ADK application.
+It initializes a set of Google Gemini-powered agent, each loaded from a specific personality.
+We then cache these agents for fast retrieval.
 """
 
 from google.adk.agents import Agent
@@ -26,7 +25,7 @@ def create_agent(personality: Personality) -> Agent:
         instruction=personality.system_instruction,
         tools=[google_search],
         generate_content_config=GenerateContentConfig(
-            temperature=personality.temperature, top_p=1, max_output_tokens=16384
+            temperature=personality.temperature, top_p=1, max_output_tokens=8192
         ),
     )
 

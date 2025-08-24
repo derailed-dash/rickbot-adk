@@ -20,7 +20,7 @@ ROOT_DIR = Path(__file__).parent.parent
 USER_AVATAR = str(ROOT_DIR / "rickbot_agent/media/morty.png")
 
 
-async def get_adk_response(runner: Runner, prompt: str, uploaded_file: Any):
+async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any):
     """
     Handles user input and generates the bot's response using the Rickbot ADK agent.
     """
@@ -38,27 +38,29 @@ async def get_adk_response(runner: Runner, prompt: str, uploaded_file: Any):
     if uploaded_file:
         message_parts.append(
             Part(
-                inline_data=Blob(
-                    data=uploaded_file.getvalue(), mime_type=uploaded_file.type
-                )
+                inline_data=Blob(data=uploaded_file.getvalue(), mime_type=uploaded_file.type)
             )
         )
 
     new_message = Content(role="user", parts=message_parts)
 
-    # Generate and display the ADK agent's response
-    with st.chat_message(
-        "assistant", avatar=st.session_state.current_personality.avatar
-    ):
-        response_placeholder = st.empty()
+    # Generate and display the agent's response
+    with st.chat_message("assistant", avatar=st.session_state.current_personality.avatar):
+        response_placeholder = st.empty() # empty invisible container for retrieving streamed content
         full_response = ""
+
+        # Call the agent runner
         async for event in runner.run_async(
-            user_id="test_user", session_id="test_session", new_message=new_message
+            user_id="test_user", 
+            session_id="test_session",
+            new_message=new_message
         ):
             if event.is_final_response() and event.content and event.content.parts:
-                for part in event.content.parts:
+                for part in event.content.parts: # retrieve the response in parts
                     if part.text:
                         full_response += part.text
+                # Visual trick!
+                # Add the block element - a similated cursor - whilst the agent is still streaming the response
                 response_placeholder.markdown(full_response + "▌")
         response_placeholder.markdown(full_response)
 
@@ -141,4 +143,4 @@ def render_chat(config, rate_limiter, rate_limit, adk_runner: Runner):
 
     # Handle new user input
     if prompt := st.chat_input(st.session_state.current_personality.prompt_question):
-        asyncio.run(get_adk_response(adk_runner, prompt, uploaded_file))
+        asyncio.run(get_agent_response(adk_runner, prompt, uploaded_file))
