@@ -33,8 +33,14 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, ra
         )
         st.stop()  # Stop execution to prevent the message from being processed
 
-    # Append user message to session state
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    # Create the user message object, including any attachments
+    user_message: dict[str, Any] = {"role": "user", "content": prompt}
+    if uploaded_file:
+        user_message["attachment"] = {
+            "data": uploaded_file.getvalue(),
+            "mime_type": uploaded_file.type or "",
+        }
+    st.session_state.messages.append(user_message)
 
     # Display user message and attachment in the chat
     with st.chat_message("user", avatar=USER_AVATAR):
@@ -90,15 +96,20 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
     """
     st.session_state.current_personality = st.session_state.current_personality
 
+    # --- Session State Initialization ---
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    if "file_just_uploaded" not in st.session_state:
+        st.session_state.file_just_uploaded = False
+
+    def on_file_change():
+        st.session_state.file_just_uploaded = True
+
     # --- Title and Introduction ---
     header_col1, header_col2 = st.columns([0.3, 0.7])
     header_col1.image(st.session_state.current_personality.avatar, width=140)
     header_col2.title(f"{st.session_state.current_personality.title}")
     st.caption(st.session_state.current_personality.welcome)
-
-    # --- Session State Initialization ---
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
 
     # --- Sidebar for Configuration ---
     with st.sidebar:
@@ -131,6 +142,7 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
         uploaded_file = st.file_uploader(
             "Upload a file.",
             type=["png", "jpg", "jpeg", "pdf", "mp3", "mp4", "mov", "webm"],
+            on_change=on_file_change,
         )
 
         if st.button("Clear Chat History", use_container_width=True):
@@ -155,8 +167,18 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
             else st.session_state.current_personality.avatar
         )
         with st.chat_message(message["role"], avatar=avatar):
+            if attachment := message.get("attachment"):
+                if "image" in attachment.get("mime_type", ""):
+                    st.image(attachment["data"])
+                elif "video" in attachment.get("mime_type", ""):
+                    st.video(attachment["data"])
             st.markdown(message["content"])
 
     # Handle new user input
     if prompt := st.chat_input(st.session_state.current_personality.prompt_question):
-        asyncio.run(get_agent_response(adk_runner, prompt, uploaded_file, rate_limiter))
+        file_to_process = None
+        if st.session_state.get("file_just_uploaded"):
+            file_to_process = uploaded_file
+            st.session_state.file_just_uploaded = False # Consume the flag
+        
+        asyncio.run(get_agent_response(adk_runner, prompt, file_to_process, rate_limiter))
