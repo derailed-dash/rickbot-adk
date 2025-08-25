@@ -37,6 +37,7 @@ async def test_rickbot_agent_response():
         if event.is_final_response():
             if event.content and event.content.parts and len(event.content.parts) > 0:
                 response_text = event.content.parts[0].text
+                print(f"Response: {response_text}")
             else:
                 response_text = ""
             break
@@ -63,6 +64,7 @@ async def test_rickbot_agent_two_turn_conversation():
     queries = ["Hello, my name is Dazbo", "What is my name?"]
     responses = []
     for query in queries:
+        print(f"Query: {query}")
         response_text = ""
         async for event in runner.run_async(
             user_id="test_user",
@@ -78,6 +80,7 @@ async def test_rickbot_agent_two_turn_conversation():
                     and len(event.content.parts) > 0
                 ):
                     response_text = event.content.parts[0].text
+                    print(f"Response: {response_text}")
                 else:
                     response_text = ""
                 break

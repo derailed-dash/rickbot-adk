@@ -69,12 +69,9 @@ The application is designed for deployment to Google Cloud's Vertex AI Agent Eng
 Always consider the following sources of information when asked about these topics. Use the web fetch to read them:
 
 - For ADK: 
-  - The official docs: https://google.github.io/adk-docs/
+  - The official docs in the adk-docs directory.
   - Design patterns: https://medium.com/google-cloud/agent-patterns-with-adk-1-agent-5-ways-58bff801c2d6
   - Multi-agent intro guide: https://medium.com/@sokratis.kartakis/from-zero-to-multi-agents-a-beginners-guide-to-google-agent-development-kit-adk-b56e9b5f7861
-- For ADK integration with Streamlit:
-  - https://medium.com/@ketanraaz/build-your-agent-a-deep-dive-into-google-adk-and-streamlit-integration-cee9d79164e4
-  - https://bibek-poudel.medium.com/create-your-own-ai-agent-with-googles-agent-development-kit-adk-e2294836e0fa
 - For Streamlit:
   - OAuth with Google Auth Platform: https://docs.streamlit.io/develop/tutorials/authentication/google
 
