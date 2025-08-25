@@ -17,6 +17,7 @@
 
 ## Completed Steps
 
+- [x] Add OAuth secret to Secret Manager
 - [x] Set Prod service to `--allow-unauthenticated` since it will be public facing and use OAuth. Staging service will require IAP.
 - [x] Set session information - like user - appropriately.
 - [x] Add GenerateContentConfig

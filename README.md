@@ -12,6 +12,8 @@ Author: Darren Lester
 - [Useful Commands](#useful-commands)
   - [Streamlit UI](#streamlit-ui)
   - [ADK](#adk)
+    - [Testing Locally](#testing-locally)
+    - [Testing Remote](#testing-remote)
   - [Running in a Local Container](#running-in-a-local-container)
 - [Using Agent Starter Kit for Initial Project Setup](#using-agent-starter-kit-for-initial-project-setup)
   - [Pre-Reqs](#pre-reqs)
@@ -80,16 +82,16 @@ Install required packages and launch the local development environment:
 make install && make playground
 ```
 
-| Command                 | Description                                                                           |
-| ----------------------- | ------------------------------------------------------------------------------------- |
-| `source scripts/setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production |
-| `make install`          | Install all required dependencies using `uv`                                          |
-| `make playground`       | Launch UI for testing agent locally and remotely. This runs `uv run adk web src`      |
-| `make test`             | Run unit and integration tests                                                        |
-| `make lint`             | Run code quality checks (codespell, ruff, mypy)                                       |
-| `uv run scripts/test_rickbot_agent.py` | Run standalone rickbot_agent test script                               |
-| `uv run jupyter lab`    | Launch Jupyter notebook                                                               |
-| `uv run streamlit run src/frontend/app.py` | Launch Streamlit frontend                                          |
+| Command                       | Description                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------------- |
+| `source scripts/setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production       |
+| `make install`                | Install all required dependencies using `uv`                                          |
+| `make playground`             | Launch UI for testing agent locally and remotely. This runs `uv run adk web src`      |
+| `make test`                   | Run unit and integration tests                                                        |
+| `make lint`                   | Run code quality checks (codespell, ruff, mypy)                                       |
+| `uv run scripts/test_rickbot_agent.py` | Run standalone rickbot_agent test script                                     |
+| `uv run jupyter lab`          | Launch Jupyter notebook                                                               |
+| `uv run streamlit run src/frontend/app.py` | Launch Streamlit frontend                                                |
 
 For full command options and usage, refer to the [Makefile](Makefile).
 
@@ -309,4 +311,6 @@ terraform plan -var-file="vars/env.tfvars" -out out.tfplan
 
 # Check the TF plan then apply
 terraform apply "out.tfplan"
+```
+
 ```
