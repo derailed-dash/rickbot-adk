@@ -36,8 +36,14 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, ra
     # Append user message to session state
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # Display user message
+    # Display user message and attachment in the chat
     with st.chat_message("user", avatar=USER_AVATAR):
+        if uploaded_file:
+            mime_type = uploaded_file.type or ""
+            if "image" in mime_type:
+                st.image(uploaded_file.getvalue())
+            elif "video" in mime_type:
+                st.video(uploaded_file.getvalue())
         st.markdown(prompt)
 
     # Prepare the message for the ADK
@@ -52,24 +58,27 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, ra
     new_message = Content(role="user", parts=message_parts)
 
     # Generate and display the agent's response
-    with st.chat_message("assistant", avatar=st.session_state.current_personality.avatar):
-        response_placeholder = st.empty() # empty invisible container for retrieving streamed content
-        full_response = ""
+    with st.status("Thinking...", expanded=True) as bot_status:
+        with st.chat_message("assistant", avatar=st.session_state.current_personality.avatar):
+            response_placeholder = st.empty() # empty invisible container for retrieving streamed content
+            full_response = ""
 
-        # Call the agent runner
-        async for event in runner.run_async(
-            user_id=st.session_state.user_id,
-            session_id=st.session_state.session_id,
-            new_message=new_message
-        ):
-            if event.is_final_response() and event.content and event.content.parts:
-                for part in event.content.parts: # retrieve the response in parts
-                    if part.text:
-                        full_response += part.text
-                # Visual trick!
-                # Add the block element - a similated cursor - whilst the agent is still streaming the response
-                response_placeholder.markdown(full_response + "▌")
-        response_placeholder.markdown(full_response)
+            # Call the agent runner
+            async for event in runner.run_async(
+                user_id=st.session_state.user_id,
+                session_id=st.session_state.session_id,
+                new_message=new_message
+            ):
+                if event.is_final_response() and event.content and event.content.parts:
+                    for part in event.content.parts: # retrieve the response in parts
+                        if part.text:
+                            full_response += part.text
+                    # Visual trick!
+                    # Add the block element - a similated cursor - whilst the agent is still streaming the response
+                    response_placeholder.markdown(full_response + "▌")
+
+            bot_status.update(label="Done.", state="complete")
+            response_placeholder.markdown(full_response)
 
     # Add the full bot response to the session state
     st.session_state.messages.append({"role": "assistant", "content": full_response})

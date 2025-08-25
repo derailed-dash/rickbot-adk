@@ -8,8 +8,11 @@ import google.auth
 from dotenv import load_dotenv
 
 agent_name = os.environ.setdefault("AGENT_NAME", "rickbot_agent")
-
 load_dotenv()
+
+# Suppress verbose logging from ADK and GenAI libraries - INFO logging is quite verbose
+logging.getLogger("google_adk").setLevel(logging.WARNING)
+logging.getLogger("google_genai").setLevel(logging.WARNING)
 
 def setup_logger() -> logging.Logger:
     """Sets up and configures a logger for the application."""
