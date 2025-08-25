@@ -18,7 +18,7 @@ streamlit:
 	@echo "================================================================================="
 	@echo "| 🚀 Launching Streamlit FE...                                                  |"
 	@echo "================================================================================="
-	uv run streamlit run src/streamlit_fe/app.py
+	uv run -- streamlit run src/streamlit_fe/app.py
 
 # Launch local development server with hot-reload
 local-backend:

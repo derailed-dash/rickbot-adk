@@ -180,5 +180,5 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
         if st.session_state.get("file_just_uploaded"):
             file_to_process = uploaded_file
             st.session_state.file_just_uploaded = False # Consume the flag
-        
+
         asyncio.run(get_agent_response(adk_runner, prompt, file_to_process, rate_limiter))

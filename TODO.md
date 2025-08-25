@@ -2,7 +2,6 @@
 
 ## Next Steps
 
-- [ ] Create and execute Streamlit UI test for all personalities.
 - [ ] Update dockerfile and deployment to deploy Streamlit_fe
 - [ ] Configure OAuth Client in Prod project.
 - [ ] Ensure OAuth secrets are set.
@@ -18,6 +17,7 @@
 
 ## Completed Steps
 
+- [x] Create and execute Streamlit UI test for all personalities.
 - [x] Check for any missing logic in the original Rickbot - like rate limiting.
 - [x] Configure OAuth Client in Staging project.
 - [x] Add OAuth secret to Secret Manager

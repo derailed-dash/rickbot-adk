@@ -40,7 +40,7 @@ async def initialize_adk_runner(personality: Personality):
         session_service=session_service
     )
 
-@st.cache_resource # Ensure this rate limiter is share d across all user sessions and reruns
+@st.cache_resource # Ensure this rate limiter is shared across all user sessions and reruns
 def initialize_rate_limiter():
     """ Initialize the rate limiter. """
     return RateLimiter(config.rate_limit_qpm)
