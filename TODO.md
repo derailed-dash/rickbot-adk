@@ -4,6 +4,9 @@
 
 - [ ] Check for any missing logic in the original Rickbot - like rate limiting.
 - [ ] Perform UI test for all personalities.
+- [ ] Ensure OAuth secrets are set.
+- [ ] Implement OAuth with Google Auth and provide a way to test unauthenticated flow
+- [ ] Update DNS to point to Prod Rickbot Streamlit service
 - [ ] Remove sample `frontend`.
 - [ ] Create new React UI.
 - [ ] Implement OAuth login, potentially as sidecar container.
@@ -14,6 +17,7 @@
 
 ## Completed Steps
 
+- [x] Set Prod service to `--allow-unauthenticated` since it will be public facing and use OAuth. Staging service will require IAP.
 - [x] Set session information - like user - appropriately.
 - [x] Add GenerateContentConfig
 - [x] Evaluate frontend UI options, e.g. Streamlit and React.

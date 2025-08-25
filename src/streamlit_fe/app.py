@@ -15,6 +15,7 @@ from streamlit.runtime.scriptrunner import get_script_run_ctx
 from rickbot_agent.agent import get_agent  # Import the agent getter
 from rickbot_agent.personality import Personality, get_avatar, personalities
 from streamlit_fe.chat import render_chat
+from streamlit_fe.create_auth_secrets import create_secrets_toml
 from streamlit_fe.st_config import config, logger
 from streamlit_fe.st_utils import RateLimiter
 
@@ -46,20 +47,52 @@ def initialize_rate_limiter():
 
 def main():
     """ Main function to run the Streamlit application. """
-    try:
-        # --- Page Configuration ---
-        st.set_page_config(
-            page_title="Rickbot",
-            page_icon=RICKBOT_AVATAR,  # Rickbot logo
-            layout="wide",
-            initial_sidebar_state="expanded",
-        )
+    # --- Page Configuration ---
+    st.set_page_config(
+        page_title="Rickbot",
+        page_icon=RICKBOT_AVATAR,  # Rickbot logo
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
 
-        # --- Authentication Check ---
-        if config.auth_required and not st.user.is_logged_in:
-            st.error("Please log in to access this application.")
+    if "current_personality" not in st.session_state:
+        st.session_state.current_personality = personalities[DEFAULT_PERSONALITY]
+
+    # --- Authentication Check ---
+    if config.auth_required:
+        try:
+            create_secrets_toml(config.google_project_id) # Do once and cache
+        except ValueError as e:
+            logger.error(f"Failed to setup auth: {e}", exc_info=True)
+            st.error(f"⚠️ Could not initialize the application. Please check your configuration. Error: {e}" )
             st.stop()
 
+        # If the user isn't logged in, show the unauthenticated welcome screen
+        if not st.user.is_logged_in:
+            header_col1, header_col2 = st.columns([0.3, 0.7])
+            header_col1.image(RICKBOT_AVATAR, width=140)
+            header_col2.title(f"{st.session_state.current_personality.title}")
+
+            st.divider()
+            st.markdown(
+                "Rickbot is a chat application. Chat with Rick, ask your questions, and feel free to upload content as part of your discussion. Rickbot also offers multiple other personalities to interact with."
+            )
+            st.markdown(
+                ":eyes: We do not store any user data, prompts or responses. Read our [Privacy Policy](/privacy_policy)."
+            )
+            st.divider()
+            st.markdown(
+                ":lock: Please login to use Rickbot. Any Google account will do. Login helps us prevent abuse and maintain a stable, accessible experience for everyone."
+            )
+            if st.button("Log in with Google", use_container_width=True):
+                st.login()
+        else: # We are authenticated
+            authenticated_flow()
+    else: # No authentication required - go straight to authenticated page
+        authenticated_flow()
+
+def authenticated_flow():
+    try:
         # --- Rate Limiting ---
         rate_limiter = initialize_rate_limiter()
 
@@ -77,9 +110,6 @@ def main():
         if "session_id" not in st.session_state:
             st.session_state.session_id = str(uuid.uuid4())
             logger.debug(f"Session ID: {st.session_state.session_id}")
-
-        if "current_personality" not in st.session_state:
-            st.session_state.current_personality = personalities[DEFAULT_PERSONALITY]
 
         # Re-initialize ADK runner if personality changes or not yet initialized
         if (

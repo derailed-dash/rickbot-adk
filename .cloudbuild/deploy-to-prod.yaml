@@ -28,6 +28,7 @@ steps:
       - '--cpu-boost'
       - '--set-env-vars=GOOGLE_CLOUD_PROJECT=$_PROD_PROJECT_ID,GOOGLE_CLOUD_REGION=$_REGION,LOG_LEVEL=$_LOG_LEVEL,AUTH_REQUIRED=$_AUTH_REQUIRED,RATE_LIMIT=$_RATE_LIMIT'
       - '--service-account=$_SERVICE_NAME-app-sa@$_PROD_PROJECT_ID.iam.gserviceaccount.com'
+      - '--allow-unauthenticated' # Allow unauthenticated invocations - end user will perform OAuth
 
 substitutions:
   _PROD_PROJECT_ID: YOUR_PROD_PROJECT_ID
