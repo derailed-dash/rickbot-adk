@@ -4,6 +4,8 @@
 
 - [ ] Check for any missing logic in the original Rickbot - like rate limiting.
 - [ ] Perform UI test for all personalities.
+- [ ] Update dockerfile and deployment to deploy Streamlit_fe
+- [ ] Configure OAuth Client in Prod project.
 - [ ] Ensure OAuth secrets are set.
 - [ ] Implement OAuth with Google Auth and provide a way to test unauthenticated flow
 - [ ] Update DNS to point to Prod Rickbot Streamlit service
@@ -17,6 +19,7 @@
 
 ## Completed Steps
 
+- [x] Configure OAuth Client in Staging project.
 - [x] Add OAuth secret to Secret Manager
 - [x] Set Prod service to `--allow-unauthenticated` since it will be public facing and use OAuth. Staging service will require IAP.
 - [x] Set session information - like user - appropriately.

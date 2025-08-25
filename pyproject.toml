@@ -19,13 +19,13 @@ dependencies = [
     # Frontend
     "streamlit",
     "psycopg2-binary>=2.9.10",
+    "Authlib==1.6.0",
+    "limits",
     # Required for the sample Streamlit UI from agent-starter-pack
     "langchain",
     "langchain-core",
     "streamlit-feedback",
     "langchain-google-vertexai",
-    "Authlib==1.6.0",
-    "limits",
 ]
 
 requires-python = ">=3.10,<3.13"

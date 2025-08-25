@@ -140,6 +140,12 @@ dmypy.json
 # PyCharm
 .idea
 
+# secrets
+*.key
+.gitsecret/keys/random_seed
+secrets.toml
+secrets.toml*
+
 # Terraform
 .terraform*
 .Terraform*
