@@ -58,7 +58,7 @@ The application is designed for deployment to Google Cloud's Vertex AI Agent Eng
 - **Configuration:** Project dependencies and metadata are defined in `pyproject.toml`.
 - **Dependencies:** Project dependencies are managed in `pyproject.toml`. The `[project]` section defines the main dependencies, and the `[dependency-groups]` section defines development and optional dependencies.
 - **Source code:** Lives the `/src/` directory. This includes agents, frontends, notebooks and tests.
-- **Testing:** The `tests/` directory contains unit and integration tests. Tests are written using `pytest` and `pytest-asyncio`.
+- **Testing:** The `src/tests/` directory contains unit and integration tests. Tests are written using `pytest` and `pytest-asyncio`.
 - **Linting:** The project uses `ruff` for linting and formatting, `mypy` for static type checking, and `codespell` for checking for common misspellings. The configuration for these tools can be found in `pyproject.toml`.
 - **Notebooks:** The `notebooks/` directory contains Jupyter notebooks for prototyping, testing, and evaluating the agent.
 - **Agents:** The ADK agents will live in the `src/` directory.

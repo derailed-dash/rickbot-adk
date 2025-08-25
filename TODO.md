@@ -2,7 +2,7 @@
 
 ## Next Steps
 
-- [ ] Perform UI test for all personalities.
+- [ ] Create and execute Streamlit UI test for all personalities.
 - [ ] Update dockerfile and deployment to deploy Streamlit_fe
 - [ ] Configure OAuth Client in Prod project.
 - [ ] Ensure OAuth secrets are set.
