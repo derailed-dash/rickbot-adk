@@ -14,6 +14,12 @@ playground:
 	@echo "================================================================================="
 	uv run adk web --port 8501 src
 
+streamlit:
+	@echo "================================================================================="
+	@echo "| 🚀 Launching Streamlit FE...                                                  |"
+	@echo "================================================================================="
+	uv run streamlit run src/streamlit_fe/app.py
+
 # Launch local development server with hot-reload
 local-backend:
 	uv run uvicorn adk_sample_app.server:app --app-dir src --host 0.0.0.0 --port 8000 --reload
