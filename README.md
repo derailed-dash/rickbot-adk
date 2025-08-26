@@ -132,10 +132,6 @@ make install && make playground
 # Get a unique version to tag our image
 export VERSION=$(git rev-parse --short HEAD)
 
-# Load any additional env vars required by the container. E.g.
-source src/rickbot_agent/.env
-source src/streamlit_fe/.env
-
 # To build as a container image
 docker build -t $SERVICE_NAME:$VERSION .
 

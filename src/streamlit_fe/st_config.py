@@ -7,13 +7,8 @@ import os
 from dataclasses import dataclass
 
 import streamlit as st
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
 
 app_name = os.environ.setdefault("APP_NAME", "rickbot_st_ui")
-
 
 def setup_logger() -> logging.Logger:
     """Sets up and configures a logger for the application."""
