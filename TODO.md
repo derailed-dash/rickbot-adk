@@ -2,17 +2,17 @@
 
 ## Next Steps
 
+- [ ] Implement a way to test unauthenticated flow.
 - [ ] Configure OAuth Client in Prod project.
-- [ ] Ensure OAuth secrets are set.
-- [ ] Implement OAuth with Google Auth and provide a way to test unauthenticated flow
+- [ ] Ensure OAuth secrets are set in Prod.
 - [ ] Update CI/CD to deploy to Prod
 - [ ] Update DNS to point to Prod Rickbot Streamlit service
-- [ ] Create new React UI.
-- [ ] Implement OAuth login, potentially as sidecar container.
-- [ ] Ensure React UI works on mobile.
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
 - [ ] Extend Dazbot to have knowledge.
+- [ ] Create new React UI.
+- [ ] Implement OAuth login, potentially as sidecar container.
+- [ ] Ensure React UI works on mobile.
 
 ## Completed Steps
 
