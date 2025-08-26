@@ -19,6 +19,8 @@ resource "google_cloudbuild_trigger" "pr_checks" {
     "data_ingestion/**",
     "deployment/**",
     "uv.lock",
+    "Dockerfile",
+    "pyproject.toml"
   ]
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
   depends_on = [

@@ -324,4 +324,3 @@ terraform plan -var-file="vars/env.tfvars" -out out.tfplan
 terraform apply "out.tfplan"
 ```
 
-```
