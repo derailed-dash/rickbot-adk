@@ -132,6 +132,10 @@ make install && make playground
 # Get a unique version to tag our image
 export VERSION=$(git rev-parse --short HEAD)
 
+# Load any additional env vars required by the container. E.g.
+source src/rickbot_agent/.env
+source src/streamlit_fe/.env
+
 # To build as a container image
 docker build -t $SERVICE_NAME:$VERSION .
 
@@ -141,6 +145,12 @@ docker build -t $SERVICE_NAME:$VERSION .
 docker run --rm -p 8080:8080 \
   -e GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT -e GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION \
   -e LOG_LEVEL=$LOG_LEVEL \
+  -e APP_NAME=$APP_NAME \
+  -e AGENT_NAME=$AGENT_NAME \
+  -e GOOGLE_GENAI_USE_VERTEXAI=$GOOGLE_GENAI_USE_VERTEXAI \
+  -e MODEL=$MODEL \
+  -e AUTH_REQUIRED=$AUTH_REQUIRED \
+  -e RATE_LIMIT=$RATE_LIMIT \
   -e GOOGLE_APPLICATION_CREDENTIALS="/app/.config/gcloud/application_default_credentials.json" \
   --mount type=bind,source=${HOME}/.config/gcloud,target=/app/.config/gcloud \
    $SERVICE_NAME:$VERSION
