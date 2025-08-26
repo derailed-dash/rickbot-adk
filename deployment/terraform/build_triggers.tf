@@ -52,7 +52,9 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     "src/**",
     "data_ingestion/**",
     "deployment/**",
-    "uv.lock"
+    "uv.lock",
+    "Dockerfile",
+    "pyproject.toml"
   ]
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
   substitutions = {
@@ -63,6 +65,10 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     _ORG                           = var.my_org
     _SERVICE_NAME                  = var.service_name
     _ARTIFACT_REPO_NAME            = var.artifact_repo_name
+    _APP_NAME                      = var.app_name
+    _AGENT_NAME                    = var.agent_name
+    _GOOGLE_GENAI_USE_VERTEXAI     = var.google_genai_use_vertexai
+    _MODEL                         = var.model
     _MAX_INSTANCES                 = "1"
     _LOG_LEVEL                     = var.log_level
     _AUTH_REQUIRED                 = "True"

@@ -41,6 +41,30 @@ variable "service_name" {
   type        = string
 }
 
+variable "app_name" {
+  description  = "The name of the UI client application"
+  type         = string
+  default      = "rickbot_st_ui"
+}
+
+variable "agent_name" {
+  description  = "The name of the Ricbot agent"
+  type         = string
+  default      = "rickbot_agent"
+}
+
+variable "google_genai_use_vertexai" {
+  description  = "Whether to use Vertex AI for auth, rather than API Key"
+  type         = bool
+  default      = true
+}
+
+variable "model" {
+  description  = "The model used by the agent"
+  type         = string
+  default      = "gemini-2.5-flash"
+}
+
 variable "log_level" {
   description = "Logging level."
   type        = string
