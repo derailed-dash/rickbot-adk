@@ -8,7 +8,10 @@ import google.auth
 from dotenv import load_dotenv
 
 agent_name = os.environ.setdefault("AGENT_NAME", "rickbot_agent")
-load_dotenv()
+
+# Only load the .env file if not in a deployed Cloud Run environment
+if not os.getenv("K_SERVICE"):
+    load_dotenv()
 
 # Suppress verbose logging from ADK and GenAI libraries - INFO logging is quite verbose
 logging.getLogger("google_adk").setLevel(logging.WARNING)

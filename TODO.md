@@ -6,8 +6,8 @@
 - [ ] Configure OAuth Client in Prod project.
 - [ ] Ensure OAuth secrets are set.
 - [ ] Implement OAuth with Google Auth and provide a way to test unauthenticated flow
+- [ ] Update CI/CD to deploy to Prod
 - [ ] Update DNS to point to Prod Rickbot Streamlit service
-- [ ] Remove sample `frontend`.
 - [ ] Create new React UI.
 - [ ] Implement OAuth login, potentially as sidecar container.
 - [ ] Ensure React UI works on mobile.
@@ -17,6 +17,7 @@
 
 ## Completed Steps
 
+- [x] Remove sample `frontend`.
 - [x] Create and execute Streamlit UI test for all personalities.
 - [x] Check for any missing logic in the original Rickbot - like rate limiting.
 - [x] Configure OAuth Client in Staging project.
