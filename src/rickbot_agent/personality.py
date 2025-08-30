@@ -56,10 +56,14 @@ class Personality:
                 self.system_instruction = f.read()
         else:
             logger.debug(f"Unable to find {system_prompt_file}. Attempting to retrieve from Secret Manager.")
+            secret_name = f"{self.name.lower()}-system-prompt"
             try:
                 google_project = os.environ.get("GOOGLE_CLOUD_PROJECT")
-                secret_name = f"{self.name.lower()}-system-prompt"
-                self.system_instruction = retrieve_secret(google_project, secret_name)  # type: ignore
+                if not google_project:
+                    raise ValueError(
+                        "GOOGLE_CLOUD_PROJECT environment variable not set, and local prompt file not found."
+                    )
+                self.system_instruction = retrieve_secret(google_project, secret_name)
                 logger.info("Successfully retrieved.")
             except Exception as e:
                 logger.error(f"Unable to retrieve '{secret_name}' from Secret Manager.")
