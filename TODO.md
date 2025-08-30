@@ -2,11 +2,7 @@
 
 ## Next Steps
 
-- [ ] Update CI/CD to deploy to Prod
 - [ ] Implement a way to test unauthenticated flow.
-- [ ] Configure OAuth Client in Prod project.
-- [ ] Ensure OAuth secrets are set.
-- [ ] Implement OAuth with Google Auth and provide a way to test unauthenticated flow
 - [ ] Update DNS to point to Prod Rickbot Streamlit service
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
@@ -17,6 +13,9 @@
 
 ## Completed Steps
 
+- [x] Configure OAuth Client in Prod project.
+- [x] Ensure OAuth secrets are set.
+- [x] Update CI/CD to deploy to Prod
 - [x] Update dockerfile and deployment to deploy Streamlit_fe
 - [x] Remove sample `frontend`.
 - [x] Create and execute Streamlit UI test for all personalities.
