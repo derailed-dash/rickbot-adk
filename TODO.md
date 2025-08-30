@@ -3,7 +3,6 @@
 ## Next Steps
 
 - [ ] Implement a way to test unauthenticated flow.
-- [ ] Update DNS to point to Prod Rickbot Streamlit service
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
 - [ ] Extend Dazbot to have knowledge.
@@ -13,6 +12,7 @@
 
 ## Completed Steps
 
+- [x] Update DNS to point to Prod Rickbot Streamlit service
 - [x] Configure OAuth Client in Prod project.
 - [x] Ensure OAuth secrets are set.
 - [x] Update CI/CD to deploy to Prod

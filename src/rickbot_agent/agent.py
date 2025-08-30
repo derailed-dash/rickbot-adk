@@ -29,22 +29,32 @@ def create_agent(personality: Personality) -> Agent:
         ),
     )
 
-# Pre-load and cache all agents at startup
-_agent_cache: dict[str, Agent] = {
-    name: create_agent(p) for name, p in get_personalities().items()
-}
-logger.info(f"Pre-loaded and cached {len(_agent_cache)} agents.")
+# Agent cache (initially empty, agents are loaded lazily)
+_agent_cache: dict[str, Agent] = {}
 
 def get_agent(personality_name: str) -> Agent:
-    """Retrieves a pre-configured agent from the cache."""
+    """
+    Retrieves a pre-configured agent from the cache, or creates it if not found.
+    Agents are loaded lazily to improve startup performance.
+    """
     agent = _agent_cache.get(personality_name)
-    if not agent:
-        logger.error(f"Agent for personality '{personality_name}' not found in cache.")
-        # Fallback to Rick or raise an error
-        rick_agent = _agent_cache.get("Rick")
-        if not rick_agent:
-            raise ValueError("Default 'Rick' personality agent not found.")
-        return rick_agent
+    if agent:
+        return agent
+
+    # If agent not in cache, create it
+    personalities = get_personalities()
+    personality = personalities.get(personality_name)
+
+    if not personality:
+        logger.error(f"Personality '{personality_name}' not found. Falling back to 'Rick'.")
+        personality = personalities.get("Rick")
+        if not personality:
+            raise ValueError("Default 'Rick' personality not found. Cannot initialize agent.")
+        personality_name = "Rick" # Update name to reflect fallback
+
+    logger.info(f"Lazily creating and caching agent for personality: {personality_name}")
+    agent = create_agent(personality)
+    _agent_cache[personality_name] = agent
     return agent
 
 # For backwards compatibility or direct access if needed, though get_agent is preferred.

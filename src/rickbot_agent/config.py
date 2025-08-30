@@ -19,6 +19,7 @@ def setup_logger() -> logging.Logger:
     app_logger = logging.getLogger(agent_name)
     log_level_num = getattr(logging, log_level, logging.INFO)
     app_logger.setLevel(log_level_num)
+    app_logger.propagate = False  # Prevent messages from propagating to the root logger
 
     # Add a handler only if one doesn't exist to prevent duplicate logs
     if not app_logger.handlers:
