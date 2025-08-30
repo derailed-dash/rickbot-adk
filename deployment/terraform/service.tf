@@ -88,6 +88,7 @@ resource "google_cloud_run_v2_service" "app_prod" {
           memory = "8Gi"
         }
         cpu_idle = false
+        startup_cpu_boost = true
       }
 
     }

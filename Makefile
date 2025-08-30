@@ -38,3 +38,17 @@ lint:
 # Run the programmatic test script
 test-rickbot-standalone:
 	uv run python scripts/test_rickbot_agent.py
+
+# Deploy infrastructure using Terraform
+terraform:
+	@echo "Running Terraform init and plan..."
+	@(cd "deployment/terraform" && terraform init && terraform plan -var-file="vars/env.tfvars" -out=out.tfplan)
+	@echo "Terraform plan complete. Review the output above."
+	@echo -n "Do you want to apply this plan? [y/n] " && read REPLY; \
+	if [[ $${REPLY:-'n'} =~ ^[Yy] ]]; then \
+		echo "Applying Terraform plan..."; \
+		cd "deployment/terraform"; \
+		terraform apply "out.tfplan"; \
+	else \
+		echo "Terraform apply cancelled."; \
+	fi

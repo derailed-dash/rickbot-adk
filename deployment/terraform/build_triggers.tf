@@ -105,6 +105,10 @@ resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
     _REGION                      = var.region
     _ARTIFACT_REPO_NAME          = var.artifact_repo_name
     _SERVICE_NAME                = var.service_name
+    _APP_NAME                    = var.app_name
+    _AGENT_NAME                  = var.agent_name
+    _GOOGLE_GENAI_USE_VERTEXAI   = var.google_genai_use_vertexai
+    _MODEL                       = var.model
     _LOG_LEVEL                   = var.log_level
     _AUTH_REQUIRED               = "True"
     _RATE_LIMIT                  = "120"
