@@ -9,7 +9,7 @@ from google.adk.tools import google_search  # built-in Google Search tool
 from google.genai.types import GenerateContentConfig
 
 from .config import get_config, logger
-from .personality import Personality, personalities
+from .personality import Personality, get_personalities
 
 config = get_config()
 
@@ -31,7 +31,7 @@ def create_agent(personality: Personality) -> Agent:
 
 # Pre-load and cache all agents at startup
 _agent_cache: dict[str, Agent] = {
-    name: create_agent(p) for name, p in personalities.items()
+    name: create_agent(p) for name, p in get_personalities().items()
 }
 logger.info(f"Pre-loaded and cached {len(_agent_cache)} agents.")
 

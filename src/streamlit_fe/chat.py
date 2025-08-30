@@ -13,7 +13,7 @@ import streamlit as st
 from google.adk.runners import Runner
 from google.genai.types import Blob, Content, Part
 
-from rickbot_agent.personality import personalities
+from rickbot_agent.personality import get_personalities
 from streamlit_fe.st_utils import RateLimiter
 
 # Define the root path of the project
@@ -21,16 +21,16 @@ ROOT_DIR = Path(__file__).parent.parent
 USER_AVATAR = str(ROOT_DIR / "rickbot_agent/media/morty.png")
 
 
-async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, rate_limiter: RateLimiter):
+async def get_agent_response(
+    runner: Runner, prompt: str, uploaded_file: Any, rate_limiter: RateLimiter
+):
     """
     Handles user input and generates the bot's response using the Rickbot ADK agent.
     """
     # --- Rate Limiting Check ---
     # Perform this check *before* modifying session state or displaying the user's prompt
     if not rate_limiter.hit("rickbot"):
-        st.warning(
-            "Whoa, slow down there! Give me a minute."
-        )
+        st.warning("Whoa, slow down there! Give me a minute.")
         st.stop()  # Stop execution to prevent the message from being processed
 
     # Create the user message object, including any attachments
@@ -57,7 +57,9 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, ra
     if uploaded_file:
         message_parts.append(
             Part(
-                inline_data=Blob(data=uploaded_file.getvalue(), mime_type=uploaded_file.type)
+                inline_data=Blob(
+                    data=uploaded_file.getvalue(), mime_type=uploaded_file.type
+                )
             )
         )
 
@@ -65,18 +67,22 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, ra
 
     # Generate and display the agent's response
     with st.status("Thinking...", expanded=True) as bot_status:
-        with st.chat_message("assistant", avatar=st.session_state.current_personality.avatar):
-            response_placeholder = st.empty() # empty invisible container for retrieving streamed content
+        with st.chat_message(
+            "assistant", avatar=st.session_state.current_personality.avatar
+        ):
+            response_placeholder = (
+                st.empty()
+            )  # empty invisible container for retrieving streamed content
             full_response = ""
 
             # Call the agent runner
             async for event in runner.run_async(
                 user_id=st.session_state.user_id,
                 session_id=st.session_state.session_id,
-                new_message=new_message
+                new_message=new_message,
             ):
                 if event.is_final_response() and event.content and event.content.parts:
-                    for part in event.content.parts: # retrieve the response in parts
+                    for part in event.content.parts:  # retrieve the response in parts
                         if part.text:
                             full_response += part.text
                     # Visual trick!
@@ -118,6 +124,7 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
             st.button("Log out", on_click=st.logout)
 
         # --- Personality Selection ---
+        personalities = get_personalities()
         personality_menu_names = [p.menu_name for p in personalities.values()]
         selected_menu_name = st.selectbox(
             "Choose your bot personality:",
@@ -179,6 +186,8 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
         file_to_process = None
         if st.session_state.get("file_just_uploaded"):
             file_to_process = uploaded_file
-            st.session_state.file_just_uploaded = False # Consume the flag
+            st.session_state.file_just_uploaded = False  # Consume the flag
 
-        asyncio.run(get_agent_response(adk_runner, prompt, file_to_process, rate_limiter))
+        asyncio.run(
+            get_agent_response(adk_runner, prompt, file_to_process, rate_limiter)
+        )

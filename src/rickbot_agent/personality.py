@@ -9,6 +9,7 @@ if not found, by attempting to fetch it from Google Secret Manager.
 import logging
 import os
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 
 import yaml  # pyyaml
@@ -22,32 +23,22 @@ logger = logging.getLogger(__name__)
 def get_avatar(name: str) -> str:
     return str(SCRIPT_DIR / f"media/{name}.png")
 
-
-@dataclass(unsafe_hash=True) # Allow this to be hashable even though mutated through __post_init__
+@dataclass(unsafe_hash=True)
 class Personality:
-    """Represents a distinct chatbot personality, encapsulating its configuration.
+    """Represents a distinct chatbot personality, encapsulating its configuration."""
 
-    This dataclass holds all the attributes that define how a specific
-    personality (e.g., Rick, Yoda) looks, behaves, and responds. It includes
-    user-facing text, behavioral settings for the LLM, and paths to media assets.
-    The system instruction is loaded dynamically upon initialization.
-    """
-
-    name: str  # The internal identifier for the personality (e.g., 'rick').
-    menu_name: str  # The user-facing name for UI menus (e.g., 'Rick Sanchez').
-    title: str  # The title displayed at the top of the chat window.
-    overview: str  # A brief, user-facing description of the character.
-    welcome: str  # The initial greeting message from the agent
-    prompt_question: str  # A sample question to prompt the user for input.
+    name: str
+    menu_name: str
+    title: str
+    overview: str
+    welcome: str
+    prompt_question: str
     temperature: float
     avatar: str = field(init=False)
     system_instruction: str = field(init=False)
 
     def __post_init__(self) -> None:
         self.avatar = get_avatar(self.name.lower())
-
-        # Retrieve the prompt from the system_prompts folder
-        # If the prompt doesn't exist, try retrieving from Secret Manager
         system_prompt_file = (
             SCRIPT_DIR / "data/system_prompts" / f"{self.name.lower()}.txt"
         )
@@ -55,7 +46,9 @@ class Personality:
             with open(system_prompt_file, encoding="utf-8") as f:
                 self.system_instruction = f.read()
         else:
-            logger.debug(f"Unable to find {system_prompt_file}. Attempting to retrieve from Secret Manager.")
+            logger.debug(
+                f"Unable to find {system_prompt_file}. Attempting to retrieve from Secret Manager."
+            )
             secret_name = f"{self.name.lower()}-system-prompt"
             try:
                 google_project = os.environ.get("GOOGLE_CLOUD_PROJECT")
@@ -74,9 +67,8 @@ class Personality:
     def __repr__(self) -> str:
         return self.name
 
-
-def load_personalities(yaml_file: str) -> dict[str, Personality]:
-    """Load personalities from a YAML file."""
+def _load_personalities(yaml_file: str) -> dict[str, Personality]:
+    """Internal function to load personalities from a YAML file."""
     peeps: dict[str, Personality] = {}
     with open(yaml_file, encoding="utf-8") as f:
         peep_data = yaml.safe_load(f)
@@ -85,6 +77,11 @@ def load_personalities(yaml_file: str) -> dict[str, Personality]:
             peeps[personality.name] = personality
     return peeps
 
-
-# Load personalities from the YAML file
-personalities = load_personalities(str(SCRIPT_DIR / "data/personalities.yaml"))
+@lru_cache(maxsize=1)
+def get_personalities() -> dict[str, Personality]:
+    """
+    Loads personalities from the YAML file and caches them.
+    This function is the single entry point for accessing personalities.
+    """
+    yaml_path = str(SCRIPT_DIR / "data/personalities.yaml")
+    return _load_personalities(yaml_path)

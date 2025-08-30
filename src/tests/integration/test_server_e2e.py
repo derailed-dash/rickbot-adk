@@ -1,11 +1,14 @@
+"""
+This module contains end-to-end tests for the Rickbot-ADK API server.
+It starts the server as a subprocess, waits for it to become ready, and then performs
+integration tests against its endpoints, specifically focusing on the chat streaming functionality.
+"""
 import json
 import logging
 import os
 import subprocess
-import sys
 import threading
 import time
-import uuid
 from collections.abc import Iterator
 from typing import Any
 
@@ -13,14 +16,17 @@ import pytest
 import requests
 from requests.exceptions import RequestException
 
+# This module contains end-to-end tests for the Rickbot-ADK API server.
+# It starts the server as a subprocess, waits for it to become ready, and then performs
+# integration tests against its endpoints, specifically focusing on the chat streaming functionality.
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-APP_ENTRYPOINT = "adk_sample_app.server:app"
+APP_NAME = "rickbot_agent"  # Use the correct agent name
 BASE_URL = "http://127.0.0.1:8000/"
 STREAM_URL = BASE_URL + "run_sse"
-FEEDBACK_URL = BASE_URL + "feedback"
 
 HEADERS = {"Content-Type": "application/json"}
 
@@ -32,19 +38,18 @@ def log_output(pipe: Any, log_func: Any) -> None:
 
 
 def start_server() -> subprocess.Popen[str]:
-    """Start the FastAPI server using subprocess and log its output."""
+    """Start the ADK API server using subprocess and log its output."""
+    # Use the ADK CLI to start the server for the rickbot_agent
     command = [
-        sys.executable,
-        "-m",
-        "uvicorn",
-        APP_ENTRYPOINT,
-        "--host",
-        "0.0.0.0",
+        "uv",
+        "run",
+        "adk",
+        "api_server",
+        "src/rickbot_agent",
         "--port",
         "8000",
     ]
     env = os.environ.copy()
-    env["INTEGRATION_TEST"] = "TRUE"
     process = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
@@ -68,9 +73,11 @@ def start_server() -> subprocess.Popen[str]:
 def wait_for_server(timeout: int = 60, interval: int = 1) -> bool:
     """Wait for the server to be ready."""
     start_time = time.time()
+    # The /list-apps endpoint is a reliable way to check if the ADK server is up
+    health_check_url = BASE_URL + "list-apps"
     while time.time() - start_time < timeout:
         try:
-            response = requests.get("http://127.0.0.1:8000/docs", timeout=10)
+            response = requests.get(health_check_url, timeout=10)
             if response.status_code == 200:
                 logger.info("Server is ready")
                 return True
@@ -101,14 +108,14 @@ def server_fixture(request: Any) -> Iterator[subprocess.Popen[str]]:
 
 
 def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
-    """Test the chat stream functionality."""
+    """Test the chat stream functionality for the rickbot_agent."""
     logger.info("Starting chat stream test")
 
     # Create session first
     user_id = "test_user_123"
-    session_data = {"state": {"preferred_language": "English", "visit_count": 1}}
+    session_data = {"state": {}}  # No specific state needed for this test
 
-    session_url = f"{BASE_URL}/apps/app/users/{user_id}/sessions"
+    session_url = f"{BASE_URL}/apps/{APP_NAME}/users/{user_id}/sessions"
     session_response = requests.post(
         session_url,
         headers=HEADERS,
@@ -121,32 +128,38 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
 
     # Then send chat message
     data = {
-        "app_name": "app",
+        "app_name": APP_NAME,
         "user_id": user_id,
         "session_id": session_id,
         "new_message": {
             "role": "user",
-            "parts": [{"text": "What's the weather in San Francisco?"}],
+            "parts": [{"text": "Why is the sky blue?"}],
         },
-        "streaming": True,
+        "run_config": {  # ADK server expects a run_config for streaming
+            "streaming_mode": "STREAMING_MODE_SSE"
+        },
     }
 
     response = requests.post(
         STREAM_URL, headers=HEADERS, json=data, stream=True, timeout=60
     )
     assert response.status_code == 200
+
     # Parse SSE events from response
     events = []
     for line in response.iter_lines():
         if line:
-            # SSE format is "data: {json}"
             line_str = line.decode("utf-8")
             if line_str.startswith("data: "):
-                event_json = line_str[6:]  # Remove "data: " prefix
-                event = json.loads(event_json)
-                events.append(event)
+                event_json = line_str[6:]
+                try:
+                    event = json.loads(event_json)
+                    events.append(event)
+                except json.JSONDecodeError:
+                    logger.error(f"Failed to decode JSON: {event_json}")
 
     assert events, "No events received from stream"
+
     # Check for valid content in the response
     has_text_content = False
     for event in events:
@@ -159,36 +172,4 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
             has_text_content = True
             break
 
-
-def test_chat_stream_error_handling(server_fixture: subprocess.Popen[str]) -> None:
-    """Test the chat stream error handling."""
-    logger.info("Starting chat stream error handling test")
-    data = {
-        "input": {"messages": [{"type": "invalid_type", "content": "Cause an error"}]}
-    }
-    response = requests.post(
-        STREAM_URL, headers=HEADERS, json=data, stream=True, timeout=10
-    )
-
-    assert (
-        response.status_code == 422
-    ), f"Expected status code 422, got {response.status_code}"
-    logger.info("Error handling test completed successfully")
-
-
-def test_collect_feedback(server_fixture: subprocess.Popen[str]) -> None:
-    """
-    Test the feedback collection endpoint (/feedback) to ensure it properly
-    logs the received feedback.
-    """
-    # Create sample feedback data
-    feedback_data = {
-        "score": 4,
-        "invocation_id": str(uuid.uuid4()),
-        "text": "Great response!",
-    }
-
-    response = requests.post(
-        FEEDBACK_URL, json=feedback_data, headers=HEADERS, timeout=10
-    )
-    assert response.status_code == 200
+    assert has_text_content, "Expected at least one message with text content"

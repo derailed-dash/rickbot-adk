@@ -13,7 +13,7 @@ from streamlit.errors import StreamlitAPIException
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 from rickbot_agent.agent import get_agent  # Import the agent getter
-from rickbot_agent.personality import Personality, get_avatar, personalities
+from rickbot_agent.personality import Personality, get_avatar, get_personalities
 from streamlit_fe.chat import render_chat
 from streamlit_fe.create_auth_secrets import create_secrets_toml
 from streamlit_fe.st_config import config, logger
@@ -23,6 +23,7 @@ from streamlit_fe.st_utils import RateLimiter
 ROOT_DIR = Path(__file__).parent.parent
 DEFAULT_PERSONALITY = "Rick"
 RICKBOT_AVATAR = get_avatar("rickbot-trans")
+
 
 async def initialize_adk_runner(personality: Personality):
     """Initialise the ADK runner with the correct agent personality."""
@@ -35,18 +36,18 @@ async def initialize_adk_runner(personality: Personality):
         session_id=st.session_state.session_id,
     )
     return Runner(
-        agent=rickbot_agent,
-        app_name=config.app_name,
-        session_service=session_service
+        agent=rickbot_agent, app_name=config.app_name, session_service=session_service
     )
 
-@st.cache_resource # Ensure this rate limiter is shared across all user sessions and reruns
+
+@st.cache_resource  # Ensure this rate limiter is shared across all user sessions and reruns
 def initialize_rate_limiter():
-    """ Initialize the rate limiter. """
+    """Initialize the rate limiter."""
     return RateLimiter(config.rate_limit_qpm)
 
+
 def main():
-    """ Main function to run the Streamlit application. """
+    """Main function to run the Streamlit application."""
     # --- Page Configuration ---
     st.set_page_config(
         page_title="Rickbot",
@@ -55,16 +56,19 @@ def main():
         initial_sidebar_state="expanded",
     )
 
+    personalities = get_personalities()
     if "current_personality" not in st.session_state:
         st.session_state.current_personality = personalities[DEFAULT_PERSONALITY]
 
     # --- Authentication Check ---
     if config.auth_required:
         try:
-            create_secrets_toml(config.google_project_id) # Do once and cache
+            create_secrets_toml(config.google_project_id)  # Do once and cache
         except ValueError as e:
             logger.error(f"Failed to setup auth: {e}", exc_info=True)
-            st.error(f"⚠️ Could not initialize the application. Please check your configuration. Error: {e}" )
+            st.error(
+                f"⚠️ Could not initialize the application. Please check your configuration. Error: {e}"
+            )
             st.stop()
 
         # If the user isn't logged in, show the unauthenticated welcome screen
@@ -86,10 +90,11 @@ def main():
             )
             if st.button("Log in with Google", use_container_width=True):
                 st.login()
-        else: # We are authenticated
+        else:  # We are authenticated
             authenticated_flow()
-    else: # No authentication required - go straight to authenticated page
+    else:  # No authentication required - go straight to authenticated page
         authenticated_flow()
+
 
 def authenticated_flow():
     try:
@@ -114,23 +119,21 @@ def authenticated_flow():
         # Re-initialize ADK runner if personality changes or not yet initialized
         if (
             "adk_runner" not in st.session_state
-            or st.session_state.get("last_personality") != st.session_state.current_personality
+            or st.session_state.get("last_personality")
+            != st.session_state.current_personality
         ):
             st.session_state.adk_runner = asyncio.run(
                 initialize_adk_runner(st.session_state.current_personality)
             )
-            st.session_state.last_personality = (st.session_state.current_personality)
+            st.session_state.last_personality = st.session_state.current_personality
 
         # --- Render Chat Interface ---
-        render_chat(
-            config,
-            rate_limiter,
-            st.session_state.adk_runner
-        )
+        render_chat(config, rate_limiter, st.session_state.adk_runner)
 
     except (StreamlitAPIException, KeyError, ValueError, TypeError, RuntimeError) as e:
         st.error(f"An unexpected error occurred: {e}")
         logger.error(f"Application error: {e}", exc_info=True)
+
 
 if __name__ == "__main__":
     main()

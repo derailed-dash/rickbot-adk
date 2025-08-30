@@ -1,4 +1,4 @@
-"""Unit tests for the Rickbot agent.
+"""Integration tests for the Rickbot agent, making use of Google APIs.
 
 This file contains unit tests to verify the functionality and behavior of the
 Rickbot agent, including its ability to handle multi-turn conversations and

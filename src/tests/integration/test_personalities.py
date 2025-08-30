@@ -1,20 +1,17 @@
 """
 Integration tests to execute the agent with each personality.
 """
-
-import asyncio
-
 import pytest
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
 
 from rickbot_agent.agent import get_agent
-from rickbot_agent.personality import personalities
+from rickbot_agent.personality import get_personalities
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("personality_name", personalities.keys())
+@pytest.mark.parametrize("personality_name", get_personalities().keys())
 async def test_personality_loads_and_responds(personality_name):
     """
     Tests that each personality can be loaded, receive a prompt, and generate a response.
