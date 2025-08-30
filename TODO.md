@@ -7,7 +7,6 @@
 - [ ] Configure OAuth Client in Prod project.
 - [ ] Ensure OAuth secrets are set.
 - [ ] Implement OAuth with Google Auth and provide a way to test unauthenticated flow
-- [ ] Update CI/CD to deploy to Prod
 - [ ] Update DNS to point to Prod Rickbot Streamlit service
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
