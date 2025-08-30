@@ -1,3 +1,7 @@
+# Manages creation of Cloud Run services.
+# Note: initial creation is done by TF, but subsequent Cloud Run service deployment is handled by CI/CD.
+# If we want to redeploy Cloud Run from this TF again, we should comment out the lifecycle blocks.
+
 # Get project information to access the project number
 data "google_project" "project" {
   for_each = local.deploy_project_ids
@@ -58,12 +62,10 @@ resource "google_cloud_run_v2_service" "app_staging" {
     percent = 100
   }
 
-  # This lifecycle block prevents Terraform from overwriting the container image when it's
+  # This lifecycle block prevents Terraform from overwriting the Cloud Run service when it's
   # updated by Cloud Run deployments outside of Terraform (e.g., via CI/CD pipelines)
   lifecycle {
-    ignore_changes = [
-      template[0].containers[0].image,
-    ]
+    ignore_changes = all
   }
 
   # Make dependencies conditional to avoid errors.
@@ -109,12 +111,10 @@ resource "google_cloud_run_v2_service" "app_prod" {
     percent = 100
   }
 
-  # This lifecycle block prevents Terraform from overwriting the container image when it's
+  # This lifecycle block prevents Terraform from overwriting the Cloud Run service when it's
   # updated by Cloud Run deployments outside of Terraform (e.g., via CI/CD pipelines)
   lifecycle {
-    ignore_changes = [
-      template[0].containers[0].image,
-    ]
+    ignore_changes = all
   }
 
   # Make dependencies conditional to avoid errors.

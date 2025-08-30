@@ -90,6 +90,7 @@ make install && make playground
 | `make streamlit`              | Run Streamlit FE: `uv run streamlit run src/streamlit_fe/app.py`                      |
 | `make test`                   | Run unit and integration tests                                                        |
 | `make lint`                   | Run code quality checks (codespell, ruff, mypy)                                       |
+| `make terraform`              | Plan Terraform, prompt for authorisation, then apply                                  |
 | `uv run scripts/test_rickbot_agent.py` | Run standalone rickbot_agent test script                                     |
 | `uv run jupyter lab`          | Launch Jupyter notebook                                                               |
 | `uv run streamlit run src/streamlit_fe/app.py` | Launch Streamlit frontend                                            |
