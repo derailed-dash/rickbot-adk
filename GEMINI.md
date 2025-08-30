@@ -24,23 +24,18 @@ Project dependencies are managed in `pyproject.toml` and can be installed using 
 
 ### Testing
 
-The project includes unit and integration tests that can be run with:
+The project includes unit and integration tests in `src/tests/`. Tests are written using `pytest` and `pytest-asyncio`. They can be run with:
 
 ```bash
 make test
 ```
 
-Linting and code quality checks can be run with:
-
-```bash
-make lint
-```
-
 ### Environment
 
-Google Cloud configuration is achieved through a combination of `.env` and the `scripts/setup-env.sh` script. 
-- If the environment var GOOGLE_CLOUD_PROJECT is set then it is likely that we have already run `scripts/setup-env.sh`.
-- If the environment var GOOGLE_CLOUD_PROJECT is not set, we will need to run `scripts/setup-env.sh` before performing any other actions.
+Google Cloud configuration is achieved through a combination of `.env` and the `scripts/setup-env.sh` script. Failures with Google Cloud are likely if this script has not been run. This will cause tests to fail. If tests are failing, check if the script has been run:
+
+- If the environment var `GOOGLE_CLOUD_PROJECT` is set then it is likely that we have already run `scripts/setup-env.sh`.
+- If the environment var `GOOGLE_CLOUD_PROJECT` is not set, we will need to run `scripts/setup-env.sh` before performing any other actions.
 
 ## Deployment
 
@@ -58,7 +53,6 @@ The application is designed for deployment to Google Cloud's Vertex AI Agent Eng
 - **Configuration:** Project dependencies and metadata are defined in `pyproject.toml`.
 - **Dependencies:** Project dependencies are managed in `pyproject.toml`. The `[project]` section defines the main dependencies, and the `[dependency-groups]` section defines development and optional dependencies.
 - **Source code:** Lives the `/src/` directory. This includes agents, frontends, notebooks and tests.
-- **Testing:** The `src/tests/` directory contains unit and integration tests. Tests are written using `pytest` and `pytest-asyncio`.
 - **Linting:** The project uses `ruff` for linting and formatting, `mypy` for static type checking, and `codespell` for checking for common misspellings. The configuration for these tools can be found in `pyproject.toml`.
 - **Notebooks:** The `notebooks/` directory contains Jupyter notebooks for prototyping, testing, and evaluating the agent.
 - **Agents:** The ADK agents will live in the `src/` directory.
