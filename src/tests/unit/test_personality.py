@@ -48,7 +48,7 @@ def mock_personalities_yaml():
 
 def test_get_avatar():
     """Tests that get_avatar returns the correct path."""
-    expected_path = str(TEST_SCRIPT_DIR / f"media/rick.png")
+    expected_path = str(TEST_SCRIPT_DIR / "media/rick.png")
     assert get_avatar("rick") == expected_path
 
 @patch('rickbot_agent.personality.retrieve_secret')
