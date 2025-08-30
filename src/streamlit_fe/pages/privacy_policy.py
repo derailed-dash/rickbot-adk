@@ -1,3 +1,9 @@
+"""
+This Streamlit page displays the privacy policy for the Rickbot application.
+It outlines how user data is handled, emphasizing that no personal data, prompts,
+or responses are collected or stored.
+"""
+
 import streamlit as st
 
 st.set_page_config(
