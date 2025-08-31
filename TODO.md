@@ -3,7 +3,10 @@
 ## Next Steps
 
 - [ ] Implement a way to test unauthenticated flow.
+- [ ] Map test domain for our Dev service.
+- [ ] Investigate mapping domains in Terraform.
 - [ ] Verify the Prod OAuth app for Google Auth Platform.
+- [ ] Decomm Rickbot project and update repo documentation accordingly.
 - [ ] Investigate adding other auth methods.
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
