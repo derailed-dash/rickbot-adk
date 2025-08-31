@@ -2,6 +2,7 @@
 
 ## Next Steps
 
+- [ ] Check Cloud Run instance size and optimise.
 - [ ] Implement a way to test unauthenticated flow.
 - [ ] Investigate mapping domains in Terraform.
 - [ ] Verify the Prod OAuth app for Google Auth Platform.
