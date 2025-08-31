@@ -18,7 +18,7 @@ streamlit:
 	@echo "================================================================================="
 	@echo "| 🚀 Launching Streamlit FE...                                                  |"
 	@echo "================================================================================="
-	uv run -- streamlit run src/streamlit_fe/app.py
+	MOCK_AUTH_USER="mock.user@example.com" uv run -- streamlit run src/streamlit_fe/app.py
 
 # Launch local development server with hot-reload
 local-backend:
@@ -43,7 +43,7 @@ terraform:
 	@echo "Terraform plan complete. Review the output above."
 	@echo -n "Do you want to apply this plan? [y/n] " && read REPLY; \
 	echo "(DEBUG: You entered '$$REPLY')"; \
-	case "$$REPLY:-'n'""}" in \
+	case "$$REPLY:-'n'" in \
 		[Yy]*) \
 			echo "Applying Terraform plan..."; \
 			cd "deployment/terraform"; \

@@ -6,6 +6,7 @@ and interacts with the Agent Development Kit (ADK) runner to generate bot respon
 """
 
 import asyncio
+import os
 from pathlib import Path
 from typing import Any
 
@@ -96,6 +97,16 @@ async def get_agent_response(
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 
+def custom_logout():
+    if os.environ.get("MOCK_AUTH_USER"):
+        # For mock auth, just clear the session state flags
+        st.session_state.is_logged_in = False
+        st.session_state.user_email = None
+        st.session_state.user_name = None
+    else:
+        # For real auth, use Streamlit's logout
+        st.logout()
+
 def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
     """
     Renders the main chat interface, including sidebar and chat history.
@@ -119,9 +130,9 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
 
     # --- Sidebar for Configuration ---
     with st.sidebar:
-        if config.auth_required and st.user.is_logged_in:
-            st.caption(f"Welcome, {st.user.name}")
-            st.button("Log out", on_click=st.logout)
+        if st.session_state.get("is_logged_in"):
+            st.caption(f"Welcome, {st.session_state.user_name}")
+            st.button("Log out", on_click=custom_logout)
 
         # --- Personality Selection ---
         personalities = get_personalities()

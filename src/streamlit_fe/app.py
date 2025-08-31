@@ -3,6 +3,7 @@ This is the main entry point for the Rickbot Streamlit application.
 """
 
 import asyncio
+import os
 import uuid
 from pathlib import Path
 
@@ -46,6 +47,35 @@ def initialize_rate_limiter():
     return RateLimiter(config.rate_limit_qpm)
 
 
+def render_login_screen(mock_user: bool = False, mock_user_email: str | None = None):
+    """Renders the login screen for both real and mock users."""
+    header_col1, header_col2 = st.columns([0.3, 0.7])
+    header_col1.image(RICKBOT_AVATAR, width=140)
+    header_col2.title(f"{st.session_state.current_personality.title}")
+
+    st.divider()
+    st.markdown(
+        "Rickbot is a multi-personality chatbot application. Chat with Rick or other personalities, ask your questions, and feel free to upload content as part of your discussion."
+    )
+    st.markdown(
+        ":eyes: We do not store any user data, prompts or responses. Read our [Privacy Policy](/privacy_policy)."
+    )
+    st.divider()
+    if mock_user:
+        st.markdown(":lock: Click to start your mock session.")
+        if st.button("Log in as Mock User", use_container_width=True):
+            st.session_state.is_logged_in = True
+            st.session_state.user_email = mock_user_email
+            st.session_state.user_name = "Mock User"
+            st.rerun()
+    else:
+        st.markdown(
+            ":lock: Please login to use Rickbot. Any Google account will do. Login helps us prevent abuse and maintain a stable, accessible experience for everyone."
+        )
+        if st.button("Log in with Google", use_container_width=True):
+            st.login("google")
+
+
 def main():
     """Main function to run the Streamlit application."""
     # --- Page Configuration ---
@@ -61,7 +91,21 @@ def main():
         st.session_state.current_personality = personalities[DEFAULT_PERSONALITY]
 
     # --- Authentication Check ---
-    if config.auth_required:
+    mock_user_email = os.environ.get("MOCK_AUTH_USER")
+
+    # Initialize login state if it doesn't exist
+    if "is_logged_in" not in st.session_state:
+        st.session_state.is_logged_in = False
+
+    # If logged in, show the app
+    if st.session_state.is_logged_in:
+        authenticated_flow()
+        return
+
+    # --- Login Flow ---
+    if mock_user_email:
+        render_login_screen(mock_user=True, mock_user_email=mock_user_email)
+    elif config.auth_required:
         try:
             create_secrets_toml(config.google_project_id)  # Do once and cache
         except ValueError as e:
@@ -71,30 +115,17 @@ def main():
             )
             st.stop()
 
-        # If the user isn't logged in, show the unauthenticated welcome screen
         if not st.user.is_logged_in:
-            header_col1, header_col2 = st.columns([0.3, 0.7])
-            header_col1.image(RICKBOT_AVATAR, width=140)
-            header_col2.title(f"{st.session_state.current_personality.title}")
-
-            st.divider()
-            st.markdown(
-                "Rickbot is a multi-personality chatbot application. Chat with Rick or other personalities, ask your questions, and feel free to upload content as part of your discussion."
-            )
-            st.markdown(
-                ":eyes: We do not store any user data, prompts or responses. Read our [Privacy Policy](/privacy_policy)."
-            )
-            st.divider()
-            st.markdown(
-                ":lock: Please login to use Rickbot. Any Google account will do. Login helps us prevent abuse and maintain a stable, accessible experience for everyone."
-            )
-            if st.button("Log in with Google", use_container_width=True):
-                st.login("google")
-            # if st.button("Log in with GitHub", use_container_width=True):
-            #     st.login("github")
-        else:  # We are authenticated
-            authenticated_flow()
+            render_login_screen(mock_user=False)
+        else:
+            # This block is for when st.user.is_logged_in is true, but our session_state flag is not.
+            # This happens on the rerun after a successful login.
+            st.session_state.is_logged_in = True
+            st.session_state.user_email = st.user.email
+            st.session_state.user_name = st.user.name
+            st.rerun()  # Rerun to enter the authenticated_flow
     else:  # No authentication required - go straight to authenticated page
+        st.session_state.is_logged_in = False
         authenticated_flow()
 
 
@@ -105,8 +136,8 @@ def authenticated_flow():
 
         # --- Session State Initialization ---
         if "user_id" not in st.session_state:
-            if config.auth_required and st.user.is_logged_in:
-                st.session_state.user_id = st.user.email
+            if st.session_state.get("is_logged_in"):
+                st.session_state.user_id = st.session_state.user_email
             else:
                 # No user logged in so get use Streamlit unique session ID as a stand-in for user_id
                 ctx = get_script_run_ctx()
