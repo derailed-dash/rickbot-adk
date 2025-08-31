@@ -79,7 +79,7 @@ def main():
 
             st.divider()
             st.markdown(
-                "Rickbot is a chat application. Chat with Rick, ask your questions, and feel free to upload content as part of your discussion. Rickbot also offers multiple other personalities to interact with."
+                "Rickbot is a multi-personality chatbot application. Chat with Rick or other personalities, ask your questions, and feel free to upload content as part of your discussion."
             )
             st.markdown(
                 ":eyes: We do not store any user data, prompts or responses. Read our [Privacy Policy](/privacy_policy)."
@@ -89,7 +89,9 @@ def main():
                 ":lock: Please login to use Rickbot. Any Google account will do. Login helps us prevent abuse and maintain a stable, accessible experience for everyone."
             )
             if st.button("Log in with Google", use_container_width=True):
-                st.login()
+                st.login("google")
+            # if st.button("Log in with GitHub", use_container_width=True):
+            #     st.login("github")
         else:  # We are authenticated
             authenticated_flow()
     else:  # No authentication required - go straight to authenticated page
