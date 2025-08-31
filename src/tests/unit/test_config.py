@@ -1,4 +1,31 @@
-"""Unit tests for the rickbot_agent.config module."""
+"""Unit tests for the rickbot_agent.config module.
+
+This test suite validates the configuration loading and logger setup functionalities
+of the Rickbot agent. It ensures that the agent's configuration is correctly
+derived from environment variables and that the logger is initialized with the
+appropriate settings.
+
+The tests for `setup_logger` cover:
+- Initialization of the logger with the default log level (INFO) when no
+  environment variable is specified.
+- Correctly setting the log level to DEBUG and WARNING based on the `LOG_LEVEL`
+  environment variable.
+- A fixture is used to clear logging handlers before each test to ensure
+  isolation and prevent log duplication.
+
+The tests for `get_config` cover:
+- Loading default configuration values when no specific environment variables
+  are set.
+- Overriding default configuration values with custom settings provided through
+  environment variables (e.g., AGENT_NAME, GOOGLE_CLOUD_LOCATION, MODEL).
+- Correctly handling case-insensitive boolean conversion for the
+  `GOOGLE_GENAI_USE_VERTEXAI` environment variable.
+- Mocking of `google.auth.default` to simulate the retrieval of a Google Cloud
+  project ID without making actual API calls.
+
+The tests use `unittest.mock.patch` to manage environment variables for each
+test case, ensuring that tests are independent and deterministic.
+"""
 
 import logging
 import os

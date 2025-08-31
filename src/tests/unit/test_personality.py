@@ -1,5 +1,28 @@
+"""Unit tests for the rickbot_agent.personality module.
 
-"""Unit tests for the rickbot_agent.personality module."""
+This test suite covers the functionality of the Personality class and its related
+functions. It ensures that personalities are correctly loaded and initialized
+from different sources, including local files and Google Secret Manager.
+
+The tests cover the following scenarios:
+- Correctly constructing avatar paths.
+- Initializing a Personality by fetching the system instruction from Google
+  Secret Manager when a local file is not present.
+- Initializing a Personality by loading the system instruction from a local
+  file when it exists.
+- Handling errors when the required GOOGLE_CLOUD_PROJECT environment variable
+  is not set for Secret Manager access.
+- Handling exceptions that occur during the retrieval of secrets from
+  Secret Manager.
+- Loading and parsing personality data from a YAML configuration file.
+- Caching the loaded personalities to avoid redundant file I/O and API calls.
+
+Fixtures are used to create a temporary test directory and mock the
+`personalities.yaml` file, ensuring that the tests run in an isolated
+environment. The `unittest.mock` library is used extensively to patch
+dependencies and simulate different conditions, such as the existence of
+files or the behavior of external services like Secret Manager.
+"""
 
 import os
 from pathlib import Path

@@ -26,6 +26,7 @@ local-backend:
 
 # Run unit and integration tests
 test:
+	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "Error: GOOGLE_CLOUD_PROJECT is not set. Setup environment before running tests" && exit 1)
 	uv run pytest src/tests/unit && uv run pytest src/tests/integration
 
 # Run code quality checks (codespell, ruff, mypy)
@@ -35,17 +36,13 @@ lint:
 	uv run ruff format . --check --diff
 	uv run mypy .
 
-# Run the programmatic test script
-test-rickbot-standalone:
-	uv run python scripts/test_rickbot_agent.py
-
 # Deploy infrastructure using Terraform
 terraform:
 	@echo "Running Terraform init and plan..."
 	@(cd "deployment/terraform" && terraform init && terraform plan -var-file="vars/env.tfvars" -out=out.tfplan)
 	@echo "Terraform plan complete. Review the output above."
 	@echo -n "Do you want to apply this plan? [y/n] " && read REPLY; \
-	if [[ $${REPLY:-'n'} =~ ^[Yy] ]]; then \
+	if [[ ${REPLY:-'n'} =~ ^[Yy] ]]; then \
 		echo "Applying Terraform plan..."; \
 		cd "deployment/terraform"; \
 		terraform apply "out.tfplan"; \

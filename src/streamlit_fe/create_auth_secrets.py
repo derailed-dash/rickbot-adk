@@ -1,10 +1,17 @@
 """
-If Rickbot is configured to perform user authentication, then we delegate user authentication to Google Auth.
-We do this by retrieving Google OAuth credentials (client_id and client_secret) 
-from Google Secret Manager and saving them to secrets.toml at run time.
-These are required for Rickbot to identify itself to Google Auth.
-(The .streamlit/secrets.toml is Streamlit's standard mechanism for handling sensitive information.)
-Now our users can authenticate, using Google's Auth UI.
+If Rickbot is configured to perform user authentication, 
+then we delegate user authentication to one or more OAuth providers.
+
+E.g. for we can use the Google Authentication Platform as an OAuth provider:
+- We retrieve Google OAuth credentials (client_id and client_secret)
+from Google Secret Manager and save them to secrets.toml at run time.
+- OAuth credentials are required for Rickbot to identify itself to the Google Auth Platform.
+
+The .streamlit/secrets.toml is Streamlit's standard mechanism for handling sensitive information.
+- See Streamlit docs here: https://docs.streamlit.io/develop/concepts/connections/authentication.
+- The file is built once when the service is first launched.
+
+Now our users can authenticate using Google's Auth UI.
 We can run this from our app code or standalone.
 """
 

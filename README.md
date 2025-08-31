@@ -38,10 +38,15 @@ The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot).
 
 See my Medium articles which are intended to supplement this repo:
 
-1. [Enhancing the Rickbot Multi-Personality Agentic Application - using Gemini CLI, Google Agent-Starter-Pack and the Agent Development Kit (ADK)](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24)
+1. [Creating a Rick & Morty Chatbot with Google Cloud and the Gen AI SDK](https://medium.com/google-cloud/creating-a-rick-morty-chatbot-with-google-cloud-and-the-gen-ai-sdk-e8108e83dbee)
+1. [Adding Authentication and Authorisation to our Rickbot Streamlit Chatbot with OAuth and the Google Auth Platform](https://medium.com/google-cloud/adding-authentication-and-authorisation-to-our-rickbot-streamlit-chatbot-with-oauth-and-the-google-b892cda3f1d9)
+1. [Building the Rickbot Multi-Personality Agentic Application using Gemini CLI, Google Agent-Starter-Pack and the Agent Development Kit (ADK)](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24)
 1. [Updating the Rickbot Multi-Personality Agentic Application - Integrate Agent Development Kit (ADK) using Gemini CLI](https://medium.com/google-cloud/updating-the-rickbot-multi-personality-agentic-application-part-2-integrate-agent-development-ad39203e66ad)
+1. [Guided Implementation of Agent Development Kit (ADK) with the Rickbot Multi-Personality Application (Series)](https://medium.com/google-cloud/updating-the-rickbot-multi-personality-agentic-application-part-3-guided-implementation-of-the-9675d3f92c11)
 
 ## Per Dev Session (Once One-Time Setup Tasks Have Been Completed)
+
+**DO THIS STEP BEFORE EACH DEV SESSION**
 
 To configure your shell for a development session, **source** the `scripts/setup-env.sh` script. This will handle authentication, set the correct Google Cloud project, install dependencies, and activate the Python virtual environment.
 
@@ -53,7 +58,7 @@ source scripts/setup-env.sh
 source scripts/setup-env.sh prod
 ```
 
-These scripts run the following setup:
+These scripts run the following setup, and add a bit of intelligence on top:
 
 ```bash
 # From rickbot-adk project root folder
@@ -75,12 +80,6 @@ source .venv/bin/activate
 ```
 
 ## Useful Commands
-
-Install required packages and launch the local development environment:
-
-```bash
-make install && make playground
-```
 
 | Command                       | Description                                                                           |
 | ----------------------------- | ------------------------------------------------------------------------------------- |
@@ -104,14 +103,26 @@ For full command options and usage, refer to the [Makefile](Makefile).
 uv run streamlit run src/frontend/streamlit_app.py
 ```
 
-### ADK
+### Testing
+
+- All tests are in the `src/tests` folder.
+- We can run our tests with `make test`.
+- Note that integration tests will fail if the development environment has not first been configured with the `setup-env.sh` script. This is because the test code will not have access to the required Google APIs.
+- If we want to run tests verbosely, we can do this:
+
+  ```bash
+  uv run pytest -v -s src/tests/unit/test_config.py
+  uv run pytest -v -s src/tests/unit/test_personality.py
+  uv run pytest -v -s src/tests/integration/test_rickbot_agent_multiturn.py
+  uv run pytest -v -s src/tests/integration/test_server_e2e.py
+  uv run pytest -v -s src/tests/integration/test_personalities.py
+  ```
 
 #### Testing Locally
 
 With CLI:
 
 ```bash
-uv run adk run src/adk_sample_app
 uv run adk run src/rickbot_agent
 ```
 
@@ -158,6 +169,8 @@ docker run --rm -p 8080:8080 \
 Use the `src/notebooks/adk_app_testing.ipynb` notebook.
 
 ## Using Agent Starter Kit for Initial Project Setup
+
+This project, its GitHub repo, and associated CI/CD pipeline were initially setup using the Agent Starter Kit. Much of the original template files have since been removed from the project.  But this section has been retained to provide an overview of this process. But do read [this article](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24) for a more detailed walkthrough.
 
 ### Pre-Reqs
 
@@ -305,9 +318,9 @@ The following is just for my own quota issue. May not apply to others! Update th
 - variables.tf
 - env.tfvars (x2)
 
-## Deploying Infra Commands
+## Deploying Infrastucture
 
-If we need to redeploy...
+The following commands describe how to run Terraform tasks, to deploy infrastructure. Note that I have now added a `terraform` target to my `Makefile`, so we can achieve the same result by simply running `make terraform` from the project root directory.
 
 ```bash
 # Assuming we're in the project root folder
