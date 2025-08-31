@@ -2,7 +2,6 @@
 
 ## Next Steps
 
-- [ ] Implement a way to test unauthenticated flow.
 - [ ] Investigate mapping domains in Terraform.
 - [ ] Verify the Prod OAuth app for Google Auth Platform.
 - [ ] Decomm Rickbot project and update repo documentation accordingly.
@@ -16,6 +15,7 @@
 
 ## Completed Steps
 
+- [x] Implement a way to test authentication for local dev
 - [x] Check Cloud Run instance size and optimise.
 - [x] Create `staging` subdomain and map to our Dev Cloud Run service.
 - [x] Add `staging` URL to allowed OAuth URIs.
