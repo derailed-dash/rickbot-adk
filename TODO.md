@@ -3,7 +3,6 @@
 ## Next Steps
 
 - [ ] Implement a way to test unauthenticated flow.
-- [ ] Map test domain for our Dev service.
 - [ ] Investigate mapping domains in Terraform.
 - [ ] Verify the Prod OAuth app for Google Auth Platform.
 - [ ] Decomm Rickbot project and update repo documentation accordingly.
@@ -17,6 +16,8 @@
 
 ## Completed Steps
 
+- [x] Create `staging` subdomain and map to our Dev Cloud Run service.
+- [x] Add `staging` URL to allowed OAuth URIs.
 - [x] Update DNS to point to Prod Rickbot Streamlit service
 - [x] Configure OAuth Client in Prod project.
 - [x] Ensure OAuth secrets are set.
