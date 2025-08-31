@@ -23,10 +23,9 @@ resource "google_cloud_run_v2_service" "app_staging" {
 
       resources {
         limits = {
-          cpu    = "4"
-          memory = "8Gi"
+          cpu    = "1"
+          memory = "2Gi"
         }
-        cpu_idle = false
         startup_cpu_boost = true
       }
 
@@ -86,10 +85,10 @@ resource "google_cloud_run_v2_service" "app_prod" {
 
       resources {
         limits = {
-          cpu    = "4"
-          memory = "8Gi"
+          cpu    = "2"
+          memory = "4Gi"
         }
-        cpu_idle = false
+        # cpu_idle = false
         startup_cpu_boost = true
       }
 
