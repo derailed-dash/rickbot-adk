@@ -3,6 +3,8 @@
 ## Next Steps
 
 - [ ] Implement a way to test unauthenticated flow.
+- [ ] Verify the Prod OAuth app for Google Auth Platform.
+- [ ] Investigate adding other auth methods.
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
 - [ ] Extend Dazbot to have knowledge.
