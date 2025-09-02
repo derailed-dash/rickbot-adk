@@ -2,9 +2,8 @@
 
 ## Next Steps
 
+- [ ] Decomm original Rickbot and update repo documentation accordingly.
 - [ ] Investigate mapping domains in Terraform.
-- [ ] Verify the Prod OAuth app for Google Auth Platform.
-- [ ] Decomm Rickbot project and update repo documentation accordingly.
 - [ ] Investigate adding other auth methods.
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
@@ -15,6 +14,7 @@
 
 ## Completed Steps
 
+- [x] Perform OAuth App Verification with Google for Prod.
 - [x] Implement a way to test authentication for local dev
 - [x] Check Cloud Run instance size and optimise.
 - [x] Create `staging` subdomain and map to our Dev Cloud Run service.
