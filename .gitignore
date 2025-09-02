@@ -143,8 +143,7 @@ dmypy.json
 # secrets
 *.key
 .gitsecret/keys/random_seed
-secrets.toml
-secrets.toml*
+**/.streamlit/secrets.toml
 
 # Terraform
 .terraform*

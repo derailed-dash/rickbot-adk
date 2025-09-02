@@ -72,7 +72,7 @@ fi
 # 4. Authenticate with gcloud and configure project
 if [ "$AUTH_ENABLED" = true ]; then
     echo -e "\n🔐 Authenticating with gcloud and setting project to ${BOLD}$GOOGLE_CLOUD_PROJECT...${RESET}"
-    gcloud auth login --update-adc --launch-browser
+    gcloud auth login --update-adc 2>&1 | grep -v -e '^$' -e 'WSL' # Suppress any annoying WSL messages
     gcloud config set project "$GOOGLE_CLOUD_PROJECT"
     gcloud auth application-default set-quota-project "$GOOGLE_CLOUD_PROJECT"
 else

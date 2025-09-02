@@ -1,4 +1,4 @@
 input*.txt filter=git-crypt diff=git-crypt
 .env* filter=git-crypt diff=git-crypt
 **/*.tfvars filter=git-crypt diff=git-crypt
-**/secure_prompts/** filter=git-crypt diff=git-crypt
+**/secure_dev_config/** filter=git-crypt diff=git-crypt
