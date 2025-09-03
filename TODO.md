@@ -3,9 +3,11 @@
 ## Next Steps
 
 - [ ] Perform project review.
+- [ ] Add lifecycle policy to buckets - delete older data.
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
 - [ ] Extend Dazbot to have knowledge.
+- [ ] Restrict access to certain personalities.
 - [ ] Create new React UI.
 - [ ] Implement OAuth login, potentially as sidecar container.
 - [ ] Investigate adding other auth methods.
