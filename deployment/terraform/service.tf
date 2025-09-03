@@ -1,11 +1,10 @@
-# Manages creation of Cloud Run services.
+# Manages creation of Cloud Run services and associated domain mappings.
 # Note: initial creation is done by TF, but subsequent Cloud Run service deployment is handled by CI/CD.
 # If we want to redeploy Cloud Run from this TF again, we should comment out the lifecycle blocks.
 
 # Get project information to access the project number
 data "google_project" "project" {
   for_each = local.deploy_project_ids
-
   project_id = local.deploy_project_ids[each.key]
 }
 
@@ -71,6 +70,20 @@ resource "google_cloud_run_v2_service" "app_staging" {
   depends_on = [google_project_service.deploy_project_services]
 }
 
+# Create domain mappings for all listed domains
+resource "google_cloud_run_domain_mapping" "app_staging_domain_mapping" {
+  for_each = toset(var.staging_app_domain_name)
+  name     = each.key
+  project  = var.staging_project_id
+  location = google_cloud_run_v2_service.app_staging.location
+  metadata {
+    namespace = data.google_project.project["staging"].project_id
+  }
+  spec {
+    route_name = google_cloud_run_v2_service.app_staging.name
+  }
+}
+
 resource "google_cloud_run_v2_service" "app_prod" {  
   name                = var.project_name
   location            = var.region
@@ -118,4 +131,18 @@ resource "google_cloud_run_v2_service" "app_prod" {
 
   # Make dependencies conditional to avoid errors.
   depends_on = [google_project_service.deploy_project_services]
+}
+
+# Create domain mappings for all listed domains
+resource "google_cloud_run_domain_mapping" "app_prod_domain_mapping" {
+  for_each = toset(var.prod_app_domain_name)
+  name     = each.key
+  project  = var.prod_project_id  
+  location = google_cloud_run_v2_service.app_prod.location
+  metadata {
+    namespace = data.google_project.project["prod"].project_id
+  }
+  spec {
+    route_name = google_cloud_run_v2_service.app_prod.name
+  }
 }

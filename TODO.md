@@ -2,17 +2,18 @@
 
 ## Next Steps
 
-- [ ] Investigate mapping domains in Terraform.
-- [ ] Investigate adding other auth methods.
+- [ ] Perform project review.
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
 - [ ] Extend Dazbot to have knowledge.
 - [ ] Create new React UI.
 - [ ] Implement OAuth login, potentially as sidecar container.
+- [ ] Investigate adding other auth methods.
 - [ ] Ensure React UI works on mobile.
 
 ## Completed Steps
 
+- [x] Investigate mapping domains in Terraform.
 - [x] Decomm original Rickbot and update repo documentation accordingly.
 - [x] Perform OAuth App Verification with Google for Prod.
 - [x] Implement a way to test authentication for local dev

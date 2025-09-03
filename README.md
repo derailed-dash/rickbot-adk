@@ -86,7 +86,7 @@ source .venv/bin/activate
 | `source scripts/setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production       |
 | `make install`                | Install all required dependencies using `uv`                                          |
 | `make playground`             | Launch UI for testing agent locally and remotely. This runs `uv run adk web src`      |
-| `make streamlit`              | Run Streamlit FE: `uv run streamlit run src/streamlit_fe/app.py`                      |
+| `make streamlit`              | Run Streamlit FE: `MOCK_AUTH_USER="mock.user@example.com" uv run streamlit run src/streamlit_fe/app.py`                      |
 | `make test`                   | Run unit and integration tests                                                        |
 | `make lint`                   | Run code quality checks (codespell, ruff, mypy)                                       |
 | `make terraform`              | Plan Terraform, prompt for authorisation, then apply                                  |
@@ -334,3 +334,19 @@ terraform plan -var-file="vars/env.tfvars" -out out.tfplan
 terraform apply "out.tfplan"
 ```
 
+## OAuth
+
+Frontend user authentication is required for Rickbot.
+
+### Streamlit
+
+- With the Streamlit frontend this is achieved using Streamlit's integrated OIDC authentication. 
+- We use Google Auth Platform as the OAuth2 Auth provider.
+- OAuth credentials are obtained from the Google Auth Platform and stored in Google Secret Manager.
+- When the application is first launched, these credentials are read and dynamically written to the `.streamlit/secrets.toml`, which is how the Streamlit OIDC works. We must supply the `oauth2callback` URI as well as the OAuth client ID and secret.
+- Different credentials are used between Staging and Prod.
+- When running locally we use an environment variable `MOCK_AUTH_USER` to bypass real authentication. This is automatically set by `make streamlit`.
+
+## DNS
+
+Google Cloud Run offers a native domain name mapping feature. This is used to map custom domains to our Cloud Run services. Note that any custom domains used must be added to the OAuth authorised domains and authorised redirect URIs. 

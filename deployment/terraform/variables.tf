@@ -41,6 +41,16 @@ variable "service_name" {
   type        = string
 }
 
+variable "staging_app_domain_name" {
+  description = "A list of domain names to be mapped to the service"
+  type        = list(string)
+}
+
+variable "prod_app_domain_name" {
+  description = "A list of domain names to be mapped to the service"
+  type        = list(string)
+}
+
 variable "app_name" {
   description  = "The name of the UI client application"
   type         = string
