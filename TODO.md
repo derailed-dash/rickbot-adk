@@ -2,6 +2,7 @@
 
 ## Next Steps
 
+- [ ] Readme needs a good cover pic.
 - [ ] Perform project review.
 - [ ] Add lifecycle policy to buckets - delete older data.
 - [ ] Add persistence of user configuration and conversations using Firestore.
