@@ -31,6 +31,7 @@ def setup_logger() -> logging.Logger:
         handler.setFormatter(formatter)
         app_logger.addHandler(handler)
 
+    app_logger.propagate = False # Prevent propagation to the root logger
     app_logger.info("Logger initialised.")
     app_logger.debug("DEBUG level logging enabled.")
 
