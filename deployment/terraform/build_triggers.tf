@@ -62,15 +62,14 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     _BUCKET_NAME_LOAD_TEST_RESULTS = resource.google_storage_bucket.bucket_load_test_results.name
     _CB_REGION                     = var.cb_region
     _REGION                        = var.region
-    _ORG                           = var.my_org
-    _SERVICE_NAME                  = var.service_name
     _ARTIFACT_REPO_NAME            = var.artifact_repo_name
+    _SERVICE_NAME                  = var.service_name
     _APP_NAME                      = var.app_name
     _AGENT_NAME                    = var.agent_name
     _GOOGLE_GENAI_USE_VERTEXAI     = var.google_genai_use_vertexai
     _MODEL                         = var.model
+    _LOG_LEVEL                     = "DEBUG"
     _MAX_INSTANCES                 = "1"
-    _LOG_LEVEL                     = var.log_level
     _AUTH_REQUIRED                 = "True"
     _RATE_LIMIT                    = "120"    
   }
@@ -110,9 +109,9 @@ resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
     _GOOGLE_GENAI_USE_VERTEXAI   = var.google_genai_use_vertexai
     _MODEL                       = var.model
     _LOG_LEVEL                   = var.log_level
+    _MAX_INSTANCES               = "1"
     _AUTH_REQUIRED               = "True"
     _RATE_LIMIT                  = "120"
-    _MAX_INSTANCES               = "1"
   }
   depends_on = [
     resource.google_project_service.cicd_services, 
