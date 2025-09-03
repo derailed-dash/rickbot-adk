@@ -1,5 +1,7 @@
 # Rickbot-ADK
 
+<img src="media/rickbot-adk-800w.gif" alt="Rickbot" width="800" />
+
 ## Repo Metadata
 
 Author: Darren Lester

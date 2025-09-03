@@ -2,7 +2,6 @@
 
 ## Next Steps
 
-- [ ] Readme needs a good cover pic.
 - [ ] Perform project review.
 - [ ] Add lifecycle policy to buckets - delete older data.
 - [ ] Add persistence of user configuration and conversations using Firestore.
@@ -16,6 +15,7 @@
 
 ## Completed Steps
 
+- [x] Readme needs a good cover pic.
 - [x] Investigate mapping domains in Terraform.
 - [x] Decomm original Rickbot and update repo documentation accordingly.
 - [x] Perform OAuth App Verification with Google for Prod.
