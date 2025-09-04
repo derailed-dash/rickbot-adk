@@ -2,7 +2,7 @@
 
 ## Next Steps
 
-- [ ] Perform project review.
+- [ ] Refactor logging setup to eliminate duplication.
 - [ ] Add lifecycle policy to buckets - delete older data.
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
@@ -15,6 +15,7 @@
 
 ## Completed Steps
 
+- [x] Perform project review.
 - [x] Readme needs a good cover pic.
 - [x] Investigate mapping domains in Terraform.
 - [x] Decomm original Rickbot and update repo documentation accordingly.
