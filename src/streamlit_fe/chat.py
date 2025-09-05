@@ -15,7 +15,6 @@ from google.adk.runners import Runner
 from google.genai.types import Blob, Content, Part
 
 from rickbot_agent.personality import get_personalities
-from streamlit_fe.st_config import Config
 from streamlit_fe.st_utils import RateLimiter
 
 # Define the root path of the project
