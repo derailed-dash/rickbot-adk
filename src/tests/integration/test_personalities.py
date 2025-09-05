@@ -41,9 +41,11 @@ async def test_personality_loads_and_responds(personality_name: str) -> None:
     # We iterate through the asynchronous events from the agent's run
     # and build the final response string from the text parts of the final event.
     final_response = ""
-    async for event in runner.run_async(user_id=user_id, 
-                                        session_id=session_id, 
-                                        new_message=new_message):
+    async for event in runner.run_async(
+        user_id=user_id,
+        session_id=session_id,
+        new_message=new_message,
+    ):
         if event.is_final_response() and event.content and event.content.parts:
             for part in event.content.parts:
                 if part.text:

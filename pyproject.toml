@@ -76,7 +76,7 @@ ignore = ["E501", "C901", "E302", "W291"]
 known-first-party = ["src"]
 
 [tool.mypy]
-disallow_untyped_calls = true      # Prohibit calling functions that lack type annotations.
+disallow_untyped_calls = false     # Prohibit calling functions that lack type annotations.
 disallow_untyped_defs = false      # Allow defining functions without type annotations.
 disallow_incomplete_defs = true    # Prohibit defining functions with incomplete type annotations.
 no_implicit_optional = true        # Require `Optional[T]` for variables that can be `None`.

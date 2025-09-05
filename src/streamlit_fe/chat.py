@@ -54,8 +54,7 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, ra
     # Prepare the message for the ADK
     message_parts = [Part(text=prompt)]
     if uploaded_file:
-        message_parts.append(Part(inline_data=Blob(data=uploaded_file.getvalue(), 
-                                                   mime_type=uploaded_file.type)))
+        message_parts.append(Part(inline_data=Blob(data=uploaded_file.getvalue(), mime_type=uploaded_file.type)))
 
     new_message = Content(role="user", parts=message_parts)
 
@@ -96,6 +95,7 @@ def custom_logout() -> None:
         # For real auth, use Streamlit's logout
         st.logout()
 
+
 def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
     """
     Renders the main chat interface, including sidebar and chat history.
@@ -133,8 +133,7 @@ def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
         )
 
         # Find the corresponding personality object based on the selected menu_name
-        selected_personality = next(p for p in personalities.values() 
-                                            if p.menu_name == selected_menu_name)
+        selected_personality = next(p for p in personalities.values() if p.menu_name == selected_menu_name)
 
         if selected_personality != st.session_state.current_personality:
             st.session_state.current_personality = selected_personality

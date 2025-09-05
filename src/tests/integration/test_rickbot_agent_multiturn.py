@@ -14,7 +14,6 @@ from src.rickbot_agent.agent import root_agent
 
 APP_NAME = "test_rickbot"
 
-
 @pytest.mark.asyncio
 async def test_rickbot_agent_response():
     """Tests that the rickbot agent returns a non-empty response."""
@@ -22,7 +21,7 @@ async def test_rickbot_agent_response():
     await session_service.create_session(app_name=APP_NAME, user_id="test_user", session_id="test_session")
     runner = Runner(agent=root_agent, app_name=APP_NAME, session_service=session_service)
     query = "What is the meaning of life?"
-    response_text = ""
+    response_text: str|None = ""
     async for event in runner.run_async(
         user_id="test_user",
         session_id="test_session",
@@ -39,7 +38,6 @@ async def test_rickbot_agent_response():
     assert isinstance(response_text, str)
     assert len(response_text) > 0
 
-
 @pytest.mark.asyncio
 async def test_rickbot_agent_two_turn_conversation():
     """
@@ -55,12 +53,14 @@ async def test_rickbot_agent_two_turn_conversation():
     responses = []
     for query in queries:
         print(f"Query: {query}")
-        response_text = ""
+        response_text: str|None = ""
         async for event in runner.run_async(
             user_id="test_user",
             session_id="test_session",
-            new_message=genai_types.Content(role="user", 
-                                            parts=[genai_types.Part.from_text(text=query)]),
+            new_message=genai_types.Content(
+                role="user",
+                parts=[genai_types.Part.from_text(text=query)],
+            ),
         ):
             if event.is_final_response():
                 if event.content and event.content.parts and len(event.content.parts) > 0:

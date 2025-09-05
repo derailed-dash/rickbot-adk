@@ -25,8 +25,7 @@ ROOT_DIR = Path(__file__).parent.parent
 DEFAULT_PERSONALITY = "Rick"
 RICKBOT_AVATAR = get_avatar("rickbot-trans")
 
-
-async def initialize_adk_runner(personality: Personality):
+async def initialize_adk_runner(personality: Personality) -> Runner:
     """Initialise the ADK runner with the correct agent personality."""
     rickbot_agent = get_agent(personality.name)
 
@@ -38,14 +37,12 @@ async def initialize_adk_runner(personality: Personality):
     )
     return Runner(agent=rickbot_agent, app_name=config.app_name, session_service=session_service)
 
-
 @st.cache_resource  # Ensure this rate limiter is shared across all user sessions and reruns
 def initialize_rate_limiter():
     """Initialize the rate limiter."""
     return RateLimiter(config.rate_limit_qpm)
 
-
-def render_login_screen(mock_user: bool = False, mock_user_email: str | None = None):
+def render_login_screen(mock_user: bool = False, mock_user_email: str | None = None) -> None:
     """Renders the login screen for both real and mock users."""
     header_col1, header_col2 = st.columns([0.3, 0.7])
     header_col1.image(RICKBOT_AVATAR, width=140)
@@ -72,7 +69,6 @@ def render_login_screen(mock_user: bool = False, mock_user_email: str | None = N
         )
         if st.button("Log in with Google", use_container_width=True):
             st.login("google")
-
 
 def main():
     """Main function to run the Streamlit application."""
