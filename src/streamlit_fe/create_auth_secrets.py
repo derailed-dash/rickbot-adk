@@ -1,5 +1,5 @@
 """
-If Rickbot is configured to perform user authentication, 
+If Rickbot is configured to perform user authentication,
 then we delegate user authentication to one or more OAuth providers.
 
 E.g. for we can use the Google Authentication Platform as an OAuth provider:
@@ -26,8 +26,8 @@ from streamlit_fe.st_utils import retrieve_secret
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@st.cache_resource # This should only be done once
-def create_secrets_toml(google_project_id: str):
+@st.cache_resource  # This should only be done once
+def create_secrets_toml(google_project_id: str) -> None:
     streamlit_dir = ".streamlit"
     secrets_file_path = os.path.join(streamlit_dir, "secrets.toml")
 
@@ -47,9 +47,7 @@ def create_secrets_toml(google_project_id: str):
         logger.info(f"Successfully created {secrets_file_path}")
 
     except Exception as e:
-        raise ValueError(
-            f"Error accessing secret '{secret_name}' from Secret Manager: {e}"
-        ) from e
+        raise ValueError(f"Error accessing secret '{secret_name}' from Secret Manager: {e}") from e
 
 if __name__ == "__main__":
     prj_id = os.environ.get("GOOGLE_CLOUD_PROJECT")

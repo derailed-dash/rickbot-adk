@@ -34,6 +34,7 @@ test:
 
 # Run code quality checks (codespell, ruff, mypy)
 lint:
+	uv sync --dev --extra jupyter --extra lint 
 	uv run codespell
 	uv run ruff check . --diff
 	uv run ruff format . --check --diff

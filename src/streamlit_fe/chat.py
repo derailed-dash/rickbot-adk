@@ -15,6 +15,7 @@ from google.adk.runners import Runner
 from google.genai.types import Blob, Content, Part
 
 from rickbot_agent.personality import get_personalities
+from streamlit_fe.st_config import Config
 from streamlit_fe.st_utils import RateLimiter
 
 # Define the root path of the project
@@ -22,9 +23,7 @@ ROOT_DIR = Path(__file__).parent.parent
 USER_AVATAR = str(ROOT_DIR / "rickbot_agent/media/morty.png")
 
 
-async def get_agent_response(
-    runner: Runner, prompt: str, uploaded_file: Any, rate_limiter: RateLimiter
-):
+async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, rate_limiter: RateLimiter) -> None:
     """
     Handles user input and generates the bot's response using the Rickbot ADK agent.
     """
@@ -56,24 +55,15 @@ async def get_agent_response(
     # Prepare the message for the ADK
     message_parts = [Part(text=prompt)]
     if uploaded_file:
-        message_parts.append(
-            Part(
-                inline_data=Blob(
-                    data=uploaded_file.getvalue(), mime_type=uploaded_file.type
-                )
-            )
-        )
+        message_parts.append(Part(inline_data=Blob(data=uploaded_file.getvalue(), 
+                                                   mime_type=uploaded_file.type)))
 
     new_message = Content(role="user", parts=message_parts)
 
     # Generate and display the agent's response
     with st.status("Thinking...", expanded=True) as bot_status:
-        with st.chat_message(
-            "assistant", avatar=st.session_state.current_personality.avatar
-        ):
-            response_placeholder = (
-                st.empty()
-            )  # empty invisible container for retrieving streamed content
+        with st.chat_message("assistant", avatar=st.session_state.current_personality.avatar):
+            response_placeholder = st.empty()  # empty invisible container for retrieving streamed content
             full_response = ""
 
             # Call the agent runner
@@ -97,7 +87,7 @@ async def get_agent_response(
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 
-def custom_logout():
+def custom_logout() -> None:
     if os.environ.get("MOCK_AUTH_USER"):
         # For mock auth, just clear the session state flags
         st.session_state.is_logged_in = False
@@ -107,7 +97,7 @@ def custom_logout():
         # For real auth, use Streamlit's logout
         st.logout()
 
-def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
+def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
     """
     Renders the main chat interface, including sidebar and chat history.
     """
@@ -119,7 +109,7 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
     if "file_just_uploaded" not in st.session_state:
         st.session_state.file_just_uploaded = False
 
-    def on_file_change():
+    def on_file_change() -> None:
         st.session_state.file_just_uploaded = True
 
     # --- Title and Introduction ---
@@ -140,15 +130,12 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
         selected_menu_name = st.selectbox(
             "Choose your bot personality:",
             options=personality_menu_names,
-            index=personality_menu_names.index(
-                st.session_state.current_personality.menu_name
-            ),
+            index=personality_menu_names.index(st.session_state.current_personality.menu_name),
         )
 
         # Find the corresponding personality object based on the selected menu_name
-        selected_personality = next(
-            p for p in personalities.values() if p.menu_name == selected_menu_name
-        )
+        selected_personality = next(p for p in personalities.values() 
+                                            if p.menu_name == selected_menu_name)
 
         if selected_personality != st.session_state.current_personality:
             st.session_state.current_personality = selected_personality
@@ -179,11 +166,7 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
 
     # Display previous messages from history
     for message in st.session_state.messages:
-        avatar = (
-            USER_AVATAR
-            if message["role"] == "user"
-            else st.session_state.current_personality.avatar
-        )
+        avatar = USER_AVATAR if message["role"] == "user" else st.session_state.current_personality.avatar
         with st.chat_message(message["role"], avatar=avatar):
             if attachment := message.get("attachment"):
                 if "image" in attachment.get("mime_type", ""):
@@ -199,6 +182,4 @@ def render_chat(config, rate_limiter: RateLimiter, adk_runner: Runner):
             file_to_process = uploaded_file
             st.session_state.file_just_uploaded = False  # Consume the flag
 
-        asyncio.run(
-            get_agent_response(adk_runner, prompt, file_to_process, rate_limiter)
-        )
+        asyncio.run(get_agent_response(adk_runner, prompt, file_to_process, rate_limiter))

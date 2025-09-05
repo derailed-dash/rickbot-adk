@@ -39,16 +39,12 @@ class Personality:
 
     def __post_init__(self) -> None:
         self.avatar = get_avatar(self.name.lower())
-        system_prompt_file = (
-            SCRIPT_DIR / "data/system_prompts" / f"{self.name.lower()}.txt"
-        )
+        system_prompt_file = SCRIPT_DIR / "data/system_prompts" / f"{self.name.lower()}.txt"
         if os.path.exists(system_prompt_file):
             with open(system_prompt_file, encoding="utf-8") as f:
                 self.system_instruction = f.read()
         else:
-            logger.debug(
-                f"Unable to find {system_prompt_file}. Attempting to retrieve from Secret Manager."
-            )
+            logger.debug(f"Unable to find {system_prompt_file}. Attempting to retrieve from Secret Manager.")
             secret_name = f"{self.name.lower()}-system-prompt"
             try:
                 google_project = os.environ.get("GOOGLE_CLOUD_PROJECT")

@@ -3,6 +3,7 @@ This module contains end-to-end tests for the Rickbot-ADK API server.
 It starts the server as a subprocess, waits for it to become ready, and then performs
 integration tests against its endpoints, specifically focusing on the chat streaming functionality.
 """
+
 import json
 import logging
 import os
@@ -60,12 +61,8 @@ def start_server() -> subprocess.Popen[str]:
     )
 
     # Start threads to log stdout and stderr in real-time
-    threading.Thread(
-        target=log_output, args=(process.stdout, logger.info), daemon=True
-    ).start()
-    threading.Thread(
-        target=log_output, args=(process.stderr, logger.error), daemon=True
-    ).start()
+    threading.Thread(target=log_output, args=(process.stdout, logger.info), daemon=True).start()
+    threading.Thread(target=log_output, args=(process.stderr, logger.error), daemon=True).start()
 
     return process
 
@@ -113,7 +110,7 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
 
     # Create session first
     user_id = "test_user_123"
-    session_data = {"state": {}}  # No specific state needed for this test
+    session_data: dict[str, Any] = {"state": {}}  # No specific state needed for this test
 
     session_url = f"{BASE_URL}/apps/{APP_NAME}/users/{user_id}/sessions"
     session_response = requests.post(
@@ -140,9 +137,7 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
         },
     }
 
-    response = requests.post(
-        STREAM_URL, headers=HEADERS, json=data, stream=True, timeout=60
-    )
+    response = requests.post(STREAM_URL, headers=HEADERS, json=data, stream=True, timeout=60)
     assert response.status_code == 200
 
     # Parse SSE events from response
@@ -164,11 +159,7 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
     has_text_content = False
     for event in events:
         content = event.get("content")
-        if (
-            content is not None
-            and content.get("parts")
-            and any(part.get("text") for part in content["parts"])
-        ):
+        if content is not None and content.get("parts") and any(part.get("text") for part in content["parts"]):
             has_text_content = True
             break
 

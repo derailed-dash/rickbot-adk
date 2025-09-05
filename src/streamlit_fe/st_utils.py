@@ -28,7 +28,7 @@ class RateLimiter:
         self.limit = parse(f"{self.max_requests}/minute")
 
     def hit(self, key: str) -> bool:
-        """ Check if current request is within the rate limit.
+        """Check if current request is within the rate limit.
         If so (i.e. limit not exceeded), increments and returns True.
         Otherwise returns False.
         """

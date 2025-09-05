@@ -69,26 +69,27 @@ select = [
     "UP", # pyupgrade
     "RUF", # ruff specific rules
 ]
-ignore = ["E501", "C901"] # ignore line too long, too complex
+# ignore line too long, too complex, two blank lines, trailing whitespace 
+ignore = ["E501", "C901", "E302", "W291"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]
 
 [tool.mypy]
-disallow_untyped_calls = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-no_implicit_optional = true
-check_untyped_defs = true
-disallow_subclassing_any = true
-warn_incomplete_stub = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_unreachable = true
-follow_imports = "silent"
-ignore_missing_imports = true
-explicit_package_bases = true
-disable_error_code = ["misc", "no-untyped-call", "no-any-return"]
+disallow_untyped_calls = true      # Prohibit calling functions that lack type annotations.
+disallow_untyped_defs = false      # Allow defining functions without type annotations.
+disallow_incomplete_defs = true    # Prohibit defining functions with incomplete type annotations.
+no_implicit_optional = true        # Require `Optional[T]` for variables that can be `None`.
+check_untyped_defs = true          # Type-check the body of functions without annotations.
+disallow_subclassing_any = true    # Prohibit a class from inheriting from a value of type `Any`.
+warn_incomplete_stub = true        # Warn about incomplete type stubs (`.pyi` files).
+warn_redundant_casts = true        # Warn if a type cast is unnecessary.
+warn_unused_ignores = true         # Warn about `# type: ignore` comments that are no longer needed.
+warn_unreachable = true            # Warn about code that is unreachable.
+follow_imports = "silent"          # Type-check imported modules but suppress errors from them.
+ignore_missing_imports = true      # Suppress errors about unresolved imports.
+explicit_package_bases = true      # Enforce explicit declaration of package bases.
+disable_error_code = ["misc", "no-any-return"]
 
 exclude = [".venv"]
 

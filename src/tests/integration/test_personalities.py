@@ -1,6 +1,7 @@
 """
 Integration tests to execute the agent with each personality.
 """
+
 import pytest
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
@@ -12,7 +13,7 @@ from rickbot_agent.personality import get_personalities
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("personality_name", get_personalities().keys())
-async def test_personality_loads_and_responds(personality_name):
+async def test_personality_loads_and_responds(personality_name: str) -> None:
     """
     Tests that each personality can be loaded, receive a prompt, and generate a response.
 
@@ -31,12 +32,8 @@ async def test_personality_loads_and_responds(personality_name):
     session_service = InMemorySessionService()
     session_id = "test_session"
     user_id = "test_user"
-    await session_service.create_session(
-        app_name="rickbot_test", user_id=user_id, session_id=session_id
-    )
-    runner = Runner(
-        agent=agent, app_name="rickbot_test", session_service=session_service
-    )
+    await session_service.create_session(app_name="rickbot_test", user_id=user_id, session_id=session_id)
+    runner = Runner(agent=agent, app_name="rickbot_test", session_service=session_service)
     prompt = "Hello"
     new_message = Content(role="user", parts=[Part(text=prompt)])
 
@@ -44,9 +41,9 @@ async def test_personality_loads_and_responds(personality_name):
     # We iterate through the asynchronous events from the agent's run
     # and build the final response string from the text parts of the final event.
     final_response = ""
-    async for event in runner.run_async(
-        user_id=user_id, session_id=session_id, new_message=new_message
-    ):
+    async for event in runner.run_async(user_id=user_id, 
+                                        session_id=session_id, 
+                                        new_message=new_message):
         if event.is_final_response() and event.content and event.content.parts:
             for part in event.content.parts:
                 if part.text:

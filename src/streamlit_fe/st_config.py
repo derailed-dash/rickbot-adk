@@ -27,7 +27,7 @@ def setup_logger() -> logging.Logger:
         handler.setFormatter(formatter)
         app_logger.addHandler(handler)
 
-    app_logger.propagate = False # Prevent propagation to the root logger
+    app_logger.propagate = False  # Prevent propagation to the root logger
     app_logger.info("Logger initialised.")
     app_logger.debug("DEBUG level logging enabled.")
 
@@ -41,9 +41,9 @@ class Config:
     """Configuration for the application, loaded from environment variables."""
 
     app_name: str
-    google_project_id: str # used for Google Auth
+    google_project_id: str  # used for Google Auth
     auth_required: bool
-    rate_limit_qpm: int # queries per minute
+    rate_limit_qpm: int  # queries per minute
 
 @st.cache_resource
 def get_config() -> Config:
@@ -52,7 +52,7 @@ def get_config() -> Config:
     if not google_project_id:
         raise ValueError("GOOGLE_CLOUD_PROJECT environment variable not set.")
     auth_required = os.environ.get("AUTH_REQUIRED", "false").lower() == "true"
-    rate_limit = int(os.environ.get("RATE_LIMIT", "20")) # Set a low rate limit by default
+    rate_limit = int(os.environ.get("RATE_LIMIT", "20"))  # Set a low rate limit by default
 
     logger.debug(f"Auth required: {auth_required}")
     logger.debug(f"Rate limit: {rate_limit} qpm")

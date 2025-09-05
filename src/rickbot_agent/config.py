@@ -13,6 +13,7 @@ agent_name = os.environ.setdefault("AGENT_NAME", "rickbot_agent")
 logging.getLogger("google_adk").setLevel(logging.WARNING)
 logging.getLogger("google_genai").setLevel(logging.WARNING)
 
+
 def setup_logger() -> logging.Logger:
     """Sets up and configures a logger for the application."""
     log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
@@ -30,13 +31,15 @@ def setup_logger() -> logging.Logger:
         handler.setFormatter(formatter)
         app_logger.addHandler(handler)
 
-    app_logger.propagate = False # Prevent propagation to the root logger
+    app_logger.propagate = False  # Prevent propagation to the root logger
     app_logger.info("Logger initialised.")
     app_logger.debug("DEBUG level logging enabled.")
 
     return app_logger
 
+
 logger = setup_logger()
+
 
 @dataclass
 class Config:
@@ -48,6 +51,7 @@ class Config:
     model: str
     genai_use_vertexai: bool
 
+
 def get_config() -> Config:
     """Return a dictionary of the current config."""
 
@@ -56,9 +60,7 @@ def get_config() -> Config:
         "GOOGLE_CLOUD_LOCATION", "global"
     )  # assume set as env var, but fail back to global
     model = os.environ.setdefault("MODEL", "gemini-2.5-flash")
-    genai_use_vertexai = (
-        os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "True").lower() == "true"
-    )
+    genai_use_vertexai = os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "True").lower() == "true"
 
     logger.debug("agent_name set to %s", agent_name)
     logger.debug("project_id set to %s", project_id)

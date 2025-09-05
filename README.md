@@ -320,7 +320,7 @@ The following is just for my own quota issue. May not apply to others! Update th
 - variables.tf
 - env.tfvars (x2)
 
-## Deploying Infrastucture
+## Deploying Infrastructure
 
 The following commands describe how to run Terraform tasks, to deploy infrastructure. Note that I have now added a `terraform` target to my `Makefile`, so we can achieve the same result by simply running `make terraform` from the project root directory.
 
@@ -342,7 +342,7 @@ Frontend user authentication is required for Rickbot.
 
 ### Streamlit
 
-- With the Streamlit frontend this is achieved using Streamlit's integrated OIDC authentication. 
+- With the Streamlit frontend this is achieved using Streamlit\'s integrated OIDC authentication. 
 - We use Google Auth Platform as the OAuth2 Auth provider.
 - OAuth credentials are obtained from the Google Auth Platform and stored in Google Secret Manager.
 - When the application is first launched, these credentials are read and dynamically written to the `.streamlit/secrets.toml`, which is how the Streamlit OIDC works. We must supply the `oauth2callback` URI as well as the OAuth client ID and secret.

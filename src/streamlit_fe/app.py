@@ -36,9 +36,7 @@ async def initialize_adk_runner(personality: Personality):
         user_id=st.session_state.user_id,
         session_id=st.session_state.session_id,
     )
-    return Runner(
-        agent=rickbot_agent, app_name=config.app_name, session_service=session_service
-    )
+    return Runner(agent=rickbot_agent, app_name=config.app_name, session_service=session_service)
 
 
 @st.cache_resource  # Ensure this rate limiter is shared across all user sessions and reruns
@@ -110,9 +108,7 @@ def main():
             create_secrets_toml(config.google_project_id)  # Do once and cache
         except ValueError as e:
             logger.error(f"Failed to setup auth: {e}", exc_info=True)
-            st.error(
-                f"⚠️ Could not initialize the application. Please check your configuration. Error: {e}"
-            )
+            st.error(f"⚠️ Could not initialize the application. Please check your configuration. Error: {e}")
             st.stop()
 
         if not st.user.is_logged_in:
@@ -152,21 +148,17 @@ def authenticated_flow():
         # Re-initialize ADK runner if personality changes or not yet initialized
         if (
             "adk_runner" not in st.session_state
-            or st.session_state.get("last_personality")
-            != st.session_state.current_personality
+            or st.session_state.get("last_personality") != st.session_state.current_personality
         ):
-            st.session_state.adk_runner = asyncio.run(
-                initialize_adk_runner(st.session_state.current_personality)
-            )
+            st.session_state.adk_runner = asyncio.run(initialize_adk_runner(st.session_state.current_personality))
             st.session_state.last_personality = st.session_state.current_personality
 
         # --- Render Chat Interface ---
-        render_chat(config, rate_limiter, st.session_state.adk_runner)
+        render_chat(rate_limiter, st.session_state.adk_runner)
 
     except (StreamlitAPIException, KeyError, ValueError, TypeError, RuntimeError) as e:
         st.error(f"An unexpected error occurred: {e}")
         logger.error(f"Application error: {e}", exc_info=True)
-
 
 if __name__ == "__main__":
     main()

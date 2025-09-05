@@ -15,6 +15,7 @@ Key behaviors tested include:
 - Assurance that file/directory creation is skipped if secrets.toml already exists.
 - Validation of error handling when fetching the secret from the external service fails.
 """
+
 import os
 from unittest.mock import mock_open, patch
 
@@ -27,7 +28,7 @@ from src.streamlit_fe.create_auth_secrets import create_secrets_toml
 # Since the function is decorated with @st.cache_resource, we need to clear
 # its cache before each test to ensure test isolation.
 @pytest.fixture(autouse=True)
-def clear_streamlit_cache():
+def clear_streamlit_cache() -> None:
     """
     A pytest fixture that automatically runs before each test in this module.
     It clears the cache for the `create_secrets_toml` function, ensuring
@@ -44,9 +45,7 @@ def clear_streamlit_cache():
 @patch("os.path.exists")
 @patch("os.makedirs")
 @patch("builtins.open", new_callable=mock_open)
-def test_create_secrets_toml_success(
-    mock_file_open, mock_makedirs, mock_exists, mock_retrieve_secret
-):
+def test_create_secrets_toml_success(mock_file_open, mock_makedirs, mock_exists, mock_retrieve_secret) -> None:
     """
     Tests the successful creation of secrets.toml when it does not exist.
     """
@@ -70,9 +69,7 @@ server_metadata_url = "https://accounts.google.com/.well-known/openid-configurat
 
     # Assert: Verify that the correct actions were taken.
     mock_exists.assert_called_once_with(secrets_file_path)
-    mock_retrieve_secret.assert_called_once_with(
-        project_id, "rickbot-streamlit-secrets-toml"
-    )
+    mock_retrieve_secret.assert_called_once_with(project_id, "rickbot-streamlit-secrets-toml")
     mock_makedirs.assert_called_once_with(".streamlit", exist_ok=True)
     mock_file_open.assert_called_once_with(secrets_file_path, "w")
     mock_file_open().write.assert_called_once_with(mock_secret_content)
@@ -82,9 +79,7 @@ server_metadata_url = "https://accounts.google.com/.well-known/openid-configurat
 @patch("os.path.exists")
 @patch("os.makedirs")
 @patch("builtins.open", new_callable=mock_open)
-def test_create_secrets_toml_already_exists(
-    mock_file_open, mock_makedirs, mock_exists, mock_retrieve_secret
-):
+def test_create_secrets_toml_already_exists(mock_file_open, mock_makedirs, mock_exists, mock_retrieve_secret) -> None:
     """
     Tests that file creation is skipped if secrets.toml already exists.
     """
@@ -105,7 +100,7 @@ def test_create_secrets_toml_already_exists(
 
 @patch("src.streamlit_fe.create_auth_secrets.retrieve_secret")
 @patch("os.path.exists")
-def test_create_secrets_toml_retrieval_fails(mock_exists, mock_retrieve_secret):
+def test_create_secrets_toml_retrieval_fails(mock_exists, mock_retrieve_secret) -> None:
     """
     Tests that a ValueError is raised if retrieving the secret fails.
     """
