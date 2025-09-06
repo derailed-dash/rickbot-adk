@@ -2,7 +2,6 @@
 
 ## Next Steps
 
-- [ ] Refactor logging setup to eliminate duplication.
 - [ ] Add lifecycle policy to buckets - delete older data.
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
@@ -15,6 +14,7 @@
 
 ## Completed Steps
 
+- [x] Refactor logging setup to eliminate duplication.
 - [x] Perform project review.
 - [x] Readme needs a good cover pic.
 - [x] Investigate mapping domains in Terraform.
