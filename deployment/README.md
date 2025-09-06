@@ -10,31 +10,69 @@ Subsequent deployment runs can easily be invoked using `make terraform` from the
 
 ## Deployment Overview
 
-### Variables
+### Environment Management: Staging and Production
 
-Variables are configured in `vars/env.tfvars`.
+This project utilizes distinct Google Cloud Projects to manage **staging** and **production** environments. This separation ensures isolation and allows for independent testing and deployment workflows.
 
-### CI Pipeline
+*   **Project IDs:** The specific Google Cloud Project IDs for these environments are defined as variables in `deployment/terraform/variables.tf` (e.g., `prod_project_id`, `staging_project_id`).
+*   **Variable Assignment:** The actual values for these project IDs are assigned in `deployment/terraform/vars/env.tfvars`.
+*   **Environment Grouping:** The `deployment/terraform/locals.tf` file groups these project IDs into a `deploy_project_ids` map, which facilitates iteration and consistent application of configurations across environments within Terraform.
 
-Defined in `.cloudbuild/pr_checks.yaml`
+### Variable Definition and Usage
 
-- Triggered on pull request creation/update.
-- Runs unit and integration tests to ensure code quality.
+*   **Definition (`deployment/terraform/variables.tf`):** This file declares all input variables for the Terraform configuration.
+*   **Assignment (`deployment/terraform/vars/env.tfvars`):** This file is used to assign concrete values to the variables declared in `variables.tf`. This allows for environment-specific configurations.
 
-### Staging CD Pipeline 
+### CI/CD Pipeline Creation
 
-Defined in `.cloudbuild/staging.yaml`
+The entire CI/CD pipeline for this project was initially set up using the `uvx agent-starter-pack setup-cicd` command. This command automates several critical steps:
 
-- Triggered on merge to the main branch.
-- Builds and pushes the application container to Artifact Registry.
-- Deploys the new version to the staging environment.
-- Performs automated load testing against the staging environment.
+1.  **GitHub Repository Creation:** It can create a new GitHub repository for your project.
+2.  **CI/CD Runner Connection:** It connects your GitHub repository to your chosen CI/CD runner (e.g., Google Cloud Build or GitHub Actions).
+3.  **Infrastructure Provisioning:** It provisions the necessary staging and production infrastructure in your Google Cloud projects.
+4.  **Deployment Triggers:** It configures deployment triggers based on your repository's activity (e.g., pull requests, merges to `main`).
 
-### Production Deployment
+It has since been modified extensively.
 
-Defined in `.cloudbuild/deploy-to-prod.yaml`
+### Cloud Build Integration
 
-- Triggered after a successful staging deployment.
-- Requires manual approval before proceeding to production.
-- Deploys the same container image that was tested in staging to the production environment.
+This project leverages Google Cloud Build for its CI/CD workflows. The build configurations are defined in the `.cloudbuild/` directory:
 
+*   **`pr_checks.yaml` (CI Pipeline):**
+    *   **Trigger:** Activated on pull request creation or updates.
+    *   **Purpose:** Ensures code quality and functionality before merging.
+    *   **Steps:**
+        *   Installs Python dependencies using `uv`.
+        *   Runs unit tests (`pytest src/tests/unit`).
+        *   Runs integration tests (`pytest src/tests/integration`).
+*   **`staging.yaml` (Staging CD Pipeline):**
+    *   **Trigger:** Activated on merges to the `main` branch.
+    *   **Purpose:** Builds, tests, and deploys the application to the staging environment.
+    *   **Steps:**
+        *   **Build:** Builds the Docker image of the application and tags it with the `SHORT_SHA` (commit SHA).
+        *   **Push:** Pushes the built Docker image to Artifact Registry.
+        *   **Deploy to Staging:** Deploys the image to a Cloud Run service in the staging project. Environment variables (e.g., `GOOGLE_CLOUD_PROJECT`, `LOG_LEVEL`, `MODEL`) are passed via `--set-env-vars`.
+        *   **Trigger Prod Deployment:** After a successful staging deployment, it triggers the production deployment Cloud Build job.
+    *   **Substitutions:** Uses Cloud Build substitutions (e.g., `_STAGING_PROJECT_ID`, `_REGION`, `_SERVICE_NAME`) to dynamically configure the build and deployment based on environment-specific values.
+*   **`deploy-to-prod.yaml` (Production Deployment):**
+    *   **Trigger:** Manually triggered after a successful staging deployment (often with a manual approval step in Cloud Build).
+    *   **Purpose:** Deploys the *same* container image that was tested in staging to the production environment.
+    *   **Steps:**
+        *   Deploys the pre-built and tested image to a Cloud Run service in the production project.
+    *   **Substitutions:** Similar to staging, it uses substitutions (e.g., `_PROD_PROJECT_ID`, `_SERVICE_NAME`) to ensure the correct production environment is targeted.
+
+### Iteration and Environment Specifics in CI/CD
+
+The CI/CD pipelines are designed to handle multiple environments through:
+
+*   **Project ID Variables:** Cloud Build substitutions like `_STAGING_PROJECT_ID` and `_PROD_PROJECT_ID` are used in the `.cloudbuild` YAML files to ensure that deployments target the correct Google Cloud Project based on the environment.
+*   **Shared Image:** The same Docker image built and tested in the staging pipeline is promoted to production, ensuring consistency and reducing the risk of environment-specific issues.
+*   **Environment Variables:** Application configurations (e.g., `LOG_LEVEL`, `MODEL`, `AUTH_REQUIRED`) are passed as environment variables during deployment, allowing for environment-specific tuning.
+
+### Additional Useful Information
+
+*   **Convenience Commands:** The `Makefile` in the project root provides several convenient commands for development and deployment:
+    *   `make install`: Installs Python dependencies using `uv`.
+    *   `make terraform`: Applies the Terraform configurations.
+    *   `make backend`: Builds and deploys the agent to Cloud Run.
+    *   `make playground`: Starts a local web UI for interactive agent testing.
