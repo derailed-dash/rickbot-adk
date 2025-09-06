@@ -2,7 +2,7 @@
 
 ## Next Steps
 
-- [ ] Add lifecycle policy to buckets - delete older data.
+- [ ] Move upload button to be next to the prompt input.
 - [ ] Add persistence of user configuration and conversations using Firestore.
 - [ ] Update privacy policy accordingly.
 - [ ] Extend Dazbot to have knowledge.
@@ -14,6 +14,7 @@
 
 ## Completed Steps
 
+- [x] Add lifecycle policy to buckets - delete older data.
 - [x] Refactor logging setup to eliminate duplication.
 - [x] Perform project review.
 - [x] Readme needs a good cover pic.

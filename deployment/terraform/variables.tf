@@ -145,12 +145,17 @@ variable "cicd_sa_deployment_required_roles" {
 }
 
 variable "repository_name" {
-  description = "The name for the Artifact Registry repository."
+  description = "The name for the GitHub repository."
   type        = string
 }
 
 variable "repository_owner" {
   description = "Owner of the Git repository - username or organization"
+  type        = string
+}
+
+variable "repository_desc" {
+  description = "Description of the GitHub repo"
   type        = string
 }
 
