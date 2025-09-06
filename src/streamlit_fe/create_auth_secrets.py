@@ -20,7 +20,7 @@ import os
 import streamlit as st
 
 from rickbot_utils.logging_utils import setup_logger
-from src.rickbot_utils.secret_utils import retrieve_secret
+from rickbot_utils.secret_utils import retrieve_secret
 
 # Basic logger setup
 logger = setup_logger(__name__)
