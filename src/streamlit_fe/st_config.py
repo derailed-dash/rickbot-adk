@@ -2,39 +2,16 @@
 This module contains the configuration for the Rickbot Streamlit application.
 """
 
-import logging
 import os
 from dataclasses import dataclass
 
 import streamlit as st
 
+from rickbot_utils.logging_utils import setup_logger
+
 app_name = os.environ.setdefault("APP_NAME", "rickbot_st_ui")
 
-def setup_logger() -> logging.Logger:
-    """Sets up and configures a logger for the application."""
-    log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
-    app_logger = logging.getLogger(app_name)
-    log_level_num = getattr(logging, log_level, logging.INFO)
-    app_logger.setLevel(log_level_num)
-
-    # Add a handler only if one doesn't exist to prevent duplicate logs
-    if not app_logger.handlers:
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter(
-            fmt="%(asctime)s.%(msecs)03d:%(name)s - %(levelname)s: %(message)s",
-            datefmt="%H:%M:%S",
-        )
-        handler.setFormatter(formatter)
-        app_logger.addHandler(handler)
-
-    app_logger.propagate = False  # Prevent propagation to the root logger
-    app_logger.info("Logger initialised.")
-    app_logger.debug("DEBUG level logging enabled.")
-
-    return app_logger
-
-
-logger = setup_logger()
+logger = setup_logger(app_name)
 
 @dataclass
 class Config:

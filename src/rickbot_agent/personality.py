@@ -14,7 +14,7 @@ from pathlib import Path
 
 import yaml  # pyyaml
 
-from .secret_utils import retrieve_secret
+from rickbot_utils.secret_utils import retrieve_secret
 
 SCRIPT_DIR = Path(__file__).parent
 logger = logging.getLogger(__name__)

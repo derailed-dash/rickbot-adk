@@ -5,14 +5,6 @@ of the Rickbot agent. It ensures that the agent's configuration is correctly
 derived from environment variables and that the logger is initialized with the
 appropriate settings.
 
-The tests for `setup_logger` cover:
-- Initialization of the logger with the default log level (INFO) when no
-  environment variable is specified.
-- Correctly setting the log level to DEBUG and WARNING based on the `LOG_LEVEL`
-  environment variable.
-- A fixture is used to clear logging handlers before each test to ensure
-  isolation and prevent log duplication.
-
 The tests for `get_config` cover:
 - Loading default configuration values when no specific environment variables
   are set.
@@ -33,37 +25,18 @@ from unittest.mock import patch
 
 import pytest
 
-from rickbot_agent.config import get_config, setup_logger
+from rickbot_agent.config import get_config
 
 
 @pytest.fixture(autouse=True)
 def clear_logger_handlers():
     """Fixture to clear logger handlers before each test to prevent duplicate logs."""
-    for handler in logging.getLogger("rickbot_agent").handlers[:]:
-        logging.getLogger("rickbot_agent").removeHandler(handler)
+    # Clear handlers for the specific logger used in the config module
+    agent_name = os.environ.get("AGENT_NAME", "rickbot_agent")
+    logger = logging.getLogger(agent_name)
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
     yield
-
-def test_setup_logger_default_level() -> None:
-    """Test that setup_logger sets the default log level to INFO."""
-    with patch.dict(os.environ, {}, clear=True):  # Ensure no LOG_LEVEL is set
-        logger = setup_logger()
-        assert logger.level == logging.INFO
-        assert logger.name == "rickbot_agent"
-        assert len(logger.handlers) > 0
-
-
-def test_setup_logger_debug_level() -> None:
-    """Test that setup_logger sets the log level to DEBUG when specified."""
-    with patch.dict(os.environ, {"LOG_LEVEL": "DEBUG"}, clear=True):
-        logger = setup_logger()
-        assert logger.level == logging.DEBUG
-
-
-def test_setup_logger_warning_level() -> None:
-    """Test that setup_logger sets the log level to WARNING when specified."""
-    with patch.dict(os.environ, {"LOG_LEVEL": "WARNING"}, clear=True):
-        logger = setup_logger()
-        assert logger.level == logging.WARNING
 
 
 @patch("google.auth.default", return_value=(None, "test_project_id"))

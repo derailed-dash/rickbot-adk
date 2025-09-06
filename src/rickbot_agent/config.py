@@ -6,6 +6,8 @@ from dataclasses import dataclass
 
 import google.auth
 
+from rickbot_utils.logging_utils import setup_logger
+
 agent_name = os.environ.setdefault("AGENT_NAME", "rickbot_agent")
 
 
@@ -14,31 +16,7 @@ logging.getLogger("google_adk").setLevel(logging.WARNING)
 logging.getLogger("google_genai").setLevel(logging.WARNING)
 
 
-def setup_logger() -> logging.Logger:
-    """Sets up and configures a logger for the application."""
-    log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
-    app_logger = logging.getLogger(agent_name)
-    log_level_num = getattr(logging, log_level, logging.INFO)
-    app_logger.setLevel(log_level_num)
-
-    # Add a handler only if one doesn't exist to prevent duplicate logs
-    if not app_logger.handlers:
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter(
-            fmt="%(asctime)s.%(msecs)03d:%(name)s - %(levelname)s: %(message)s",
-            datefmt="%H:%M:%S",
-        )
-        handler.setFormatter(formatter)
-        app_logger.addHandler(handler)
-
-    app_logger.propagate = False  # Prevent propagation to the root logger
-    app_logger.info("Logger initialised.")
-    app_logger.debug("DEBUG level logging enabled.")
-
-    return app_logger
-
-
-logger = setup_logger()
+logger = setup_logger(agent_name)
 
 
 @dataclass

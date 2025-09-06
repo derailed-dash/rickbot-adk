@@ -41,11 +41,11 @@ def clear_streamlit_cache() -> None:
         # or caching is not active in the test environment.
         pass
 
-@patch("src.streamlit_fe.create_auth_secrets.retrieve_secret")
+@patch("src.rickbot_utils.secret_utils.secretmanager.SecretManagerServiceClient")
 @patch("os.path.exists")
 @patch("os.makedirs")
 @patch("builtins.open", new_callable=mock_open)
-def test_create_secrets_toml_success(mock_file_open, mock_makedirs, mock_exists, mock_retrieve_secret) -> None:
+def test_create_secrets_toml_success(mock_file_open, mock_makedirs, mock_exists, mock_secret_manager_client) -> None:
     """
     Tests the successful creation of secrets.toml when it does not exist.
     """
@@ -60,7 +60,9 @@ client_id = "some_client_id"
 client_secret = "some_client_secret"
 server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
 """
-    mock_retrieve_secret.return_value = mock_secret_content
+    # Configure the mock SecretManagerServiceClient
+    mock_secret_manager_client.return_value.access_secret_version.return_value.payload.data.decode.return_value = mock_secret_content
+
     project_id = "test-project"
     secrets_file_path = os.path.join(".streamlit", "secrets.toml")
 
@@ -69,13 +71,15 @@ server_metadata_url = "https://accounts.google.com/.well-known/openid-configurat
 
     # Assert: Verify that the correct actions were taken.
     mock_exists.assert_called_once_with(secrets_file_path)
-    mock_retrieve_secret.assert_called_once_with(project_id, "rickbot-streamlit-secrets-toml")
+    mock_secret_manager_client.return_value.access_secret_version.assert_called_once_with(
+        request={"name": f"projects/{project_id}/secrets/rickbot-streamlit-secrets-toml/versions/latest"}
+    )
     mock_makedirs.assert_called_once_with(".streamlit", exist_ok=True)
     mock_file_open.assert_called_once_with(secrets_file_path, "w")
     mock_file_open().write.assert_called_once_with(mock_secret_content)
 
 
-@patch("src.streamlit_fe.create_auth_secrets.retrieve_secret")
+@patch("src.rickbot_utils.secret_utils.retrieve_secret")
 @patch("os.path.exists")
 @patch("os.makedirs")
 @patch("builtins.open", new_callable=mock_open)
@@ -98,15 +102,15 @@ def test_create_secrets_toml_already_exists(mock_file_open, mock_makedirs, mock_
     mock_file_open.assert_not_called()
 
 
-@patch("src.streamlit_fe.create_auth_secrets.retrieve_secret")
+@patch("src.rickbot_utils.secret_utils.secretmanager.SecretManagerServiceClient")
 @patch("os.path.exists")
-def test_create_secrets_toml_retrieval_fails(mock_exists, mock_retrieve_secret) -> None:
+def test_create_secrets_toml_retrieval_fails(mock_exists, mock_secret_manager_client) -> None:
     """
     Tests that a ValueError is raised if retrieving the secret fails.
     """
     # Arrange: File does not exist and the secret retrieval will raise an exception.
     mock_exists.return_value = False
-    mock_retrieve_secret.side_effect = Exception("Test secret retrieval error")
+    mock_secret_manager_client.return_value.access_secret_version.side_effect = Exception("Test secret retrieval error")
     project_id = "test-project"
 
     # Act & Assert: Verify that the specific ValueError is raised.

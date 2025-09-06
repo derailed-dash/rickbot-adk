@@ -15,16 +15,16 @@ Now our users can authenticate using Google's Auth UI.
 We can run this from our app code or standalone.
 """
 
-import logging
 import os
 
 import streamlit as st
 
-from streamlit_fe.st_utils import retrieve_secret
+from rickbot_utils.logging_utils import setup_logger
+from src.rickbot_utils.secret_utils import retrieve_secret
 
 # Basic logger setup
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = setup_logger(__name__)
+
 
 @st.cache_resource  # This should only be done once
 def create_secrets_toml(google_project_id: str) -> None:
@@ -47,7 +47,10 @@ def create_secrets_toml(google_project_id: str) -> None:
         logger.info(f"Successfully created {secrets_file_path}")
 
     except Exception as e:
-        raise ValueError(f"Error accessing secret '{secret_name}' from Secret Manager: {e}") from e
+        raise ValueError(
+            f"Error accessing secret '{secret_name}' from Secret Manager: {e}"
+        ) from e
+
 
 if __name__ == "__main__":
     prj_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
