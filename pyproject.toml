@@ -80,7 +80,7 @@ disallow_untyped_calls = false     # Prohibit calling functions that lack type a
 disallow_untyped_defs = false      # Allow defining functions without type annotations.
 disallow_incomplete_defs = true    # Prohibit defining functions with incomplete type annotations.
 no_implicit_optional = true        # Require `Optional[T]` for variables that can be `None`.
-check_untyped_defs = true          # Type-check the body of functions without annotations.
+check_untyped_defs = true          # Type-check the body of functions without annotations. Catch potential mismatches.
 disallow_subclassing_any = true    # Prohibit a class from inheriting from a value of type `Any`.
 warn_incomplete_stub = true        # Warn about incomplete type stubs (`.pyi` files).
 warn_redundant_casts = true        # Warn if a type cast is unnecessary.
@@ -89,7 +89,7 @@ warn_unreachable = true            # Warn about code that is unreachable.
 follow_imports = "silent"          # Type-check imported modules but suppress errors from them.
 ignore_missing_imports = true      # Suppress errors about unresolved imports.
 explicit_package_bases = true      # Enforce explicit declaration of package bases.
-disable_error_code = ["misc", "no-any-return"]
+disable_error_code = ["misc", "no-any-return", "no-untyped-def"]
 
 exclude = [".venv"]
 

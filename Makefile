@@ -34,8 +34,9 @@ test:
 
 # Run code quality checks (codespell, ruff, mypy)
 lint:
+	@echo "Running code quality checks..."
 	uv sync --dev --extra jupyter --extra lint 
-	uv run codespell
+	uv run codespell -s
 	uv run ruff check . --diff
 	uv run mypy .
 
