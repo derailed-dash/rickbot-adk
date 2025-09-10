@@ -45,6 +45,7 @@ See my Medium articles which are intended to supplement this repo:
 1. [Building the Rickbot Multi-Personality Agentic Application using Gemini CLI, Google Agent-Starter-Pack and the Agent Development Kit (ADK)](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24)
 1. [Updating the Rickbot Multi-Personality Agentic Application - Integrate Agent Development Kit (ADK) using Gemini CLI](https://medium.com/google-cloud/updating-the-rickbot-multi-personality-agentic-application-part-2-integrate-agent-development-ad39203e66ad)
 1. [Guided Implementation of Agent Development Kit (ADK) with the Rickbot Multi-Personality Application (Series)](https://medium.com/google-cloud/updating-the-rickbot-multi-personality-agentic-application-part-3-guided-implementation-of-the-9675d3f92c11)
+1. [Productionising the Rickbot ADK Application and More Gemini CLI Tips](https://medium.com/google-cloud/productionising-the-rickbot-adk-application-and-more-gemini-cli-tips-577cf6b37366)
 
 ## Per Dev Session (Once One-Time Setup Tasks Have Been Completed)
 
@@ -53,32 +54,17 @@ See my Medium articles which are intended to supplement this repo:
 To configure your shell for a development session, **source** the `scripts/setup-env.sh` script. This will handle authentication, set the correct Google Cloud project, install dependencies, and activate the Python virtual environment.
 
 ```bash
+### Prereqs ###
+# If running on WSL, consider first installing wslu
+
 # For the Staging/Dev environment (default)
 source scripts/setup-env.sh
 
 # For the Production environment
-source scripts/setup-env.sh prod
-```
+source scripts/setup-env.sh --target-env PROD
 
-These scripts run the following setup, and add a bit of intelligence on top:
-
-```bash
-# From rickbot-adk project root folder
-source .env
-
-gcloud auth login --update-adc
-export STAGING_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_STAGING_PROJECT --format="value(projectNumber)")
-export PROD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PRD_PROJECT --format="value(projectNumber)")
-
-# Set to $GOOGLE_CLOUD_STAGING_PROJECT or $GOOGLE_CLOUD_PRD_PROJECT as required
-export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
-
-gcloud config set project $GOOGLE_CLOUD_PROJECT
-gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
-gcloud config list project
-
-uv sync --dev --extra jupyter # Or we can use make install, from Agent Starter Kit
-source .venv/bin/activate
+# If authentication is not required
+source scripts/setup-env.sh --noauth
 ```
 
 ## Useful Commands
@@ -166,159 +152,9 @@ docker run --rm -p 8080:8080 \
    $SERVICE_NAME:$VERSION
 ```
 
-### Testing Remote
-
-Use the `src/notebooks/adk_app_testing.ipynb` notebook.
-
 ## Using Agent Starter Kit for Initial Project Setup
 
 This project, its GitHub repo, and associated CI/CD pipeline were initially setup using the Agent Starter Kit. Much of the original template files have since been removed from the project.  But this section has been retained to provide an overview of this process. But do read [this article](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24) for a more detailed walkthrough.
-
-### Pre-Reqs
-
-- Dev and Prod GCP projects created and attached to a billing account and your user is the owner of both projects.
-- GitHub CLI (gh) installed and authenticated
-- uv (Python package manager) installed
-- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install-sdk) installed
-- Terraform installed
-
-### Before Creating Project with Agent Starter Kit
-
-```bash
-# Authenticate and update ADC
-# Your user needs to be the owner of both projects
-gcloud auth login --update-adc
-
-export GOOGLE_CLOUD_STAGING_PROJECT="your-dev-project"
-export GOOGLE_CLOUD_PRD_PROJECT="your-prod-project"
-
-# Make sure we're on the Dev / Staging project...
-export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_STAGING_PROJECT
-gcloud config set project $GOOGLE_CLOUD_PROJECT
-gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
-gcloud config list project
-
-# Now let's enable some Google Cloud APIs in the project
-gcloud services enable \
-  serviceusage.googleapis.com \
-  cloudresourcemanager.googleapis.com \
-  cloudbuild.googleapis.com \
-  secretmanager.googleapis.com \
-  logging.googleapis.com \
-  storage-component.googleapis.com \
-  aiplatform.googleapis.com
-```
-
-### Create Project with Agent Starter Kit
-
-```bash
-# Dependency is Python and uv already installed
-uvx agent-starter-pack create rickbot-adk
-```
-
-Let's use:
-
-- `adk_base` as our ADK template application.
-- Google Vertex AI Agent Engine as our agent hosting service
-- Google Cloud Build for our CI/CD pipeline
-
-After running, we now have:
-
-```text
-rickbot-adk/
-├── app/
-│   ├── __init__.py
-│   ├── agent.py
-│   ├── agent_engine_app.py
-│   └── utils/
-│       ├── gcs.py
-│       ├── tracing.py
-│       └── typing.py
-|
-├── deployment/
-│   ├── README.md
-│   └── terraform/
-│       ├── dev/
-│       ├── vars/
-│       ├── apis.tf
-│       ├── build_triggers.tf
-│       ├── github.tf
-│       ├── iam.tf
-│       ├── locals.tf
-│       ├── log_sinks.tf
-│       ├── providers.tf
-│       ├── service_accounts.tf
-│       ├── storage.tf
-│       └── variables.tf
-│
-├── notebooks/
-│   ├── adk_app_testing.ipynb
-│   ├── evaluating_adk_agent.ipynb
-│   └── intro_agent_engine.ipynb
-|
-├── tests/
-│   ├── integration/
-│   │   ├── test_agent.py
-│   │   └── test_agent_engine_app.py
-│   ├── load_test/
-│   │   ├── README.md
-│   │   └── load_test.py
-│   └── unit/
-│       └── test_dummy.py
-|
-├── GEMINI.md
-├── Makefile
-├── pyproject.toml
-├── README.md
-└── uv.lock
-```
-
-### After Creating Project with Agent Starter Kit
-
-- Update `pyproject.toml`.
-- Create `.env`.
-- Update `README.md` (this file)
-
-### Creating CI/CD Pipeline
-
-First, one-time setup for Prod project. (To workaround issues I found with the `setup-cicd` command.)
-
-```bash
-# Make sure we're on the Prod/CICD project...
-export GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PRD_PROJECT
-gcloud config set project $GOOGLE_CLOUD_PROJECT
-gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
-gcloud config list project
-
-gcloud services enable \
-  serviceusage.googleapis.com \
-  cloudresourcemanager.googleapis.com \
-  aiplatform.googleapis.com \
-  cloudbuild.googleapis.com \
-  secretmanager.googleapis.com
-
-gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PRD_PROJECT \
-    --member="serviceAccount:service-$PROD_PROJECT_NUMBER@gcp-sa-cloudbuild.iam.gserviceaccount.com" \
-    --role="roles/secretmanager.admin"
-```
-
-Now we can run `setup-cicd`:
-
-```bash
-uvx agent-starter-pack setup-cicd \
-  --staging-project $GOOGLE_CLOUD_STAGING_PROJECT \
-  --prod-project $GOOGLE_CLOUD_PRD_PROJECT \
-  --repository-name $REPO \
-  --region $GOOGLE_CLOUD_BUILD_REGION # I have no quota to run Cloud Build in my preferred region
-```
-
-The following is just for my own quota issue. May not apply to others! Update the following to split out REGION and CB_REGION:
-
-- staging.yaml
-- build_triggers.tf
-- github.tf
-- variables.tf
-- env.tfvars (x2)
 
 ## Deploying Infrastructure
 

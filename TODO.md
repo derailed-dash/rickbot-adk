@@ -2,8 +2,7 @@
 
 ## Next Steps
 
-- [ ] Move upload button to be next to the prompt input.
-- [ ] Add persistence of user configuration and conversations using Firestore.
+- [ ] Add persistence of user configuration and conversations.
 - [ ] Update privacy policy accordingly.
 - [ ] Extend Dazbot to have knowledge.
 - [ ] Restrict access to certain personalities.
