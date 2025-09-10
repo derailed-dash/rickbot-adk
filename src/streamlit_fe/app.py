@@ -8,34 +8,20 @@ import uuid
 from pathlib import Path
 
 import streamlit as st
-from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
 from streamlit.errors import StreamlitAPIException
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
-from rickbot_agent.agent import get_agent  # Import the agent getter
-from rickbot_agent.personality import Personality, get_avatar, get_personalities
+from rickbot_agent.personality import get_avatar, get_personalities
 from streamlit_fe.chat import render_chat
 from streamlit_fe.create_auth_secrets import create_secrets_toml
 from streamlit_fe.st_config import config, logger
-from streamlit_fe.st_utils import RateLimiter
+from streamlit_fe.st_utils import RateLimiter, initialize_adk_runner
 
 # Define the root path of the project
 ROOT_DIR = Path(__file__).parent.parent
 DEFAULT_PERSONALITY = "Rick"
 RICKBOT_AVATAR = get_avatar("rickbot-trans")
 
-async def initialize_adk_runner(personality: Personality) -> Runner:
-    """Initialise the ADK runner with the correct agent personality."""
-    rickbot_agent = get_agent(personality.name)
-
-    session_service = InMemorySessionService()
-    await session_service.create_session(
-        app_name=config.app_name,
-        user_id=st.session_state.user_id,
-        session_id=st.session_state.session_id,
-    )
-    return Runner(agent=rickbot_agent, app_name=config.app_name, session_service=session_service)
 
 @st.cache_resource  # Ensure this rate limiter is shared across all user sessions and reruns
 def initialize_rate_limiter():

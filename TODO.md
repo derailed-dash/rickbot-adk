@@ -13,6 +13,9 @@
 
 ## Completed Steps
 
+- [x] Clear Chat History should generate new session.
+- [x] Allow multiple uploads.
+- [x] Move the file upload from the sidebar to under the persona header in the main window.
 - [x] Add lifecycle policy to buckets - delete older data.
 - [x] Refactor logging setup to eliminate duplication.
 - [x] Perform project review.

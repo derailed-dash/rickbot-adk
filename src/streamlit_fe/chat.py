@@ -7,6 +7,7 @@ and interacts with the Agent Development Kit (ADK) runner to generate bot respon
 
 import asyncio
 import os
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -15,14 +16,16 @@ from google.adk.runners import Runner
 from google.genai.types import Blob, Content, Part
 
 from rickbot_agent.personality import get_personalities
-from streamlit_fe.st_utils import RateLimiter
+from streamlit_fe.st_utils import RateLimiter, initialize_adk_runner
 
 # Define the root path of the project
 ROOT_DIR = Path(__file__).parent.parent
 USER_AVATAR = str(ROOT_DIR / "rickbot_agent/media/morty.png")
 
 
-async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, rate_limiter: RateLimiter) -> None:
+async def get_agent_response(
+    runner: Runner, prompt: str, uploaded_files: list[Any], rate_limiter: RateLimiter
+) -> None:
     """
     Handles user input and generates the bot's response using the Rickbot ADK agent.
     """
@@ -30,31 +33,35 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, ra
     # Perform this check *before* modifying session state or displaying the user's prompt
     if not rate_limiter.hit("rickbot"):
         st.warning("Whoa, slow down there! Give me a minute.")
-        st.stop()  # Stop execution to prevent the message from being processed
+        st.stop()
 
     # Create the user message object, including any attachments
     user_message: dict[str, Any] = {"role": "user", "content": prompt}
-    if uploaded_file:
-        user_message["attachment"] = {
-            "data": uploaded_file.getvalue(),
-            "mime_type": uploaded_file.type or "",
-        }
+    if uploaded_files:
+        user_message["attachments"] = [
+            {"data": uploaded_file.getvalue(), "mime_type": uploaded_file.type or ""}
+            for uploaded_file in uploaded_files
+        ]
     st.session_state.messages.append(user_message)
 
     # Display user message and attachment in the chat
     with st.chat_message("user", avatar=USER_AVATAR):
-        if uploaded_file:
-            mime_type = uploaded_file.type or ""
-            if "image" in mime_type:
-                st.image(uploaded_file.getvalue())
-            elif "video" in mime_type:
-                st.video(uploaded_file.getvalue())
+        if uploaded_files:
+            for uploaded_file in uploaded_files:
+                mime_type = uploaded_file.type or ""
+                if "image" in mime_type:
+                    st.image(uploaded_file.getvalue())
+                elif "video" in mime_type:
+                    st.video(uploaded_file.getvalue())
         st.markdown(prompt)
 
     # Prepare the message for the ADK
     message_parts = [Part(text=prompt)]
-    if uploaded_file:
-        message_parts.append(Part(inline_data=Blob(data=uploaded_file.getvalue(), mime_type=uploaded_file.type)))
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            message_parts.append(
+                Part(inline_data=Blob(data=uploaded_file.getvalue(), mime_type=uploaded_file.type))
+            )
 
     new_message = Content(role="user", parts=message_parts)
 
@@ -71,7 +78,7 @@ async def get_agent_response(runner: Runner, prompt: str, uploaded_file: Any, ra
                 new_message=new_message,
             ):
                 if event.is_final_response() and event.content and event.content.parts:
-                    for part in event.content.parts:  # retrieve the response in parts
+                    for part in event.content.parts:
                         if part.text:
                             full_response += part.text
                     # Visual trick!
@@ -92,7 +99,6 @@ def custom_logout() -> None:
         st.session_state.user_email = None
         st.session_state.user_name = None
     else:
-        # For real auth, use Streamlit's logout
         st.logout()
 
 
@@ -107,6 +113,8 @@ def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
         st.session_state.messages = []
     if "file_just_uploaded" not in st.session_state:
         st.session_state.file_just_uploaded = False
+    if "file_uploader_key" not in st.session_state:
+        st.session_state.file_uploader_key = 0
 
     def on_file_change() -> None:
         st.session_state.file_just_uploaded = True
@@ -117,7 +125,15 @@ def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
     header_col2.title(f"{st.session_state.current_personality.title}")
     st.caption(st.session_state.current_personality.welcome)
 
-    # --- Sidebar for Configuration ---
+    with st.container(border=True):
+        uploaded_files = st.file_uploader(
+            "Upload a file.",
+            type=["png", "jpg", "jpeg", "pdf", "mp3", "mp4", "mov", "webm"],
+            on_change=on_file_change,
+            accept_multiple_files=True,
+            key=f"file_uploader_{st.session_state.file_uploader_key}",
+        )
+
     with st.sidebar:
         if st.session_state.get("is_logged_in"):
             st.caption(f"Welcome, {st.session_state.user_name}")
@@ -142,14 +158,13 @@ def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
 
         st.info(st.session_state.current_personality.overview)
 
-        uploaded_file = st.file_uploader(
-            "Upload a file.",
-            type=["png", "jpg", "jpeg", "pdf", "mp3", "mp4", "mov", "webm"],
-            on_change=on_file_change,
-        )
-
         if st.button("Clear Chat History", use_container_width=True):
             st.session_state.messages = []
+            st.session_state.session_id = str(uuid.uuid4())
+            st.session_state.adk_runner = asyncio.run(
+                initialize_adk_runner(st.session_state.current_personality)
+            )
+            st.session_state.file_uploader_key += 1
             st.rerun()
 
         st.info(
@@ -166,18 +181,19 @@ def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
     for message in st.session_state.messages:
         avatar = USER_AVATAR if message["role"] == "user" else st.session_state.current_personality.avatar
         with st.chat_message(message["role"], avatar=avatar):
-            if attachment := message.get("attachment"):
-                if "image" in attachment.get("mime_type", ""):
-                    st.image(attachment["data"])
-                elif "video" in attachment.get("mime_type", ""):
-                    st.video(attachment["data"])
+            if attachments := message.get("attachments"):
+                for attachment in attachments:
+                    if "image" in attachment.get("mime_type", ""):
+                        st.image(attachment["data"])
+                    elif "video" in attachment.get("mime_type", ""):
+                        st.video(attachment["data"])
             st.markdown(message["content"])
 
     # Handle new user input
     if prompt := st.chat_input(st.session_state.current_personality.prompt_question):
-        file_to_process = None
+        files_to_process = []
         if st.session_state.get("file_just_uploaded"):
-            file_to_process = uploaded_file
-            st.session_state.file_just_uploaded = False  # Consume the flag
+            files_to_process = uploaded_files
+            st.session_state.file_just_uploaded = False
 
-        asyncio.run(get_agent_response(adk_runner, prompt, file_to_process, rate_limiter))
+        asyncio.run(get_agent_response(adk_runner, prompt, files_to_process, rate_limiter))
