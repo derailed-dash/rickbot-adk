@@ -170,7 +170,7 @@ def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
         st.info(
             """
             ### Info
-            * Created by Dazbo.
+            * Created by [Dazbo](https://github.com/derailed-dash).
             * I do not store any user data, prompts or responses. Read our [Privacy Policy](/privacy_policy).
             * Check out the [GitHub repo](https://github.com/derailed-dash/rickbot-adk/).
             * View the [Rickbot blog posts](https://medium.com/google-cloud/creating-a-rick-morty-chatbot-with-google-cloud-and-the-gen-ai-sdk-e8108e83dbee).
