@@ -1,6 +1,6 @@
 {
   "context": {
-    "includeDirectories": ["../rickbot", "../../gcp/adk-docs"],
+    "includeDirectories": ["../../gcp/adk-docs"],
     "loadFromIncludeDirectories": false
   }
 }
