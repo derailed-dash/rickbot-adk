@@ -12,8 +12,8 @@ agent_name = os.environ.setdefault("AGENT_NAME", "rickbot_agent")
 
 
 # Suppress verbose logging from ADK and GenAI libraries - INFO logging is quite verbose
-logging.getLogger("google_adk").setLevel(logging.WARNING)
-logging.getLogger("google_genai").setLevel(logging.WARNING)
+logging.getLogger("google_adk").setLevel(logging.ERROR)
+logging.getLogger("google_genai").setLevel(logging.ERROR)
 
 
 logger = setup_logger(agent_name)

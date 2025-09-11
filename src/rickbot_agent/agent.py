@@ -7,13 +7,35 @@ We then cache these agents for fast retrieval.
 import functools
 
 from google.adk.agents import Agent
-from google.adk.tools import google_search  # built-in Google Search tool
+from google.adk.tools import (
+    AgentTool,
+    # FunctionTool,
+    google_search,  # built-in Google Search tool
+)
 from google.genai.types import GenerateContentConfig
 
 from .config import get_config, logger
 from .personality import Personality, get_personalities
 
 config = get_config()
+
+def test() -> str:
+    """ Create a simple test message when asked to run a test """
+    return "Testing 123"
+
+search_agent = Agent(
+    model=config.model,
+    name='SearchAgent',
+    instruction="You're a specialist in Google Search",
+    tools=[google_search],
+)
+
+# test_agent = Agent(
+#     model = config.model,
+#     name = "TestAgent",
+#     instruction = "You execute when asked to test",
+#     tools = [FunctionTool(func=test)],
+# )
 
 def create_agent(personality: Personality) -> Agent:
     """Creates and returns an agent with the given personality."""
@@ -25,7 +47,7 @@ def create_agent(personality: Personality) -> Agent:
         description=f"A chatbot with the personality of {personality.menu_name}",
         model=config.model,
         instruction=personality.system_instruction,
-        tools=[google_search],
+        tools=[AgentTool(agent=search_agent)],
         generate_content_config=GenerateContentConfig(
             temperature=personality.temperature, top_p=1, max_output_tokens=8192
         ),
