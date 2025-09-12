@@ -55,7 +55,7 @@ load-test = [
 ]
 
 [tool.ruff]
-line-length = 120
+line-length = 130
 target-version = "py310"
 
 [tool.ruff.lint]
@@ -70,7 +70,7 @@ select = [
     "RUF", # ruff specific rules
 ]
 # ignore line too long, too complex, two blank lines, trailing whitespace 
-ignore = ["E501", "C901", "E302", "W291"]
+ignore = ["C901", "E302", "W291"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]

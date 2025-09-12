@@ -28,6 +28,7 @@ def initialize_rate_limiter():
     """Initialize the rate limiter."""
     return RateLimiter(config.rate_limit_qpm)
 
+
 def render_login_screen(mock_user: bool = False, mock_user_email: str | None = None) -> None:
     """Renders the login screen for both real and mock users."""
     header_col1, header_col2 = st.columns([0.3, 0.7])
@@ -36,7 +37,9 @@ def render_login_screen(mock_user: bool = False, mock_user_email: str | None = N
 
     st.divider()
     st.markdown(
-        "Rickbot is a multi-personality chatbot application. Chat with Rick or other personalities, ask your questions, and feel free to upload content as part of your discussion."
+        """Rickbot is a multi-personality chatbot application. 
+        Chat with Rick or other personalities, ask your questions, and feel free to upload content as part of your discussion.
+        """
     )
     st.markdown(
         ":eyes: We do not store any user data, prompts or responses. Read our [Privacy Policy](/privacy_policy)."
@@ -51,10 +54,12 @@ def render_login_screen(mock_user: bool = False, mock_user_email: str | None = N
             st.rerun()
     else:
         st.markdown(
-            ":lock: Please login to use Rickbot. Any Google account will do. Login helps us prevent abuse and maintain a stable, accessible experience for everyone."
+            """:lock: Please login to use Rickbot. Any Google account will do. 
+            Login helps us prevent abuse and maintain a stable, accessible experience for everyone."""
         )
         if st.button("Log in with Google", use_container_width=True):
             st.login("google")
+
 
 def main():
     """Main function to run the Streamlit application."""
@@ -141,6 +146,7 @@ def authenticated_flow():
     except (StreamlitAPIException, KeyError, ValueError, TypeError, RuntimeError) as e:
         st.error(f"An unexpected error occurred: {e}")
         logger.error(f"Application error: {e}", exc_info=True)
+
 
 if __name__ == "__main__":
     main()
