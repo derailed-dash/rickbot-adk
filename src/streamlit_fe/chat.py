@@ -87,12 +87,15 @@ async def get_agent_response(
                     bot_status.update(label=f"Delegating to agent: {agent_name}...", state="running", expanded=True)
                 # If it's the final response, stream it
                 elif event.is_final_response() and event.content and event.content.parts:
+                    bot_status.update(label="Responding...", expanded=True)
                     for part in event.content.parts:
                         if part.text:
                             full_response += part.text
                     # Visual trick!
                     # Add the block element - a similated cursor - whilst the agent is still streaming the response
                     response_placeholder.markdown(full_response + "▌")
+                else:
+                    bot_status.update(label="Thinking...", expanded=True)
 
             bot_status.update(label="Done.", state="complete")
             response_placeholder.markdown(full_response)

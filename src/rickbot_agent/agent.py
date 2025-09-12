@@ -26,6 +26,7 @@ config = get_config()
 # It cannot use other tools (custom or built-in) simultaneously within the same agent.
 # To combine multiple built-in tools or use built-in tools with other custom tools,
 # we should define an agent to wrap the built-in tool. This is the Agent-as-a-Tool pattern.
+# Note: agent-as-tool receives only necessary input, whereas a sub-agent can access the complete session context.
 search_agent = Agent(
     model=config.model,
     name="SearchAgent",

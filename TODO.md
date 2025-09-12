@@ -13,6 +13,7 @@
 
 ## Completed Steps
 
+- [x] Show tool use in the UI, e.g. if we're delegating to Google Search
 - [x] Clear Chat History should generate new session.
 - [x] Allow multiple uploads.
 - [x] Move the file upload from the sidebar to under the persona header in the main window.
