@@ -77,7 +77,16 @@ async def get_agent_response(
                 session_id=st.session_state.session_id,
                 new_message=new_message,
             ):
-                if event.is_final_response() and event.content and event.content.parts:
+                # Check for tool calls - and update "Thinking" header accordingly
+                if function_calls := event.get_function_calls():
+                    tool_name = function_calls[0].name
+                    bot_status.update(label=f"Using tool: {tool_name}...", state="running", expanded=True)
+                # Check for agent transfers
+                elif event.actions and event.actions.transfer_to_agent:
+                    agent_name = event.actions.transfer_to_agent
+                    bot_status.update(label=f"Delegating to agent: {agent_name}...", state="running", expanded=True)
+                # If it's the final response, stream it
+                elif event.is_final_response() and event.content and event.content.parts:
                     for part in event.content.parts:
                         if part.text:
                             full_response += part.text

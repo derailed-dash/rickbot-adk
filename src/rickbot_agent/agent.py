@@ -9,7 +9,7 @@ import functools
 from google.adk.agents import Agent
 from google.adk.tools import (
     AgentTool,
-    # FunctionTool,
+    FunctionTool,  # noqa: F401
     google_search,  # built-in Google Search tool
 )
 from google.genai.types import GenerateContentConfig
@@ -19,10 +19,13 @@ from .personality import Personality, get_personalities
 
 config = get_config()
 
-def test() -> str:
-    """ Create a simple test message when asked to run a test """
-    return "Testing 123"
 
+# ADK Built-in Tool Limitation:
+# A single root agent or a standalone agent can only support ONE built-in tool.
+# See here: https://google.github.io/adk-docs/tools/built-in-tools/#use-built-in-tools-with-other-tools
+# It cannot use other tools (custom or built-in) simultaneously within the same agent.
+# To combine multiple built-in tools or use built-in tools with other custom tools,
+# we should define an agent to wrap the built-in tool. This is the Agent-as-a-Tool pattern.
 search_agent = Agent(
     model=config.model,
     name="SearchAgent",
@@ -30,13 +33,6 @@ search_agent = Agent(
     instruction="You're a specialist in Google Search",
     tools=[google_search],
 )
-
-# test_agent = Agent(
-#     model = config.model,
-#     name = "TestAgent",
-#     instruction = "You execute when asked to test",
-#     tools = [FunctionTool(func=test)],
-# )
 
 def create_agent(personality: Personality) -> Agent:
     """Creates and returns an agent with the given personality."""

@@ -14,7 +14,9 @@ from streamlit_fe.st_config import config
 
 
 async def initialize_adk_runner(personality: Personality) -> Runner:
-    """Initialise the ADK runner with the correct agent personality."""
+    """Initialise the ADK runner with the correct agent personality.
+    Here we create a new session whenever we initialise the runner.
+    """
     rickbot_agent = get_agent(personality.name)
 
     session_service = InMemorySessionService()
