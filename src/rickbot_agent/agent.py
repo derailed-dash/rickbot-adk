@@ -25,7 +25,8 @@ def test() -> str:
 
 search_agent = Agent(
     model=config.model,
-    name='SearchAgent',
+    name="SearchAgent",
+    description="Agent to perform Google Search",
     instruction="You're a specialist in Google Search",
     tools=[google_search],
 )
@@ -41,12 +42,14 @@ def create_agent(personality: Personality) -> Agent:
     """Creates and returns an agent with the given personality."""
     logger.debug(f"Creating agent for personality: {personality.name}")
     # Load configuration
+    instruction = f"""{personality.system_instruction}
+    If you don't know the answer to something, use the SearchAgent to perform a Google Search"""
 
     return Agent(
         name=f"{config.agent_name}_{personality.name}",  # Make agent name unique
         description=f"A chatbot with the personality of {personality.menu_name}",
         model=config.model,
-        instruction=personality.system_instruction,
+        instruction=instruction,
         tools=[AgentTool(agent=search_agent)],
         generate_content_config=GenerateContentConfig(
             temperature=personality.temperature, top_p=1, max_output_tokens=8192
