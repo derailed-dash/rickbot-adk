@@ -10,7 +10,7 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 
-from src.rickbot_agent.agent import root_agent
+from rickbot_agent.agent import root_agent
 
 APP_NAME = "test_rickbot"
 

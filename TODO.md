@@ -10,6 +10,7 @@
 - [ ] Implement OAuth login, potentially as sidecar container.
 - [ ] Investigate adding other auth methods.
 - [ ] Ensure React UI works on mobile.
+- [ ] Add voice / live.
 
 ## Completed Steps
 
