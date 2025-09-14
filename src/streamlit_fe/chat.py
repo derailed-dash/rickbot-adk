@@ -139,7 +139,7 @@ def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
 
     with st.container(border=True):
         uploaded_files = st.file_uploader(
-            "Upload a file.",
+            "You can upload files here",
             type=["png", "jpg", "jpeg", "pdf", "mp3", "mp4", "mov", "webm"],
             on_change=on_file_change,
             accept_multiple_files=True,

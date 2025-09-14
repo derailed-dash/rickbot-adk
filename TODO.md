@@ -4,7 +4,9 @@
 
 - [ ] Add persistence of user configuration and conversations.
 - [ ] Update privacy policy accordingly.
-- [ ] Extend Dazbot to have knowledge.
+- [ ] Extend Dazbot to have knowledge. Options include:
+    - [Vertex AI Search Grounding with VertexAiSearchTool](https://google.github.io/adk-docs/grounding/vertex_ai_search_grounding/)
+    - Loading directly into cached context
 - [ ] Restrict access to certain personalities.
 - [ ] Create new React UI.
 - [ ] Implement OAuth login, potentially as sidecar container.
