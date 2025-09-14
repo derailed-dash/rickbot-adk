@@ -61,7 +61,12 @@ class Personality:
                 ) from e
 
     def __repr__(self) -> str:
-        return self.name
+        return (f"{self.__class__.__name__}"
+                f"(name={self.name!r},title={self.title!r},overview={self.overview!r},temperature={self.temperature!r})")
+
+    def __str__(self) -> str:
+        return f"{self.name}: {self.overview}"
+
 
 def _load_personalities(yaml_file: str) -> dict[str, Personality]:
     """Internal function to load personalities from a YAML file."""
