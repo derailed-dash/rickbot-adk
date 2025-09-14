@@ -51,6 +51,7 @@ def create_agent(personality: Personality) -> Agent:
         generate_content_config=GenerateContentConfig(
             temperature=personality.temperature, top_p=1, max_output_tokens=8192
         ),
+        output_key="last_turn_response"
     )
 
 @functools.cache
