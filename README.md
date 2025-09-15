@@ -74,13 +74,11 @@ source scripts/setup-env.sh --noauth
 | `source scripts/setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production       |
 | `make install`                | Install all required dependencies using `uv`                                          |
 | `make playground`             | Launch UI for testing agent locally and remotely. This runs `uv run adk web src`      |
-| `make streamlit`              | Run Streamlit FE: `MOCK_AUTH_USER="mock.user@example.com" uv run streamlit run src/streamlit_fe/app.py`                      |
+| `make streamlit`              | Run Streamlit FE: `MOCK_AUTH_USER="mock.user@example.com" uv run streamlit run src/streamlit_fe/app.py`|
 | `make test`                   | Run unit and integration tests                                                        |
 | `make lint`                   | Run code quality checks (codespell, ruff, mypy)                                       |
 | `make terraform`              | Plan Terraform, prompt for authorisation, then apply                                  |
-| `uv run scripts/test_rickbot_agent.py` | Run standalone rickbot_agent test script                                     |
 | `uv run jupyter lab`          | Launch Jupyter notebook                                                               |
-| `uv run streamlit run src/streamlit_fe/app.py` | Launch Streamlit frontend                                            |
 
 For full command options and usage, refer to the [Makefile](Makefile).
 
