@@ -71,7 +71,7 @@ source scripts/setup-env.sh --noauth
 
 | Command                       | Description                                                                           |
 | ----------------------------- | ------------------------------------------------------------------------------------- |
-| `source scripts/setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Add `prod` for Production       |
+| `source scripts/setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Parameter options:<br> `[--noauth] [-t\|--target-env <DEV\|PROD>]` |
 | `make install`                | Install all required dependencies using `uv`                                          |
 | `make playground`             | Launch UI for testing agent locally and remotely. This runs `uv run adk web src`      |
 | `make streamlit`              | Run Streamlit FE: `MOCK_AUTH_USER="mock.user@example.com" uv run streamlit run src/streamlit_fe/app.py`|
