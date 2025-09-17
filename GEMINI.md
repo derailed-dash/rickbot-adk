@@ -1,5 +1,20 @@
 # Project: Rickbot-ADK
 
+---
+***IMPORTANT: Run this check at the start of EVERY session!***
+
+Google Cloud configuration is achieved through a combination of `.env` and the `scripts/setup-env.sh` script. 
+
+Before providing your FIRST response in any conversation, you MUST perform the following steps:
+1.  Run `printenv GOOGLE_CLOUD_PROJECT` to check the environment variable.
+2.  Based only on the output of that command, state whether the variable is set.
+3.  If it is not set, advise me to run `scripts/setup-env.sh` before resuming the converation.
+
+The presence of this environment variable indicates that the script has been run. The absence of this variable indicates that the script has NOT been run.
+
+Note that failures with Google Cloud are likely if this script has not been run. For example, tests will fail. If tests are failing, we should check if the script has been run.
+---
+
 ## Project Overview
 
 This project is "Rickbot-ADK," a multi-personality chatbot built using Google Gemini, the Agent Development Kit (ADK), and the Google Agent-Starter-Pack. It is an evolution of the original Rickbot, aiming to leverage the ADK for more advanced capabilities. The chatbot can adopt various personalities, such as Rick Sanchez, Yoda, and others.
@@ -20,7 +35,7 @@ In particular, this project aims to evolve my previous Rickbot project by:
 - **Terraform:** For infrastructure as code
 - **make:** For running common development tasks
 
-Project dependencies are managed in `pyproject.toml` and can be installed using `uv`. The `make` commands streamline many `uv` and `adk` commands:
+Project dependencies are managed in `pyproject.toml` and can be installed using `uv`. The `make` commands streamline many `uv` and `adk` commands.
 
 ### Testing
 
@@ -29,13 +44,6 @@ The project includes unit and integration tests in `src/tests/`. Tests are writt
 ```bash
 make test
 ```
-
-### Environment
-
-Google Cloud configuration is achieved through a combination of `.env` and the `scripts/setup-env.sh` script. Failures with Google Cloud are likely if this script has not been run. This will cause tests to fail. If tests are failing, check if the script has been run:
-
-- If the environment var `GOOGLE_CLOUD_PROJECT` is set then it is likely that we have already run `scripts/setup-env.sh`.
-- If the environment var `GOOGLE_CLOUD_PROJECT` is not set, we will need to run `scripts/setup-env.sh` before performing any other actions. It will need to be run with interactive input.
 
 ## Deployment
 
@@ -78,4 +86,4 @@ Always consider the following sources of information when asked about these topi
 
 # ADK
 
-For any queries relating to ADK usage and implementation, refer to the adk-docs folder hierarchy.
+For any queries relating to ADK usage and implementation, refer to the `adk-docs` folder hierarchy.
