@@ -3,8 +3,10 @@ Integration tests to execute the agent with each personality.
 """
 
 import pytest
+import tenacity
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
+from google.genai import errors
 from google.genai.types import Content, Part
 
 from rickbot_agent.agent import get_agent
@@ -13,6 +15,20 @@ from rickbot_agent.personality import get_personalities
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("personality_name", get_personalities().keys())
+# The @tenacity.retry decorator is used to automatically retry the test if it
+# fails with a `google.genai.errors.ClientError`, which typically happens
+# when the API rate limit is exceeded (429 RESOURCE_EXHAUSTED).
+# - wait=tenacity.wait_exponential(multiplier=1, min=4, max=10): Implements
+#   exponential backoff, starting with a 4-second wait and increasing
+#   exponentially up to a maximum of 10 seconds between retries.
+# - stop=tenacity.stop_after_attempt(5): Stops retrying after 5 attempts.
+# - retry=tenacity.retry_if_exception_type(errors.ClientError): Specifies
+#   that the retry should only happen for `ClientError` exceptions.
+@tenacity.retry(
+    wait=tenacity.wait_exponential(multiplier=1, min=4, max=10),
+    stop=tenacity.stop_after_attempt(5),
+    retry=tenacity.retry_if_exception_type(errors.ClientError),
+)
 async def test_personality_loads_and_responds(personality_name: str) -> None:
     """
     Tests that each personality can be loaded, receive a prompt, and generate a response.
