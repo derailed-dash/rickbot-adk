@@ -1,25 +1,25 @@
 [project]
 name = "rickbot-adk"
-version = "0.1.0"
+version = "0.2.0"
 description = "A multi-personality AI chatbot built using Google Gemini and ADK"
 authors = [
     {name = "Dazbo (Darren Lester)", email = "derailed.dash@gmail.com"},
 ]
 dependencies = [
-    "google-adk~=1.8.0",
+    "google-adk~=1.13.0", # means >= 1.13.0 but < 1.14
     "opentelemetry-exporter-gcp-trace~=1.9.0",
-    "google-cloud-logging~=3.11.4",
-    "google-cloud-aiplatform[evaluation]~=1.106.0",
+    "google-cloud-logging~=3.12.0",
+    "google-cloud-aiplatform[evaluation,agent_engines]~=1.114.0",
     "google-cloud-secret-manager",
     "python-dotenv",
     # Web framework
-    "fastapi~=0.115.8",
-    "uvicorn~=0.34.0",    
+    "fastapi~=0.115.14",
+    "uvicorn~=0.34.3", # means >= 0.34.3 but < 0.35
     "pyyaml>=6.0.2",
     # Frontend
     "streamlit",
     "psycopg2-binary>=2.9.10",
-    "Authlib==1.6.0",
+    "Authlib~=1.6.0",
     "limits",
     # Required for the sample Streamlit UI from agent-starter-pack
     "langchain",
@@ -28,7 +28,7 @@ dependencies = [
     "langchain-google-vertexai",
 ]
 
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.11,<3.13"
 
 [dependency-groups]
 dev = [
@@ -40,15 +40,15 @@ dev = [
 [project.optional-dependencies]
 
 jupyter = [
-    "jupyter~=1.0.0",
+    "jupyter~=1.1.0",
     "ipython>=8.37.0"
 ]
 lint = [
     "ruff>=0.4.6",
-    "mypy~=1.15.0",
-    "codespell~=2.2.0",
-    "types-pyyaml~=6.0.12.20240917",
-    "types-requests~=2.32.0.20240914",
+    "mypy~=1.17.0",
+    "codespell~=2.4.1",
+    "types-pyyaml~=6.0.12",
+    "types-requests~=2.32.4",
 ]
 load-test = [
     "locust==2.31.1",
@@ -56,7 +56,7 @@ load-test = [
 
 [tool.ruff]
 line-length = 130
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = [
@@ -106,6 +106,7 @@ build-backend = "hatchling.build"
 [tool.pytest.ini_options]
 pythonpath = "."
 asyncio_default_fixture_loop_scope = "function"
+testpaths = ["src/tests"] # This helps pytest to find tests, making collection faster
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/rickbot_agent", "src/rickbot_utils", "src/streamlit_fe"]
