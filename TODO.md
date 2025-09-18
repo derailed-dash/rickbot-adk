@@ -1,61 +1,69 @@
 # Rickbot-ADK To-Do List
 
-## Next Steps
-
-- [ ] Add persistence of user configuration and conversations.
-- [ ] Update privacy policy accordingly.
-- [ ] Extend Dazbot to have knowledge. Options include:
-    - [Vertex AI Search Grounding with VertexAiSearchTool](https://google.github.io/adk-docs/grounding/vertex_ai_search_grounding/)
-    - Loading directly into cached context
+- [x] Create initial project with Agent-Starter-Kit
+- [x] Setup `.env`
+- [x] Setup CI/CD using Agent-Starter-Kit
+- [x] Test the sample agent locally
+- [x] Deploy with Terraform
+- [x] Deploy the agent with CI/CD
+- [x] Test the sample agent remotely
+- [x] Add `setup-env.sh` to configure Google environment.
+- [x] Refactor sample agent `app` to `adk_sample_app`
+- [x] Refactor application into the `/src` folder
+- [x] Create `rickbot_agent`.
+- [x] Migrate `rickbot` functionality to `rickbot_agent` ensuring that session, short-term memory multi-turn conversations are handled by ADK.
+- [x] Create unit test for multi-turn Rickbot conversation.
+- [x] Migrate `rickbot` Streamlit UI as `streamlit_fe`.
+- [x] Evaluate frontend UI options, e.g. Streamlit and React.
+- [x] Add GenerateContentConfig
+- [x] Set session information - like user - appropriately.
+- [x] Set Prod service to `--allow-unauthenticated` since it will be public facing and use OAuth. Staging service will require IAP.
+- [x] Add OAuth secret to Secret Manager
+- [x] Configure OAuth Client in Staging project.
+- [x] Check for any missing logic in the original Rickbot - like rate limiting.
+- [x] Create and execute Streamlit UI test for all personalities.
+- [x] Remove sample `frontend`.
+- [x] Update dockerfile and deployment to deploy Streamlit_fe
+- [x] Update CI/CD to deploy to Prod
+- [x] Ensure OAuth secrets are set.
+- [x] Configure OAuth Client in Prod project.
+- [x] Update DNS to point to Prod Rickbot Streamlit service
+- [x] Add `staging` URL to allowed OAuth URIs.
+- [x] Create `staging` subdomain and map to our Dev Cloud Run service.
+- [x] Check Cloud Run instance size and optimise.
+- [x] Implement a way to test authentication for local dev
+- [x] Perform OAuth App Verification with Google for Prod.
+- [x] Decomm original Rickbot and update repo documentation accordingly.
+- [x] Investigate mapping domains in Terraform.
+- [x] Readme needs a good cover pic.
+- [x] Perform project review.
+- [x] Refactor logging setup to eliminate duplication.
+- [x] Add lifecycle policy to buckets - delete older data.
+- [x] Move the file upload from the sidebar to under the persona header in the main window.
+- [x] Allow multiple uploads.
+- [x] Clear Chat History should generate new session.
+- [x] Show tool use in the UI, e.g. if we're delegating to Google Search
+- [ ] **Refactor Rickbot-ADK into a decoupled, scalable architecture using Vertex AI Agent Engine**
+    - [ ] **Phase 1: Backend Refactoring**
+        - [ ] **Update Dependencies:** Add `google-cloud-aiplatform[adk,agent_engines]` to `pyproject.toml`.
+        - [ ] **Refactor Agent for Dynamic Personalities:** Modify the agent to be state-aware and load personalities/tools dynamically based on `session.state`.
+        - [ ] **Create `set_personality` Tool:** Implement the tool for changing the active personality in the session state.
+    - [ ] **Phase 2: Notebook-Driven Backend Development & Verification**
+        - [ ] **Update Notebook (`notebooks/rickbot_experiments.ipynb`):**
+        - [ ] **Provision Knowledge Base:** Add cells to use `VertexAiMemoryBankService` to create a data store for "Dazbo" and upload documents. Capture the `data_store_id`.
+        - [ ] **Deploy to Agent Engine:** Add cells to deploy the refactored dynamic agent, capturing the `resource_name`.
+        - [ ] **Verify Backend:** Add cells to connect to the deployed agent and run remote tests. Verify session persistence, dynamic personality switching, knowledge base queries, and conversation history retrieval. This serves as the primary verification for the backend.
+    - [ ] **Phase 3: Frontend Refactoring**
+        - [ ] **Implement Agent Engine Client:** Create a client in the Streamlit code to communicate with the deployed agent using its `resource_name`.
+        - [ ] **Implement Conversation History & Resumption:** Add UI and logic to list and resume past conversations.
+        - [ ] **Update UI Logic:** Replace the local `Runner` with the new client and integrate the `set_personality` calls.
+        - [ ] Update privacy policy accordingly.
+    - [ ] **Phase 4: Final End-to-End Verification**
+        - [ ] **Deploy Frontend:** Deploy the refactored Streamlit application to Cloud Run.
+        - [ ] **Full User Test:** Conduct a full user journey via the web UI to ensure the frontend and backend are integrated correctly.
 - [ ] Restrict access to certain personalities.
 - [ ] Create new React UI.
 - [ ] Implement OAuth login, potentially as sidecar container.
 - [ ] Investigate adding other auth methods.
 - [ ] Ensure React UI works on mobile.
 - [ ] Add voice / live.
-
-## Completed Steps
-
-- [x] Show tool use in the UI, e.g. if we're delegating to Google Search
-- [x] Clear Chat History should generate new session.
-- [x] Allow multiple uploads.
-- [x] Move the file upload from the sidebar to under the persona header in the main window.
-- [x] Add lifecycle policy to buckets - delete older data.
-- [x] Refactor logging setup to eliminate duplication.
-- [x] Perform project review.
-- [x] Readme needs a good cover pic.
-- [x] Investigate mapping domains in Terraform.
-- [x] Decomm original Rickbot and update repo documentation accordingly.
-- [x] Perform OAuth App Verification with Google for Prod.
-- [x] Implement a way to test authentication for local dev
-- [x] Check Cloud Run instance size and optimise.
-- [x] Create `staging` subdomain and map to our Dev Cloud Run service.
-- [x] Add `staging` URL to allowed OAuth URIs.
-- [x] Update DNS to point to Prod Rickbot Streamlit service
-- [x] Configure OAuth Client in Prod project.
-- [x] Ensure OAuth secrets are set.
-- [x] Update CI/CD to deploy to Prod
-- [x] Update dockerfile and deployment to deploy Streamlit_fe
-- [x] Remove sample `frontend`.
-- [x] Create and execute Streamlit UI test for all personalities.
-- [x] Check for any missing logic in the original Rickbot - like rate limiting.
-- [x] Configure OAuth Client in Staging project.
-- [x] Add OAuth secret to Secret Manager
-- [x] Set Prod service to `--allow-unauthenticated` since it will be public facing and use OAuth. Staging service will require IAP.
-- [x] Set session information - like user - appropriately.
-- [x] Add GenerateContentConfig
-- [x] Evaluate frontend UI options, e.g. Streamlit and React.
-- [x] Migrate `rickbot` Streamlit UI as `streamlit_fe`.
-- [x] Create unit test for multi-turn Rickbot conversation.
-- [x] Migrate `rickbot` functionality to `rickbot_agent` ensuring that session, short-term memory multi-turn conversations are handled by ADK.
-- [x] Create `rickbot_agent`.
-- [x] Refactor application into the `/src` folder
-- [x] Refactor sample agent `app` to `adk_sample_app`
-- [x] Add `setup-env.sh` to configure Google environment.
-- [x] Test the sample agent remotely
-- [x] Deploy the agent with CI/CD
-- [x] Deploy with Terraform
-- [x] Test the sample agent locally
-- [x] Setup CI/CD using Agent-Starter-Kit
-- [x] Setup `.env`
-- [x] Create initial project with Agent-Starter-Kit

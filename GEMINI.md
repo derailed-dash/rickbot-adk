@@ -37,33 +37,26 @@ In particular, this project aims to evolve my previous Rickbot project by:
 
 Project dependencies are managed in `pyproject.toml` and can be installed using `uv`. The `make` commands streamline many `uv` and `adk` commands.
 
-### Testing
-
-The project includes unit and integration tests in `src/tests/`. Tests are written using `pytest` and `pytest-asyncio`. They can be run with:
-
-```bash
-make test
-```
-
 ## Deployment
 
 The application is designed for deployment to Google Cloud's Vertex AI Agent Engine. The deployment process is managed via Terraform and Google Cloud Build.
 
 - **CI/CD:** The `.cloudbuild/` directory contains configurations for CI/CD pipelines using Google Cloud Build. The `uvx agent-starter-pack setup-cicd` command is used to set up the full CI/CD pipeline.
-- **Backend Deployment:** The `make backend` command deploys the agent to the Google Cloud Run.
 
 ## Infra
 
 - **Infrastructure as Code:** Infrastructure is defined using Terraform in the `deployment/terraform/` directory.
 
-## Development Conventions
+## Development Guide
 
 - **Configuration:** Project dependencies and metadata are defined in `pyproject.toml`.
 - **Dependencies:** Project dependencies are managed in `pyproject.toml`. The `[project]` section defines the main dependencies, and the `[dependency-groups]` section defines development and optional dependencies.
 - **Source code:** Lives the `/src/` directory. This includes agents, frontends, notebooks and tests.
-- **Linting:** The project uses `ruff` for linting and formatting, `mypy` for static type checking, and `codespell` for checking for common misspellings. The configuration for these tools can be found in `pyproject.toml`.
-- **Notebooks:** The `notebooks/` directory contains Jupyter notebooks for prototyping, testing, and evaluating the agent.
-- **Agents:** The ADK agents will live in the `src/` directory.
+  - **Agents:** The ADK agents will live in the `src/` directory.
+  - **Frontends:** Frontends - like `streamlit_fe` live in the `src/` directory.
+- **Notebooks:** The `notebooks/` directory contains Jupyter notebooks for prototyping, testing, and evaluating the agent. In particular, the `rickbot_experiments.ipynb` should be used for prototyping new features before implementing deployable code.
+- **Testing:** The project includes unit and integration tests in `src/tests/`. Tests are written using `pytest` and `pytest-asyncio`. They can be run with `make test`
+- **Linting:** The project uses `ruff` for linting and formatting, `mypy` for static type checking, and `codespell` for checking for common misspellings. The configuration for these tools can be found in `pyproject.toml`. We can run linting with `make lint`.
 - **AI-Assisted Development:** The `GEMINI.md` file provides context for AI tools like Gemini CLI to assist with development.
 
 ## Documentation and Information
@@ -80,9 +73,6 @@ Always consider the following sources of information when asked about these topi
 ## Project Plan
 
 - The `TODO.md` captures the overall plan for this project.
-- When completing todo actions:
-  1. Mark the action as complete.
-  2. Move the action to the TOP of the existing **Completed Steps** section.
 
 # ADK
 
