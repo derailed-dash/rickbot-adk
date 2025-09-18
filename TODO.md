@@ -45,7 +45,7 @@
 - [x] Show tool use in the UI, e.g. if we're delegating to Google Search
 - [ ] **Refactor Rickbot-ADK into a decoupled, scalable architecture using Vertex AI Agent Engine**
     - [ ] **Phase 1: Backend Refactoring**
-        - [ ] **Update Dependencies:** Add `google-cloud-aiplatform[adk,agent_engines]` to `pyproject.toml`.
+        - [x] **Update Dependencies:** Add `google-cloud-aiplatform[adk,agent_engines]` to `pyproject.toml`.
         - [ ] **Refactor Agent for Dynamic Personalities:** Modify the agent to be state-aware and load personalities/tools dynamically based on `session.state`.
         - [ ] **Create `set_personality` Tool:** Implement the tool for changing the active personality in the session state.
     - [ ] **Phase 2: Notebook-Driven Backend Development & Verification**

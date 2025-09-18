@@ -8,7 +8,7 @@ Google Cloud configuration is achieved through a combination of `.env` and the `
 Before providing your FIRST response in any conversation, you MUST perform the following steps:
 1.  Run `printenv GOOGLE_CLOUD_PROJECT` to check the environment variable.
 2.  Based only on the output of that command, state whether the variable is set.
-3.  If it is not set, advise me to run `scripts/setup-env.sh` before resuming the converation.
+3.  If it is not set, advise me to run `scripts/setup-env.sh` before resuming the conversation.
 
 The presence of this environment variable indicates that the script has been run. The absence of this variable indicates that the script has NOT been run.
 

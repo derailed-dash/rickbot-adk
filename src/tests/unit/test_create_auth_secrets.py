@@ -61,7 +61,9 @@ client_secret = "some_client_secret"
 server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
 """
     # Configure the mock SecretManagerServiceClient
-    mock_secret_manager_client.return_value.access_secret_version.return_value.payload.data.decode.return_value = mock_secret_content
+    mock_sm_client = mock_secret_manager_client.return_value
+    access_response = mock_sm_client.access_secret_version.return_value
+    access_response.payload.data.decode.return_value = mock_secret_content
 
     project_id = "test-project"
     secrets_file_path = os.path.join(".streamlit", "secrets.toml")

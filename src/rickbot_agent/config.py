@@ -34,6 +34,8 @@ def get_config() -> Config:
     """Return a dictionary of the current config."""
 
     _, project_id = google.auth.default()
+    if not project_id:
+        raise ValueError("GCP Project ID not set. Have you run scripts/setup-env.sh?")
     location = os.environ.setdefault(
         "GOOGLE_CLOUD_LOCATION", "global"
     )  # assume set as env var, but fail back to global
