@@ -35,7 +35,7 @@ class Personality:
     prompt_question: str
     temperature: float
     avatar: str = field(init=False)
-    system_instruction: str = field(init=False)
+    system_instruction: str = field(init=False) # We set this in __post_init__(), not in __init__()
 
     def __post_init__(self) -> None:
         self.avatar = get_avatar(self.name.lower())
