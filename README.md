@@ -13,17 +13,14 @@ Author: Darren Lester
 - [Per Dev Session (Once One-Time Setup Tasks Have Been Completed)](#per-dev-session-once-one-time-setup-tasks-have-been-completed)
 - [Useful Commands](#useful-commands)
   - [Streamlit UI](#streamlit-ui)
-  - [ADK](#adk)
+  - [Testing](#testing)
     - [Testing Locally](#testing-locally)
-    - [Testing Remote](#testing-remote)
   - [Running in a Local Container](#running-in-a-local-container)
 - [Using Agent Starter Kit for Initial Project Setup](#using-agent-starter-kit-for-initial-project-setup)
-  - [Pre-Reqs](#pre-reqs)
-  - [Before Creating Project with Agent Starter Kit](#before-creating-project-with-agent-starter-kit)
-  - [Create Project with Agent Starter Kit](#create-project-with-agent-starter-kit)
-  - [After Creating Project with Agent Starter Kit](#after-creating-project-with-agent-starter-kit)
-  - [Creating CI/CD Pipeline](#creating-ci-cd-pipeline)
-- [Deploying Infra Commands](#deploying-infra-commands)
+- [Deploying Infrastructure](#deploying-infrastructure)
+- [OAuth](#oauth)
+  - [Streamlit](#streamlit)
+- [DNS](#dns)
 
 ## Repo Overview
 
@@ -176,7 +173,7 @@ Frontend user authentication is required for Rickbot.
 
 ### Streamlit
 
-- With the Streamlit frontend this is achieved using Streamlit\'s integrated OIDC authentication. 
+- With the Streamlit frontend this is achieved using Streamlit's integrated OIDC authentication. 
 - We use Google Auth Platform as the OAuth2 Auth provider.
 - OAuth credentials are obtained from the Google Auth Platform and stored in Google Secret Manager.
 - When the application is first launched, these credentials are read and dynamically written to the `.streamlit/secrets.toml`, which is how the Streamlit OIDC works. We must supply the `oauth2callback` URI as well as the OAuth client ID and secret.

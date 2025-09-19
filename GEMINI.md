@@ -51,8 +51,7 @@ The application is designed for deployment to Google Cloud's Vertex AI Agent Eng
 
 - **Configuration:** Project dependencies and metadata are defined in `pyproject.toml`.
 - **Dependencies:** Project dependencies are managed in `pyproject.toml`. The `[project]` section defines the main dependencies, and the `[dependency-groups]` section defines development and optional dependencies.
-- **Source code:** Lives the `/src/` directory. This includes agents, frontends, notebooks and tests.
-  - **Agents:** The ADK agents will live in the `src/` directory.
+- **Source code:** Lives the `src/` directory. This includes agents, frontends, notebooks and tests.
   - **Frontends:** Frontends - like `streamlit_fe` live in the `src/` directory.
 - **Notebooks:** The `notebooks/` directory contains Jupyter notebooks for prototyping, testing, and evaluating the agent. In particular, the `rickbot_experiments.ipynb` should be used for prototyping new features before implementing deployable code.
 - **Testing:** The project includes unit and integration tests in `src/tests/`. Tests are written using `pytest` and `pytest-asyncio`. They can be run with `make test`
@@ -63,17 +62,10 @@ The application is designed for deployment to Google Cloud's Vertex AI Agent Eng
 
 Always consider the following sources of information when asked about these topics. Use the web fetch to read them:
 
-- For ADK: 
-  - The official docs in the adk-docs directory.
-  - Design patterns: https://medium.com/google-cloud/agent-patterns-with-adk-1-agent-5-ways-58bff801c2d6
-  - Multi-agent intro guide: https://medium.com/@sokratis.kartakis/from-zero-to-multi-agents-a-beginners-guide-to-google-agent-development-kit-adk-b56e9b5f7861
-- For Streamlit:
-  - OAuth with Google Auth Platform: https://docs.streamlit.io/develop/tutorials/authentication/google
-
+For ADK: 
+  - The official docs are in the adk-docs GitHub repo, which has been cloned and added here as context.
+  - For any queries relating to ADK usage and implementation, refer to the `adk-docs` folder hierarchy.
+  
 ## Project Plan
 
 - The `TODO.md` captures the overall plan for this project.
-
-# ADK
-
-For any queries relating to ADK usage and implementation, refer to the `adk-docs` folder hierarchy.
