@@ -2,8 +2,10 @@
 
 import logging
 import os
+from functools import cache
 
 
+@cache # We only one one logger for a given app_name
 def setup_logger(app_name: str) -> logging.Logger:
     """Sets up and a logger for the application."""
     log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
