@@ -60,11 +60,11 @@ The application is designed for deployment to Google Cloud's Vertex AI Agent Eng
 
 ## Documentation and Information
 
-Always consider the following sources of information when asked about these topics. Use the web fetch to read them:
+Always consider the following sources of information when asked about these topics.
 
-For ADK: 
+- Agent Development Kit (ADK): 
   - The official docs are in the adk-docs GitHub repo, which has been cloned and added here as context.
-  - For any queries relating to ADK usage and implementation, refer to the `adk-docs` folder hierarchy.
+  - For any queries relating to ADK usage and implementation, ALWAYS use refer to this repo. Don't rely solely on what you already konw.
   
 ## Project Plan
 
