@@ -43,6 +43,7 @@
 - [x] Allow multiple uploads.
 - [x] Clear Chat History should generate new session.
 - [x] Show tool use in the UI, e.g. if we're delegating to Google Search
+- [x] Add Gemini CLI GitHub Actions
 - [ ] **Refactor Rickbot-ADK into a decoupled, scalable architecture using Vertex AI Agent Engine**
     - [ ] **Phase 1: Backend Refactoring**
         - [x] **Update Dependencies:** Add `google-cloud-aiplatform[adk,agent_engines]` to `pyproject.toml`.
