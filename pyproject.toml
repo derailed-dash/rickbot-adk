@@ -6,20 +6,20 @@ authors = [
     {name = "Dazbo (Darren Lester)", email = "derailed.dash@gmail.com"},
 ]
 dependencies = [
-    "google-adk~=1.13.0", # means >= 1.13.0 but < 1.14
-    "opentelemetry-exporter-gcp-trace~=1.9.0",
-    "google-cloud-logging~=3.12.0",
-    "google-cloud-aiplatform[adk,evaluation,agent_engines]~=1.114.0",
+    "google-adk",
+    "opentelemetry-exporter-gcp-trace",
+    "google-cloud-logging",
+    "google-cloud-aiplatform[adk,evaluation,agent_engines]",
     "google-cloud-secret-manager",
     "python-dotenv",
     # Web framework
-    "fastapi~=0.115.14",
-    "uvicorn~=0.34.3", # means >= 0.34.3 but < 0.35
-    "pyyaml>=6.0.2",
+    "fastapi",
+    "uvicorn",
+    "pyyaml",
     # Frontend
     "streamlit",
-    "psycopg2-binary>=2.9.10",
-    "Authlib~=1.6.0",
+    "psycopg2-binary",
+    "Authlib",
     "limits",
     # Required for the sample Streamlit UI from agent-starter-pack
     "langchain",
@@ -28,36 +28,36 @@ dependencies = [
     "langchain-google-vertexai",
 ]
 
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.12"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.4",
-    "pytest-asyncio>=0.23.8",
-    "nest-asyncio>=1.6.0",
-    "tenacity>=8.5.0",
+    "pytest",
+    "pytest-asyncio",
+    "nest-asyncio",
+    "tenacity",
 ]
 
 [project.optional-dependencies]
 
 jupyter = [
-    "jupyter~=1.1.0",
-    "ipython>=8.37.0"
+    "jupyter",
+    "ipython"
 ]
 lint = [
-    "ruff>=0.4.6",
-    "mypy~=1.17.0",
-    "codespell~=2.4.1",
-    "types-pyyaml~=6.0.12",
-    "types-requests~=2.32.4",
+    "ruff",
+    "mypy",
+    "codespell",
+    "types-pyyaml",
+    "types-requests",
 ]
 load-test = [
-    "locust==2.31.1",
+    "locust",
 ]
 
 [tool.ruff]
 line-length = 130
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [
