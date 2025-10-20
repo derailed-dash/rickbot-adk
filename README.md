@@ -106,13 +106,13 @@ uv run streamlit run src/frontend/streamlit_app.py
 
 #### Testing Locally
 
-With CLI:
+With ADK CLI:
 
 ```bash
 uv run adk run src/rickbot_agent
 ```
 
-With GUI:
+With ADK Web GUI:
 
 ```bash
 # Last param is the location of the agents

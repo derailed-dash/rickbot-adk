@@ -61,10 +61,10 @@ The application is designed for deployment to Google Cloud's Vertex AI Agent Eng
 
 ## Documentation and Information
 
-Always consider the following sources of information when asked about these topics. Use the web fetch to read them:
+Always consider the following sources of information when asked about these topics. Use the web_fetch tool to read them:
 
 - For ADK: 
-  - The official docs in the adk-docs directory.
+  - Use the adk-docs-mcp tool if available. Otherwise use the official docs in the adk-docs directory.
   - Design patterns: https://medium.com/google-cloud/agent-patterns-with-adk-1-agent-5-ways-58bff801c2d6
   - Multi-agent intro guide: https://medium.com/@sokratis.kartakis/from-zero-to-multi-agents-a-beginners-guide-to-google-agent-development-kit-adk-b56e9b5f7861
 - For Streamlit:
