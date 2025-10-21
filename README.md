@@ -154,6 +154,20 @@ docker run --rm -p 8080:8080 \
 
 This project, its GitHub repo, and associated CI/CD pipeline were initially setup using the Agent Starter Kit. Much of the original template files have since been removed from the project.  But this section has been retained to provide an overview of this process. But do read [this article](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24) for a more detailed walkthrough.
 
+## Application Design
+
+### Handling Personality Changes in the Streamlit UI
+
+The application is designed to ensure a clean and robust separation of context when switching between different chatbot personalities. The process is handled as follows:
+
+1.  **UI Detection**: When a user selects a new personality from the sidebar dropdown in the Streamlit UI, the application immediately detects this change.
+2.  **State Reset**: To prevent conversational context from leaking between personalities, the application clears the current chat history.
+3.  **Application Rerun**: It then programmatically triggers a full rerun of the Streamlit application.
+4.  **Runner Re-initialization**: During the rerun, the application logic detects that the personality has changed. This triggers the creation of a **brand new ADK `Runner` instance**.
+5.  **New Agent Configuration**: The new `Runner` is configured with a fresh agent that embodies the newly selected personality. The old `Runner` instance is discarded and garbage-collected.
+
+This approach ensures that each personality operates in a clean, isolated environment. It is a simple and robust pattern that aligns well with Streamlit's execution model, prioritizing a predictable state over the premature optimization of object re-creation.
+
 ## Deploying Infrastructure
 
 The following commands describe how to run Terraform tasks, to deploy infrastructure. Note that I have now added a `terraform` target to my `Makefile`, so we can achieve the same result by simply running `make terraform` from the project root directory.

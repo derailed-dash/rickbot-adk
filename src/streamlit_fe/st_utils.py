@@ -4,12 +4,12 @@ This module contains utility functions for the Rickbot Streamlit application.
 
 import streamlit as st
 from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
 from limits import parse, storage
 from limits.strategies import MovingWindowRateLimiter
 
 from rickbot_agent.agent import get_agent
 from rickbot_agent.personality import Personality
+from rickbot_agent.services import get_session_service
 from streamlit_fe.st_config import config
 
 
@@ -19,7 +19,7 @@ async def initialize_adk_runner(personality: Personality) -> Runner:
     """
     rickbot_agent = get_agent(personality.name)
 
-    session_service = InMemorySessionService()
+    session_service = get_session_service()
     await session_service.create_session(
         app_name=config.app_name,
         user_id=st.session_state.user_id,
