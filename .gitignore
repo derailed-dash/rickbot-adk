@@ -201,5 +201,7 @@ my_env.tfvars
 .saved_chats
 .requirements.txt
 
+.scratch/
 .gemini/
+working_docs/
 gha-creds-*.json
