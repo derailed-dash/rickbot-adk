@@ -45,6 +45,8 @@
 - [x] Show tool use in the UI, e.g. if we're delegating to Google Search
 - [x] Add Gemini CLI GitHub Actions
 - [x] Move session service creation into separate module.
+- [ ] Load reference material as context to Dazbo
+- [ ] Implement Fast API
 - [ ] Restrict access to certain personalities.
 - [ ] Create new React UI.
 - [ ] Implement OAuth login, potentially as sidecar container.
