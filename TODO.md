@@ -45,11 +45,12 @@
 - [x] Show tool use in the UI, e.g. if we're delegating to Google Search
 - [x] Add Gemini CLI GitHub Actions
 - [x] Move session service creation into separate module.
-- [ ] Load reference material as context to Dazbo
 - [ ] Implement Fast API
+- [ ] Create new React UI as a React/Next.js application and using Material UI components
+- [ ] Implement OAuth Login (Google Identities) for the React frontend, potentially as sidecar container
+- [ ] Implement OAuth Login with GitHub
+- [ ] Load reference material as context to Dazbo
 - [ ] Restrict access to certain personalities.
-- [ ] Create new React UI.
-- [ ] Implement OAuth login, potentially as sidecar container.
 - [ ] Investigate adding other auth methods.
 - [ ] Ensure React UI works on mobile.
 - [ ] Add voice / live.
