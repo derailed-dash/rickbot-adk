@@ -70,11 +70,22 @@ Always consider the following sources of information when asked about these topi
   - Sample [Multi-Agent Application](https://github.com/ayoisio/adk-code-review-assistant)
 - For Streamlit:
   - [OAuth with Google Auth Platform](https://docs.streamlit.io/develop/tutorials/authentication/google)
+- For FastAPI:
+  - [FastAPI](https://fastapi.tiangolo.com/)
+  - [FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/)
+  - [FastAPI on Cloud Run](https://www.youtube.com/watch?v=79e1vm-mTs4)
+  - [Full stack ADK application with React and FastAPI](https://medium.com/google-cloud/build-a-gemini-full-stack-research-agent-with-agent-development-kit-11192e8e9165)
+  - [Gemini Fullstack Application](https://github.com/google/adk-samples/tree/main/python/agents/gemini-fullstack)
+  - [https://medium.com/@zakinabdul.jzl/orchestrating-multi-agent-workflows-with-google-adk-and-fastapi-e6b4b1a22c90](https://medium.com/@zakinabdul.jzl/orchestrating-multi-agent-workflows-with-google-adk-and-fastapi-e6b4b1a22c90)
+  - [Handling Authentication and Authorization with FastAPI and Next.js](https://www.david-crimi.com/blog/user-auth)
+- For React and Next.js:
+  - [React Tutorial](https://dev.to/aws/a-complete-beginner-s-guide-to-react-hooks-edition-1bi0)
+  - [Full stack ADK application with React and FastAPI](https://medium.com/google-cloud/build-a-gemini-full-stack-research-agent-with-agent-development-kit-11192e8e9165)
+  - [About React and Next.js](https://nextjs.org/learn/react-foundations/what-is-react-and-nextjs)
+  - [Next.js](https://nextjs.org/docs)
+  - [Next.js React Foundations](https://nextjs.org/learn/react-foundations)
 
 ## Project Plan
 
 - The `TODO.md` captures the overall plan for this project.
 
-# ADK
-
-For any queries relating to ADK usage and implementation, refer to the `adk-docs` folder hierarchy.

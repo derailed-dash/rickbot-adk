@@ -9,7 +9,7 @@ install:
 	uv sync --dev --extra jupyter
 
 # Launch local dev playground
-playground:
+adk-playground:
 	@echo "================================================================================="
 	@echo "| 🚀 Starting your agent playground...                                          |"
 	@echo "|                                                                               |"
@@ -55,3 +55,11 @@ terraform:
 		*) \
 			echo "Terraform apply cancelled.";; \
 	esac
+
+make api:
+	@echo "================================================================================="
+	@echo "| 🚀 Launching API frontend...                                                  |"
+	@echo "|                                                                               |"
+	@echo "| 📄 See docs at /docs                                                          |"
+	@echo "================================================================================="
+	uv run uvicorn api.main:app --app-dir src --host 0.0.0.0 --port 8000 --reload
