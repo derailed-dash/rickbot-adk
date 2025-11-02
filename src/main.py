@@ -68,9 +68,12 @@ async def chat(
     personality: str = Form(...),
     user_id: str = Form("api-user"),
     session_id: str | None = Form(None),
-    file: UploadFile | None = None, # Changed to None to make it truly optional
+    file: UploadFile | str | None = None,  # Allow str to handle empty file field
 ) -> ChatResponse:
     """Chat endpoint to interact with the Rickbot agent."""
+    logger.debug(f"Received chat request - "
+                 f"Personality: {personality}, User ID: {user_id}, Session ID: {session_id if session_id else 'None'}")
+
     current_session_id = session_id if session_id else str(uuid.uuid4())
 
     # 1. Get the session, or create it if it doesn't exist
@@ -78,21 +81,28 @@ async def chat(
         session_id=current_session_id, user_id=user_id, app_name=APP_NAME
     )
     if not session:
+        logger.debug(f"Creating new session: {current_session_id}")
         session = await session_service.create_session(
             session_id=current_session_id, user_id=user_id, app_name=APP_NAME
         )
+    else:
+        logger.debug(f"Found existing session: {current_session_id}")
 
     # 2. Get the correct agent personality (lazily loaded and cached)
+    logger.debug(f"Loading agent for personality: '{personality}'")
     agent = get_agent(personality)
 
     # 3. Construct the message parts
     parts = [Part.from_text(text=prompt)]
 
     # 4. Add any files to the message
-    if file and file.filename: # Check if a file was actually provided
+    if isinstance(file, UploadFile) and file.filename:
+        logger.debug(f"Processing uploaded file: {file.filename} ({file.content_type})")
         file_content = await file.read()
         # Create a Part object for the agent to process
         parts.append(Part(inline_data=Blob(data=file_content, mime_type=file.content_type)))
+    elif file is not None:
+        logger.warning(f"file was set to '{file}' - will not be processed")
 
     # 5. Associate the role with the message
     new_message = Content(role="user", parts=parts)
@@ -106,6 +116,7 @@ async def chat(
     )
 
     # 7. Run the agent and extract response and attachments
+    logger.debug(f"Running agent for session: {current_session_id}")
     final_msg = ""
     response_attachments: list[Part] = []
     async for event in runner.run_async(
@@ -119,6 +130,9 @@ async def chat(
                     final_msg += part.text 
                 elif part.inline_data:  # Check for other types of parts (e.g., images)
                     response_attachments.append(part)
+    
+    logger.debug(f"Agent for session {current_session_id} finished.")
+    logger.debug(f"Final message snippet: {final_msg[:100]}...")
 
     return ChatResponse(
         response=final_msg,
