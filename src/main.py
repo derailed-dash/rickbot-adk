@@ -3,7 +3,7 @@ import os
 import uvicorn
 from google.adk.cli.fast_api import get_fast_api_app
 
-from rickbot_agent.config import get_config, logger
+from rickbot_utils.config import get_config, logger
 
 config = get_config()
 logger.debug(config)

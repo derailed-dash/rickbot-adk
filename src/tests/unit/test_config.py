@@ -25,7 +25,7 @@ from unittest.mock import patch
 
 import pytest
 
-from rickbot_agent.config import get_config
+from rickbot_utils.config import get_config
 
 
 @pytest.fixture(autouse=True)
