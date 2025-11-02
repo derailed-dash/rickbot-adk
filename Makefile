@@ -62,4 +62,4 @@ make api:
 	@echo "|                                                                               |"
 	@echo "| 📄 See docs at /docs                                                          |"
 	@echo "================================================================================="
-	uv run uvicorn api.main:app --app-dir src --host 0.0.0.0 --port 8000 --reload
+	uv run fastapi dev src/api/main.py
