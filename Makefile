@@ -56,7 +56,7 @@ terraform:
 			echo "Terraform apply cancelled.";; \
 	esac
 
-make api:
+api:
 	@echo "================================================================================="
 	@echo "| 🚀 Launching API frontend...                                                  |"
 	@echo "|                                                                               |"
