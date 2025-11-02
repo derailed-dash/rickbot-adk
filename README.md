@@ -76,36 +76,20 @@ source scripts/setup-env.sh --noauth
 | `make playground`             | Launch ADK UI for testing agent locally and remotely. This runs `uv run adk web src` |
 | `make api`                    | Launch the FastAPI backend:<br>`uv run fastapi dev src/main.py`|
 | `make streamlit`              | Run Streamlit FE:<br>`MOCK_AUTH_USER="mock.user@example.com" uv run streamlit run src/streamlit_fe/app.py`|
-| `make test`                   | Run unit and integration tests |
+| `make test`                   | Run unit tests |
+| `make test-all`               | Run unit and integration tests (takes a little longer) |
 | `make lint`                   | Run code quality checks (codespell, ruff, mypy) |
 | `make terraform`              | Plan Terraform, prompt for authorisation, then apply |
 | `uv run jupyter lab`          | Launch Jupyter notebook |
 
 For full command options and usage, refer to the [Makefile](Makefile).
 
-### Streamlit UI
-
-```bash
-# from src folder
-uv run streamlit run src/frontend/streamlit_app.py
-```
-
 ### Testing
 
 - All tests are in the `src/tests` folder.
-- We can run our tests with `make test`.
-- Note that integration tests will fail if the development environment has not first been configured with the `setup-env.sh` script. This is because the test code will not have access to the required Google APIs.
-- If we want to run tests verbosely, we can do this:
+- The tests and how to run them are documented in `src/tests/README.md`.
 
-  ```bash
-  uv run pytest -v -s src/tests/unit/test_config.py
-  uv run pytest -v -s src/tests/unit/test_personality.py
-  uv run pytest -v -s src/tests/integration/test_rickbot_agent_multiturn.py
-  uv run pytest -v -s src/tests/integration/test_server_e2e.py
-  uv run pytest -v -s src/tests/integration/test_personalities.py
-  ```
-
-#### Testing Locally
+### Running ADK Dev Tools
 
 With ADK CLI:
 

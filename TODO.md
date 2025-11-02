@@ -45,7 +45,10 @@
 - [x] Show tool use in the UI, e.g. if we're delegating to Google Search
 - [x] Add Gemini CLI GitHub Actions
 - [x] Move session service creation into separate module.
-- [ ] Implement Fast API
+- [x] Implement Fast API with Chat endpoint
+- [x] Add unit tests for FastAPI
+- [x] Add integration tests for FastAPI
+- [ ] Implement multimodal interactions with ArtifactService
 - [ ] Create new React UI as a React/Next.js application and using Material UI components
 - [ ] Implement OAuth Login (Google Identities) for the React frontend, potentially as sidecar container
 - [ ] Implement OAuth Login with GitHub

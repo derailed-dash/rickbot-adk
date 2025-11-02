@@ -27,8 +27,13 @@ streamlit:
 local-backend:
 	uv run uvicorn adk_sample_app.server:app --app-dir src --host 0.0.0.0 --port 8000 --reload
 
-# Run unit and integration tests
+# Run unit tests
 test:
+	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "Error: GOOGLE_CLOUD_PROJECT is not set. Setup environment before running tests" && exit 1)
+	uv run pytest src/tests/unit
+
+# Run unit and integration tests (takes a little longer)
+test-all:
 	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "Error: GOOGLE_CLOUD_PROJECT is not set. Setup environment before running tests" && exit 1)
 	uv run pytest src/tests/unit && uv run pytest src/tests/integration
 
