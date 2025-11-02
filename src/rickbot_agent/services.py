@@ -2,7 +2,7 @@
 
 from functools import cache
 
-from google.adk.artifacts import GcsArtifactService, InMemoryArtifactService
+from google.adk.artifacts import InMemoryArtifactService
 from google.adk.sessions import BaseSessionService, InMemorySessionService
 
 

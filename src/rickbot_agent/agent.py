@@ -15,6 +15,7 @@ from google.adk.tools import (
 from google.genai.types import GenerateContentConfig
 
 from rickbot_utils.config import config, logger
+
 from .personality import Personality, get_personalities
 
 # ADK Built-in Tool Limitation:
