@@ -73,7 +73,8 @@ source scripts/setup-env.sh --noauth
 | ----------------------------- | ------------------------------------------------------------------------------------- |
 | `source scripts/setup-env.sh` | Setup Google Cloud project and auth with Dev/Staging. Parameter options:<br> `[--noauth] [-t\|--target-env <DEV\|PROD>]` |
 | `make install`                | Install all required dependencies using `uv` |
-| `make playground`             | Launch UI for testing agent locally and remotely. This runs `uv run adk web src` |
+| `make playground`             | Launch ADK UI for testing agent locally and remotely. This runs `uv run adk web src` |
+| `make api`                    | Launch the FastAPI backend:<br>`uv run fastapi dev src/main.py`|
 | `make streamlit`              | Run Streamlit FE:<br>`MOCK_AUTH_USER="mock.user@example.com" uv run streamlit run src/streamlit_fe/app.py`|
 | `make test`                   | Run unit and integration tests |
 | `make lint`                   | Run code quality checks (codespell, ruff, mypy) |
@@ -156,7 +157,17 @@ This project, its GitHub repo, and associated CI/CD pipeline were initially setu
 
 ## Application Design
 
-### Handling Personality Changes in the Streamlit UI
+The application is designed with two parallel interfaces to the underlying agent:
+
+### API Backend
+
+The primary entrypoint to the application is a FastAPI backend, defined in `src/main.py`. This provides a RESTful API that allows any client that can speak HTTP to interact with the Rickbot agent. This decoupled architecture allows for the development of custom user interfaces (such as a React-based web application) and enables other applications to integrate with Rickbot.
+
+### Streamlit UI
+
+For rapid prototyping and demonstration, the application also provides a Streamlit-based user interface. This UI is defined in `src/streamlit_fe/app.py` and can be launched with `make streamlit`.
+
+#### Handling Personality Changes in the Streamlit UI
 
 The application is designed to ensure a clean and robust separation of context when switching between different chatbot personalities. The process is handled as follows:
 

@@ -62,4 +62,5 @@ make api:
 	@echo "|                                                                               |"
 	@echo "| 📄 See docs at /docs                                                          |"
 	@echo "================================================================================="
-	uv run fastapi dev src/api/main.py
+	# Using 'fastapi dev' for development with auto-reloading. For production, 'uvicorn' would be used directly.
+	uv run fastapi dev src/main.py
