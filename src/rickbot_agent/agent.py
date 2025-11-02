@@ -14,11 +14,8 @@ from google.adk.tools import (
 )
 from google.genai.types import GenerateContentConfig
 
-from .config import get_config, logger
+from .config import config, logger
 from .personality import Personality, get_personalities
-
-config = get_config()
-
 
 # ADK Built-in Tool Limitation:
 # A single root agent or a standalone agent can only support ONE built-in tool.

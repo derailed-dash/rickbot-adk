@@ -6,6 +6,7 @@ from google.adk.artifacts import GcsArtifactService, InMemoryArtifactService
 from google.adk.sessions import BaseSessionService, InMemorySessionService
 
 
+@cache
 def get_artifact_service():
     """Initialise and return the artifact service."""
     return InMemoryArtifactService()

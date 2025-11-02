@@ -19,6 +19,7 @@ def clear_logger_handlers():
 
 def test_setup_logger_default_level() -> None:
     """Test that setup_logger sets the default log level to INFO."""
+    setup_logger.cache_clear()
     with patch.dict(os.environ, {}, clear=True):  # Ensure no LOG_LEVEL is set
         logger = setup_logger("test_app")
         assert logger.level == logging.INFO
@@ -28,6 +29,7 @@ def test_setup_logger_default_level() -> None:
 
 def test_setup_logger_debug_level() -> None:
     """Test that setup_logger sets the log level to DEBUG when specified."""
+    setup_logger.cache_clear()
     with patch.dict(os.environ, {"LOG_LEVEL": "DEBUG"}, clear=True):
         logger = setup_logger("test_app")
         assert logger.level == logging.DEBUG
@@ -35,6 +37,7 @@ def test_setup_logger_debug_level() -> None:
 
 def test_setup_logger_warning_level() -> None:
     """Test that setup_logger sets the log level to WARNING when specified."""
+    setup_logger.cache_clear()
     with patch.dict(os.environ, {"LOG_LEVEL": "WARNING"}, clear=True):
         logger = setup_logger("test_app")
         assert logger.level == logging.WARNING
