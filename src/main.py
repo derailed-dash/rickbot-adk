@@ -76,7 +76,7 @@ async def chat(
 
     current_session_id = session_id if session_id else str(uuid.uuid4())
 
-    # 1. Get the session, or create it if it doesn't exist
+    # Get the session, or create it if it doesn't exist
     session = await session_service.get_session(
         session_id=current_session_id, user_id=user_id, app_name=APP_NAME
     )
@@ -88,14 +88,14 @@ async def chat(
     else:
         logger.debug(f"Found existing session: {current_session_id}")
 
-    # 2. Get the correct agent personality (lazily loaded and cached)
+    # Get the correct agent personality (lazily loaded and cached)
     logger.debug(f"Loading agent for personality: '{personality}'")
     agent = get_agent(personality)
 
-    # 3. Construct the message parts
+    # Construct the message parts
     parts = [Part.from_text(text=prompt)]
 
-    # 4. Add any files to the message
+    # Add any files to the message
     if isinstance(file, UploadFile) and file.filename:
         logger.debug(f"Processing uploaded file: {file.filename} ({file.content_type})")
         file_content = await file.read()
@@ -104,10 +104,10 @@ async def chat(
     elif file is not None:
         logger.warning(f"file was set to '{file}' - will not be processed")
 
-    # 5. Associate the role with the message
+    # Associate the role with the message
     new_message = Content(role="user", parts=parts)
 
-    # 6. Create the runner
+    # Create the runner
     runner = Runner(
         agent=agent,
         app_name=APP_NAME,
@@ -115,7 +115,7 @@ async def chat(
         artifact_service=artifact_service,
     )
 
-    # 7. Run the agent and extract response and attachments
+    # Run the agent and extract response and attachments
     logger.debug(f"Running agent for session: {current_session_id}")
     final_msg = ""
     response_attachments: list[Part] = []
@@ -130,7 +130,7 @@ async def chat(
                     final_msg += part.text 
                 elif part.inline_data:  # Check for other types of parts (e.g., images)
                     response_attachments.append(part)
-    
+
     logger.debug(f"Agent for session {current_session_id} finished.")
     logger.debug(f"Final message snippet: {final_msg[:100]}...")
 
