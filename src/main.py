@@ -50,7 +50,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], # Allow requests from anywhere, but we can restrict to domains hosting frontends
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
