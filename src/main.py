@@ -11,9 +11,17 @@ Key functionalities include:
 - Orchestrating agent interactions using the ADK Runner.
 - Managing conversational sessions and artifacts.
 - Returning multimodal responses (text and optional attachments).
+
+Notes:
+- As described in https://fastapi.tiangolo.com/tutorial/request-forms/ the HTTP protocol defines that:
+  - Request data to an API would normally be sent as plain old JSON ("Body") data, encoded as application/json.
+  - BUT, data that optionally includes files must be sent as Form data, not Body data.
+  - Form data will be encoded with the media type application/x-www-form-urlencoded, if not included files;
+    or multipart/form-data, if files are included.
 """
 
 import uuid
+from typing import Annotated
 
 from fastapi import FastAPI, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,21 +36,12 @@ from rickbot_utils.config import logger
 APP_NAME = "rickbot_api"
 
 
-class ChatRequest(BaseModel):
-    """Request model for the chat endpoint."""
-
-    prompt: str
-    personality: str
-    user_id: str = "api-user"  # Default user_id if not provided by client
-    session_id: str | None = None
-
-
 class ChatResponse(BaseModel):
     """Response model for the chat endpoint."""
 
     response: str
     session_id: str
-    attachments: list[Part] | None = None  # Added for multimodal responses
+    attachments: list[Part] | None = None  # Support for multimodal response
 
 
 logger.debug("Initialising FastAPI app...")
@@ -64,11 +63,11 @@ artifact_service = get_artifact_service()
 
 @app.post("/chat")
 async def chat(
-    prompt: str = Form(...), # Signals that this form data is required
-    personality: str = Form(...), # Also required
-    user_id: str = Form("api-user"), # Optional field, but defaults to "api-user"
-    session_id: str | None = Form(None), # This field is optional
-    file: UploadFile | str | None = None,  # Allow str to handle empty file field
+    prompt: Annotated[str, Form()],
+    session_id: Annotated[str | None, Form()] = None,
+    personality: Annotated[str | None, Form()] = "Rick",
+    user_id: Annotated[str, Form()] = "api-user",
+    file: UploadFile | None = None,
 ) -> ChatResponse:
     """Chat endpoint to interact with the Rickbot agent."""
     logger.debug(f"Received chat request - "
