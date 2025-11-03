@@ -64,10 +64,10 @@ artifact_service = get_artifact_service()
 
 @app.post("/chat")
 async def chat(
-    prompt: str = Form(...),
-    personality: str = Form(...),
-    user_id: str = Form("api-user"),
-    session_id: str | None = Form(None),
+    prompt: str = Form(...), # Signals that this form data is required
+    personality: str = Form(...), # Also required
+    user_id: str = Form("api-user"), # Optional field, but defaults to "api-user"
+    session_id: str | None = Form(None), # This field is optional
     file: UploadFile | str | None = None,  # Allow str to handle empty file field
 ) -> ChatResponse:
     """Chat endpoint to interact with the Rickbot agent."""
