@@ -95,7 +95,7 @@ async def chat(
     parts = [Part.from_text(text=prompt)]
 
     # Add any files to the message
-    if isinstance(file, UploadFile) and file.filename:
+    if file and file.filename:
         logger.debug(f"Processing uploaded file: {file.filename} ({file.content_type})")
         file_content = await file.read()
         # Create a Part object for the agent to process

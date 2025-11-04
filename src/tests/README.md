@@ -50,8 +50,18 @@ curl -X POST "http://localhost:8000/chat" \
   -H "Content-Type: multipart/form-data" \
   -F "prompt=What is the meaning of life?" \
   -F "personality=Rick" \
-  -F "user_id=test_user" \
-  -F "session_id=test_session_1"
+  -F "user_id=test_user"
+```
+#### Single Turn Image Conversation
+
+```bash
+curl -X POST "http://localhost:8000/chat" \
+    -H "accept: application/json" \
+    -H "Content-Type: multipart/form-data" \
+    -F "prompt=Describe this image for me" \
+    -F "personality=Jack" \
+    -F "user_id=test_user_vision" \
+    -F "file=@/home/darren/localdev/python/rickbot-adk/media/get_schwifty_with_fastapi.png" | jq .
 ```
 
 #### Multi-Turn Conversation
@@ -64,7 +74,7 @@ curl -X POST "http://localhost:8000/chat" \
   -F "prompt=My name is Dazbo." \
   -F "personality=Rick" \
   -F "user_id=test_user" \
-  -F "session_id=test_session_1"
+  -F "session_id=multiturn_test_session"
 
 # Second turn
 curl -X POST "http://localhost:8000/chat" \
@@ -73,5 +83,5 @@ curl -X POST "http://localhost:8000/chat" \
   -F "prompt=What is my name?" \
   -F "personality=Rick" \
   -F "user_id=test_user" \
-  -F "session_id=test_session_1"
+  -F "session_id=multiturn_test_session"
 ```
