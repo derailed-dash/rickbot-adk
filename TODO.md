@@ -48,7 +48,6 @@
 - [x] Implement Fast API with Chat endpoint
 - [x] Add unit tests for FastAPI
 - [x] Add integration tests for FastAPI
-- [ ] Update CORS for API
 - [ ] Implement OAuth for our API calls - Google and GitHub?
 - [ ] Implement rate limiting for our API calls
 - [ ] Implement multimodal interactions with ArtifactService
