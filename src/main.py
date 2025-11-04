@@ -65,7 +65,7 @@ artifact_service = get_artifact_service()
 async def chat(
     prompt: Annotated[str, Form()],
     session_id: Annotated[str | None, Form()] = None,
-    personality: Annotated[str | None, Form()] = "Rick",
+    personality: Annotated[str, Form()] = "Rick",
     user_id: Annotated[str, Form()] = "api-user",
     file: UploadFile | None = None,
 ) -> ChatResponse:
