@@ -48,10 +48,12 @@
 - [x] Implement Fast API with Chat endpoint
 - [x] Add unit tests for FastAPI
 - [x] Add integration tests for FastAPI
+- [ ] Update CORS for API
+- [ ] Implement OAuth for our API calls - Google and GitHub?
+- [ ] Implement rate limiting for our API calls
 - [ ] Implement multimodal interactions with ArtifactService
 - [ ] Create new React UI as a React/Next.js application and using Material UI components
 - [ ] Implement OAuth Login (Google Identities) for the React frontend, potentially as sidecar container
-- [ ] Implement OAuth Login with GitHub
 - [ ] Load reference material as context to Dazbo
 - [ ] Restrict access to certain personalities.
 - [ ] Investigate adding other auth methods.
