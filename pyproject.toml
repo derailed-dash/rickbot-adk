@@ -7,13 +7,13 @@ authors = [
 ]
 dependencies = [
     "google-adk",
-    "opentelemetry-exporter-gcp-trace",
     "google-cloud-logging",
     "google-cloud-aiplatform[adk,evaluation,agent_engines]",
     "google-cloud-secret-manager",
+    "opentelemetry-exporter-gcp-trace",
     "python-dotenv",
     # Web framework
-    "fastapi",
+    "fastapi[standard]",
     "uvicorn",
     "pyyaml",
     # Frontend

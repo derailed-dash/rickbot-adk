@@ -3,21 +3,18 @@
 import logging
 import os
 from dataclasses import dataclass
+from functools import cache
 
 import google.auth
 
 from rickbot_utils.logging_utils import setup_logger
 
-agent_name = os.environ.setdefault("AGENT_NAME", "rickbot_agent")
-
-
 # Suppress verbose logging from ADK and GenAI libraries - INFO logging is quite verbose
 logging.getLogger("google_adk").setLevel(logging.ERROR)
 logging.getLogger("google_genai").setLevel(logging.ERROR)
 
-
+agent_name = "rickbot_agent"
 logger = setup_logger(agent_name)
-
 
 @dataclass
 class Config:
@@ -29,7 +26,7 @@ class Config:
     model: str
     genai_use_vertexai: bool
 
-
+@cache
 def get_config() -> Config:
     """Return a dictionary of the current config."""
 
@@ -55,3 +52,5 @@ def get_config() -> Config:
         model=model,
         genai_use_vertexai=genai_use_vertexai,
     )
+
+config = get_config()
