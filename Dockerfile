@@ -4,7 +4,7 @@ FROM python:3.12-slim AS builder
 
 # Install uv by copying the binary from the official image. 
 # This is faster and more reliable than installing it via pip.
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.9.8 /uv /uvx /bin/
 
 WORKDIR /app
 
