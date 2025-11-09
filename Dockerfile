@@ -36,22 +36,30 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Uses the virtual environment from the builder stage to create a smaller final image.
 FROM python:3.12-slim
 
+ENV WORKDIR=/app \
+    APP_USER=app-user
+
 # Update OS packages to patch security vulnerabilities
 RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR ${WORKDIR}
 
 # Copy the virtual environment from the builder stage
-COPY --from=builder /app/.venv ./.venv
+COPY --from=builder ${WORKDIR}/.venv ./.venv
 
 # Copy the application source code from the builder stage
-COPY --from=builder /app/src ./src
+COPY --from=builder ${WORKDIR}/src ./src
 
-# Activate the virtual environment
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="${WORKDIR}/.venv/bin:$PATH"
+
+# Create non-root user for the application with required permissions
+RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER} && \
+    chown -R ${APP_USER} ${WORKDIR}
+
+USER ${APP_USER}
 
 # Explicitly set the PYTHONPATH to the app directory to ensure modules are found
-ENV PYTHONPATH="/app"
+ENV PYTHONPATH="${WORKDIR}"
 
 ARG COMMIT_SHA=""
 ENV COMMIT_SHA=${COMMIT_SHA}
