@@ -19,7 +19,7 @@ COPY ./pyproject.toml ./uv.lock* ./
 # This layer is cached.
 # The --mount options provide access to the files and a cache directory
 # without invalidating the layer cache on content changes.
-RUN --mount=type=cache,target=/root/.cache/uv \
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
     uv sync --locked --no-install-project
 
 # Copy the application source code to /app/src. 
@@ -27,7 +27,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY ./src ./src
 
 # Sync the project
-RUN --mount=type=cache,target=/root/.cache/uv \
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
     uv sync --locked
 
 # ---- Final Stage ----
