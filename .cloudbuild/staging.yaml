@@ -1,33 +1,15 @@
 steps:
-  # Pull the latest image for cache
-  - name: "gcr.io/cloud-builders/docker"
-    id: pull-cache
-    entrypoint: 'bash'
-    args: ['-c', 'docker pull $_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:latest || exit 0']
-
-  # Build
-  - name: "gcr.io/cloud-builders/docker"
-    id: build  
+  # Build and push with Kaniko
+  - name: "gcr.io/kaniko-project/executor:latest"
+    id: build-and-push
     args:
-      - build
-      - "--cache-from"
-      - "$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:latest"
-      - "-t"
-      - "$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA"
-      - "-t"
-      - "$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:latest"
-      - "--build-arg=COMMIT_SHA=$COMMIT_SHA" # Pass commit SHA as a build-arg
-      - "."
-    env:
-      - 'DOCKER_BUILDKIT=1'
-    
-  # Push
-  - name: "gcr.io/cloud-builders/docker"
-    id: push
-    args:
-      - "push"
-      - "--all-tags"
-      - "$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME"
+      - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA"
+      - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:latest"
+      - "--context=."
+      - "--dockerfile=./Dockerfile"
+      - "--cache=true"
+      - "--cache-ttl=48h"
+      - "--build-arg=COMMIT_SHA=$COMMIT_SHA"
 
   # Deploy to Staging
   - name: "gcr.io/cloud-builders/gcloud"
