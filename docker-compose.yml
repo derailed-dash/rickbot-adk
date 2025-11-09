@@ -1,0 +1,39 @@
+services:
+  streamlit_fe:
+    container_name: rickbot-streamlit-ui
+    build: &common-build
+      context: .
+      dockerfile: Dockerfile # Dockerfile is the default
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env # Load environment variables from .env file
+    environment: &common-env
+      # Pass through environment variables from the .env file
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_CLOUD_REGION=${GOOGLE_CLOUD_REGION}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - APP_NAME=${APP_NAME}
+      - AGENT_NAME=${AGENT_NAME}
+      - GOOGLE_GENAI_USE_VERTEXAI=${GOOGLE_GENAI_USE_VERTEXAI}
+      - MODEL=${MODEL}
+      - AUTH_REQUIRED=${AUTH_REQUIRED}
+      - RATE_LIMIT=${RATE_LIMIT}
+      # Set the path to the ADC file inside the container
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/.config/gcloud/application_default_credentials.json
+      # Pass through the COMMIT_SHA from the host environment if it exists
+      - COMMIT_SHA=${COMMIT_SHA:-}
+    volumes: &common-volumes
+      - ./src:/app/src # Mount the src directory for development - overwrites folder in the container
+      - ${HOME}/.config/gcloud:/app/.config/gcloud # Mount gcloud config for ADC
+    restart: unless-stopped
+    # The command is already defined in the Dockerfile, so no need to repeat it here
+    # command: ["streamlit", "run", "streamlit_fe/app.py", "--server.port=8080", "--server.address=0.0.0.0"]
+  adk:
+    container_name: rickbot-adk-web
+    build: *common-build
+    ports:
+      - "8080:8080"
+    environment: *common-env
+    volumes: *common-volumes
+    command: adk web --host 0.0.0.0 --port 8080 src

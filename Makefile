@@ -23,6 +23,24 @@ streamlit:
 	@echo "================================================================================="
 	MOCK_AUTH_USER="mock.user@example.com" uv run -- streamlit run src/streamlit_fe/app.py ${GREP_FILTER}
 
+docker-streamlit: docker-clean
+	@echo "================================================================================="
+	@echo "| 🚀 Launching Streamlit FE in Docker                                           |"
+	@echo "================================================================================="
+	MOCK_AUTH_USER="mock.user@example.com" docker compose up streamlit_fe
+
+docker-adk: docker-clean
+	@echo "================================================================================="
+	@echo "| 🚀 Launching Streamlit FE in Docker                                           |"
+	@echo "================================================================================="
+	MOCK_AUTH_USER="mock.user@example.com" docker compose up adk ${GREP_FILTER}
+
+docker-clean:
+	@echo "================================================================================="
+	@echo "| 🚀 Cleaning orphaned containers                                               |"
+	@echo "================================================================================="
+	docker compose down --remove-orphans
+
 # Launch local development server with hot-reload
 local-backend:
 	uv run uvicorn adk_sample_app.server:app --app-dir src --host 0.0.0.0 --port 8000 --reload

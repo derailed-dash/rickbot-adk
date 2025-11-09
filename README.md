@@ -76,6 +76,9 @@ source scripts/setup-env.sh --noauth
 | `make playground`             | Launch ADK UI for testing agent locally and remotely. This runs `uv run adk web src` |
 | `make api`                    | Launch the FastAPI backend:<br>`uv run fastapi dev src/main.py`|
 | `make streamlit`              | Run Streamlit FE:<br>`MOCK_AUTH_USER="mock.user@example.com" uv run streamlit run src/streamlit_fe/app.py`|
+| `make docker-adk`             | Launch ADK UI in Docker |
+| `make docker-streamlit`       | Run Streamlit FE in Docker |
+| `make docker-clean`           | Remove any orphaned containers |
 | `make test`                   | Run unit tests |
 | `make test-all`               | Run unit and integration tests (takes a little longer) |
 | `make lint`                   | Run code quality checks (codespell, ruff, mypy) |
@@ -150,6 +153,8 @@ The primary entrypoint to the application is a FastAPI backend, defined in `src/
 ### Streamlit UI
 
 For rapid prototyping and demonstration, the application also provides a Streamlit-based user interface. This UI is defined in `src/streamlit_fe/app.py` and can be launched with `make streamlit`.
+
+Alternatively, we can launch it in a Docker container using `make docker-streamlit`.
 
 #### Handling Personality Changes in the Streamlit UI
 

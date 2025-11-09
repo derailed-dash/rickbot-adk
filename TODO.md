@@ -48,6 +48,7 @@
 - [x] Implement Fast API with Chat endpoint
 - [x] Add unit tests for FastAPI
 - [x] Add integration tests for FastAPI
+- [x] Optimise image creation with multilayer Dockerfile
 - [ ] Implement OAuth for our API calls - Google and GitHub?
 - [ ] Implement rate limiting for our API calls
 - [ ] Implement multimodal interactions with ArtifactService
