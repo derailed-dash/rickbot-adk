@@ -20,8 +20,6 @@ COPY ./pyproject.toml ./uv.lock* ./
 # The --mount options provide access to the files and a cache directory
 # without invalidating the layer cache on content changes.
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-install-project
 
 # Copy the application source code to /app/src. 
@@ -38,9 +36,6 @@ FROM python:3.12-slim
 
 ENV WORKDIR=/app \
     APP_USER=app-user
-
-# Update OS packages to patch security vulnerabilities
-RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${WORKDIR}
 
