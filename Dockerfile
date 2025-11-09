@@ -14,7 +14,8 @@ WORKDIR /app
 COPY ./pyproject.toml ./uv.lock* ./
 
 # Install dependencies into a virtual environment.
-# We use --no-install-project to only install dependencies listed in pyproject.toml, not the project code itself. 
+# We use --no-install-project to only install dependencies listed in pyproject.toml, 
+# not the project code itself. 
 # This layer is cached.
 # The --mount options provide access to the files and a cache directory
 # without invalidating the layer cache on content changes.
