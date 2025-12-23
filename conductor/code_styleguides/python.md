@@ -1,19 +1,34 @@
 # Google Python Style Guide Summary
 
-This document summarizes key rules and best practices from the Google Python Style Guide.
+This document summarizes key rules and best practices from the Google Python Style Guide, adapted for this project.
+
+## Project Specific Tooling (Rickbot-ADK)
+- **Package Management:** Use `uv` for Python package and environment management.
+- **Dependencies:** Install dependencies with `uv` using `pyproject.toml`. Ensure installation into a virtual environment.
+- **Running Scripts:** Prefer `uv run python script.py`.
+- **Third-Party Tools:** Prefer `uvx` where possible (e.g., `uvx ruff`).
+- **New Dependencies:** State the reason if a new dependency is required.
+
+## Quality Assurance Commands
+To ensure Python code adheres to standards, run the following from the project root before creating/modifying `.py` files:
+```bash
+uvx codespell@latest -s # check spelling and show summary
+uvx ruff@latest check --fix . # perform checks and fix
+```
 
 ## 1. Python Language Rules
-- **Linting:** Run `pylint` on your code to catch bugs and style issues.
+- **Type Annotations:** Strongly encouraged for all public APIs.
+  - **Standard:** Use >=3.9 types as per PEP 585 (lowercase built-in types like `dict`, `list`, etc.).
+- **Linting:** Run `ruff` (via `uvx`) to catch bugs and style issues.
 - **Imports:** Use `import x` for packages/modules. Use `from x import y` only when `y` is a submodule.
 - **Exceptions:** Use built-in exception classes. Do not use bare `except:` clauses.
 - **Global State:** Avoid mutable global state. Module-level constants are okay and should be `ALL_CAPS_WITH_UNDERSCORES`.
 - **Comprehensions:** Use for simple cases. Avoid for complex logic where a full loop is more readable.
 - **Default Argument Values:** Do not use mutable objects (like `[]` or `{}`) as default values.
 - **True/False Evaluations:** Use implicit false (e.g., `if not my_list:`). Use `if foo is None:` to check for `None`.
-- **Type Annotations:** Strongly encouraged for all public APIs.
 
 ## 2. Python Style Rules
-- **Line Length:** Maximum 80 characters.
+- **Line Length:** Maximum 80 characters (or as configured in `pyproject.toml`, typically 130 for this project).
 - **Indentation:** 4 spaces per indentation level. Never use tabs.
 - **Blank Lines:** Two blank lines between top-level definitions (classes, functions). One blank line between method definitions.
 - **Whitespace:** Avoid extraneous whitespace. Surround binary operators with single spaces.
