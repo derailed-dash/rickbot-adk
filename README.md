@@ -10,20 +10,22 @@ Author: Darren Lester
 
 - [Repo Overview](#repo-overview)
 - [Associated Articles](#associated-articles)
-- [Per Dev Session (Once One-Time Setup Tasks Have Been Completed)](#per-dev-session-once-one-time-setup-tasks-have-been-completed)
-- [Useful Commands](#useful-commands)
-  - [Streamlit UI](#streamlit-ui)
-  - [ADK](#adk)
-    - [Testing Locally](#testing-locally)
-    - [Testing Remote](#testing-remote)
+  - [Rickbot Articles](#rickbot-articles)
+  - [Related ADK Articles](#related-adk-articles)
+- [Developing With This Repo](#developing-with-this-repo)
+  - [Per Dev Session (Once One-Time Setup Tasks Have Been Completed)](#per-dev-session-once-one-time-setup-tasks-have-been-completed)
+  - [Useful Commands](#useful-commands)
+  - [Testing](#testing)
+  - [Running ADK Dev Tools](#running-adk-dev-tools)
   - [Running in a Local Container](#running-in-a-local-container)
-- [Using Agent Starter Kit for Initial Project Setup](#using-agent-starter-kit-for-initial-project-setup)
-  - [Pre-Reqs](#pre-reqs)
-  - [Before Creating Project with Agent Starter Kit](#before-creating-project-with-agent-starter-kit)
-  - [Create Project with Agent Starter Kit](#create-project-with-agent-starter-kit)
-  - [After Creating Project with Agent Starter Kit](#after-creating-project-with-agent-starter-kit)
-  - [Creating CI/CD Pipeline](#creating-ci-cd-pipeline)
-- [Deploying Infra Commands](#deploying-infra-commands)
+- [Application Design](#application-design)
+  - [API Backend](#api-backend)
+  - [Streamlit UI](#streamlit-ui)
+  - [OAuth](#oauth)
+  - [DNS](#dns)
+- [Deploying Infrastructure](#deploying-infrastructure)
+- [Historical Notes About This Repo](#historical-notes-about-this-repo)
+  - [Using Agent Starter Kit for Initial Project Setup](#using-agent-starter-kit-for-initial-project-setup)
 
 ## Repo Overview
 
@@ -38,7 +40,8 @@ The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot).
 
 ## Associated Articles
 
-See my Medium articles which are intended to supplement this repo:
+### Rickbot Articles
+See my Medium articles which are intended to supplement this _Rickbot_ repo:
 
 1. [Creating a Rick & Morty Chatbot with Google Cloud and the Gen AI SDK](https://medium.com/google-cloud/creating-a-rick-morty-chatbot-with-google-cloud-and-the-gen-ai-sdk-e8108e83dbee)
 1. [Adding Authentication and Authorisation to our Rickbot Streamlit Chatbot with OAuth and the Google Auth Platform](https://medium.com/google-cloud/adding-authentication-and-authorisation-to-our-rickbot-streamlit-chatbot-with-oauth-and-the-google-b892cda3f1d9)
@@ -46,8 +49,16 @@ See my Medium articles which are intended to supplement this repo:
 1. [Updating the Rickbot Multi-Personality Agentic Application - Integrate Agent Development Kit (ADK) using Gemini CLI](https://medium.com/google-cloud/updating-the-rickbot-multi-personality-agentic-application-part-2-integrate-agent-development-ad39203e66ad)
 1. [Guided Implementation of Agent Development Kit (ADK) with the Rickbot Multi-Personality Application (Series)](https://medium.com/google-cloud/updating-the-rickbot-multi-personality-agentic-application-part-3-guided-implementation-of-the-9675d3f92c11)
 1. [Productionising the Rickbot ADK Application and More Gemini CLI Tips](https://medium.com/google-cloud/productionising-the-rickbot-adk-application-and-more-gemini-cli-tips-577cf6b37366)
+1. [Get Schwifty with the FastAPI: Adding a REST API to our Agentic Application (with Google ADK)](https://medium.com/google-cloud/get-schwifty-with-the-fastapi-adding-a-rest-api-to-our-agentic-application-with-google-adk-6b87a4ea7567)
 
-## Per Dev Session (Once One-Time Setup Tasks Have Been Completed)
+### Related ADK Articles
+
+- [Give Your AI Agents Deep Understanding — Creating a Multi-Agent ADK Solution: Design Phase](https://medium.com/google-cloud/give-your-ai-agents-deep-understanding-creating-the-llms-txt-with-a-multi-agent-adk-solution-e5ae24bbd08b)
+- [Using the Loop Pattern to Make My Multi-Agent Solution More Robust (with Google ADK)](https://medium.com/google-cloud/using-the-loop-pattern-to-make-my-multi-agent-solution-more-robust-86f8e9159a2a)
+
+## Developing With This Repo
+
+### Per Dev Session (Once One-Time Setup Tasks Have Been Completed)
 
 **DO THIS STEP BEFORE EACH DEV SESSION**
 
@@ -67,7 +78,9 @@ source scripts/setup-env.sh --target-env PROD
 source scripts/setup-env.sh --noauth
 ```
 
-## Useful Commands
+(Note that you can automate loading the `setup-env.sh` script by installing [direnv](https://direnv.net/), and then including the `.envrc` in the project folder.)
+
+### Useful Commands
 
 | Command                       | Description                                                                           |
 | ----------------------------- | ------------------------------------------------------------------------------------- |
@@ -87,7 +100,7 @@ source scripts/setup-env.sh --noauth
 
 For full command options and usage, refer to the [Makefile](Makefile).
 
-### Testing
+###  Testing
 
 - All tests are in the `src/tests` folder.
 - The tests and how to run them are documented in `src/tests/README.md`.
@@ -138,35 +151,9 @@ docker run --rm -p 8080:8080 \
    $SERVICE_NAME:$VERSION
 ```
 
-## Using Agent Starter Kit for Initial Project Setup
-
-This project, its GitHub repo, and associated CI/CD pipeline were initially setup using the Agent Starter Kit. Much of the original template files have since been removed from the project.  But this section has been retained to provide an overview of this process. But do read [this article](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24) for a more detailed walkthrough.
-
 ## Application Design
 
-The application is designed with two parallel interfaces to the underlying agent:
-
-### API Backend
-
-The primary entrypoint to the application is a FastAPI backend, defined in `src/main.py`. This provides a RESTful API that allows any client that can speak HTTP to interact with the Rickbot agent. This decoupled architecture allows for the development of custom user interfaces (such as a React-based web application) and enables other applications to integrate with Rickbot.
-
-### Streamlit UI
-
-For rapid prototyping and demonstration, the application also provides a Streamlit-based user interface. This UI is defined in `src/streamlit_fe/app.py` and can be launched with `make streamlit`.
-
-Alternatively, we can launch it in a Docker container using `make docker-streamlit`.
-
-#### Handling Personality Changes in the Streamlit UI
-
-The application is designed to ensure a clean and robust separation of context when switching between different chatbot personalities. The process is handled as follows:
-
-1.  **UI Detection**: When a user selects a new personality from the sidebar dropdown in the Streamlit UI, the application immediately detects this change.
-2.  **State Reset**: To prevent conversational context from leaking between personalities, the application clears the current chat history.
-3.  **Application Rerun**: It then programmatically triggers a full rerun of the Streamlit application.
-4.  **Runner Re-initialization**: During the rerun, the application logic detects that the personality has changed. This triggers the creation of a **brand new ADK `Runner` instance**.
-5.  **New Agent Configuration**: The new `Runner` is configured with a fresh agent that embodies the newly selected personality. The old `Runner` instance is discarded and garbage-collected.
-
-This approach ensures that each personality operates in a clean, isolated environment. It is a simple and robust pattern that aligns well with Streamlit's execution model, prioritizing a predictable state over the premature optimization of object re-creation.
+See [docs/design.md](docs/design.md).
 
 ## Deploying Infrastructure
 
@@ -184,19 +171,8 @@ terraform plan -var-file="vars/env.tfvars" -out out.tfplan
 terraform apply "out.tfplan"
 ```
 
-## OAuth
+## Historical Notes About This Repo
 
-Frontend user authentication is required for Rickbot.
+### Using Agent Starter Kit for Initial Project Setup
 
-### Streamlit
-
-- With the Streamlit frontend this is achieved using Streamlit\'s integrated OIDC authentication. 
-- We use Google Auth Platform as the OAuth2 Auth provider.
-- OAuth credentials are obtained from the Google Auth Platform and stored in Google Secret Manager.
-- When the application is first launched, these credentials are read and dynamically written to the `.streamlit/secrets.toml`, which is how the Streamlit OIDC works. We must supply the `oauth2callback` URI as well as the OAuth client ID and secret.
-- Different credentials are used between Staging and Prod.
-- When running locally we use an environment variable `MOCK_AUTH_USER` to bypass real authentication. This is automatically set by `make streamlit`.
-
-## DNS
-
-Google Cloud Run offers a native domain name mapping feature. This is used to map custom domains to our Cloud Run services. Note that any custom domains used must be added to the OAuth authorised domains and authorised redirect URIs. 
+This project, its GitHub repo, and associated CI/CD pipeline were initially setup using the Agent Starter Kit. Much of the original template files have since been removed from the project.  But this section has been retained to provide an overview of this process. But do read [this article](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24) for a more detailed walkthrough.
