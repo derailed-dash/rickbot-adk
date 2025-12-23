@@ -20,19 +20,20 @@ Notes:
     or multipart/form-data, if files are included.
 """
 
-import uuid
 import json
-import asyncio
-from typing import Annotated, AsyncGenerator
+import uuid
+from collections.abc import AsyncGenerator
+from typing import Annotated
 
 from fastapi import FastAPI, Form, UploadFile
-from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
 from google.genai.types import Blob, Content, Part
 from pydantic import BaseModel
 
 from rickbot_agent.agent import get_agent
+from rickbot_agent.personality import get_personalities
 from rickbot_agent.services import get_artifact_service, get_session_service
 from rickbot_utils.config import logger
 
@@ -47,6 +48,14 @@ class ChatResponse(BaseModel):
     attachments: list[Part] | None = None  # Support for multimodal response
 
 
+class Persona(BaseModel):
+    """Model for a chatbot personality."""
+
+    name: str
+    description: str
+    avatar: str
+
+
 logger.debug("Initialising FastAPI app...")
 app = FastAPI()
 
@@ -58,6 +67,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/personas")
+def get_personas() -> list[Persona]:
+    """Returns a list of available chatbot personalities."""
+    personalities = get_personalities()
+    return [
+        Persona(
+            name=p.name,
+            description=p.menu_name,
+            avatar=f"/avatars/{p.name.lower()}.png",
+        )
+        for p in personalities.values()
+    ]
 
 # Initialize services and runner on startup
 logger.debug("Initialising services...")
@@ -206,16 +229,12 @@ async def chat_stream(
             session_id=current_session_id,
             new_message=new_message,
         ):
-             if event.is_model_response():
-                 # For model responses, we want to stream the chunks
-                 # Note: The `event` object in run_async might be a ModelResponseEvent or similar.
-                 # Depending on ADK version, `event.content.parts` might contain full text or chunks.
-                 # But ADK's `run_async` typically yields events as they happen.
-                 # If `event` has text, we send it.
-                 if event.content and event.content.parts:
-                    for part in event.content.parts:
-                        if part.text:
-                            yield f"data: {json.dumps({'chunk': part.text})}\n\n"
+             # For model responses, we want to stream the chunks
+             # If `event` has text, we send it.
+             if event.content and event.content.parts:
+                for part in event.content.parts:
+                    if part.text:
+                        yield f"data: {json.dumps({'chunk': part.text})}\n\n"
 
         yield f"data: {json.dumps({'done': True})}\n\n"
 

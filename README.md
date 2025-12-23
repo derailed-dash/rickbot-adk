@@ -151,6 +151,40 @@ docker run --rm -p 8080:8080 \
    $SERVICE_NAME:$VERSION
 ```
 
+### Running the React UI
+
+The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to the FastAPI backend (`make api`) to provide a modern, chat-based interface.
+
+### Prerequisites
+
+- Node.js (v18 or later)
+- Python backend running (`make api`)
+
+### Running locally
+
+1.  **Start the Backend**:
+    In one terminal, launch the FastAPI server:
+    ```bash
+    make api
+    ```
+
+2.  **Start the Frontend**:
+    In a separate terminal, navigate to the frontend directory and start the dev server:
+    ```bash
+    cd src/nextjs_fe
+    npm install
+    npm run dev
+    ```
+
+3.  **Access the UI**:
+    Open your browser to `http://localhost:3000`.
+
+### Key Features
+
+- **Dynamic Personas**: The UI fetches available personalities (Rick, Yoda, etc.) directly from the backend API (`/personas`).
+- **Streaming Responses**: Uses Server-Sent Events (SSE) for real-time streaming of agent responses.
+- **File Uploads**: Supports uploading images and text files for multimodal interactions.
+
 ## Application Design
 
 See [docs/design.md](docs/design.md).

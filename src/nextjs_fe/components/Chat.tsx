@@ -36,18 +36,13 @@ interface Personality {
     avatar: string;
 }
 
-const personalities: Personality[] = [
-    { name: 'Rick', description: 'Rick Sanchez', avatar: '/avatars/rick.png' },
-    { name: 'Morty', description: 'Morty Smith', avatar: '/avatars/morty.png' },
-    { name: 'Yoda', description: 'Yoda', avatar: '/avatars/yoda.png' },
-    { name: 'Donald', description: 'The Donald', avatar: '/avatars/donald.png' },
-    { name: 'Dazbo', description: 'Dazbot', avatar: '/avatars/dazbo.png' },
-    { name: 'Jack', description: 'Jack Burton', avatar: '/avatars/jack.png' },
-    { name: 'Yasmin', description: 'Yasmin', avatar: '/avatars/yasmin.png' }
+const initialPersonalities: Personality[] = [
+    { name: 'Rick', description: 'Rick Sanchez', avatar: '/avatars/rick.png' }
 ];
 
 export default function Chat() {
     const [messages, setMessages] = useState<Message[]>([]);
+    const [personalities, setPersonalities] = useState<Personality[]>(initialPersonalities);
     const [inputValue, setInputValue] = useState('');
     const [selectedPersonality, setSelectedPersonality] = useState('Rick');
     const [sessionId, setSessionId] = useState<string | null>(null);
@@ -63,6 +58,23 @@ export default function Chat() {
     useEffect(() => {
         scrollToBottom();
     }, [messages, streamingText]);
+
+    useEffect(() => {
+        const fetchPersonalities = async () => {
+            try {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/personas`);
+                if (response.data && Array.isArray(response.data)) {
+                    setPersonalities(response.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch personalities:", error);
+            }
+        };
+
+        fetchPersonalities();
+    }, []);
+
+
 
     const handleSendMessage = async () => {
         if (!inputValue.trim() && !file) return;

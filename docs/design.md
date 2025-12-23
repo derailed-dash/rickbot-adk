@@ -18,8 +18,8 @@ graph TD
     User([User])
     
     subgraph "Interfaces"
-        Streamlit[Streamlit UI\n(Existing)]
-        React[React/Next.js UI\n(Planned)]
+        Streamlit[Streamlit UI\n(Prototype)]
+        React[React/Next.js UI\n(Primary)]
     end
     
     subgraph "Google Cloud Platform"
@@ -66,7 +66,7 @@ graph TD
     *   **FastAPI**: Powers the backend API, exposing RESTful endpoints.
 *   **Frontend**:
     *   **Streamlit**: Powers the current frontend user interface for rapid prototyping.
-    *   **Next.js / React (Planned)**: The framework for the future modern UI.
+    *   **Next.js / React (Primary)**: The modern, material-design chat interface located in `src/nextjs_fe`.
 *   **Auth**:
     *   **Google Auth Platform**: Handles OAuth 2.0 authentication for users.
 *   **Data, Infrastructure & Tools**:
@@ -128,16 +128,18 @@ The application is designed to ensure a clean and robust separation of context w
 
 This approach ensures that each personality operates in a clean, isolated environment. It is a simple and robust pattern that aligns well with Streamlit's execution model, prioritizing a predictable state over the premature optimization of object re-creation.
 
-### React/Next.js UI (Planned)
+### React/Next.js UI (Primary)
 
-The future "North Star" interface for Rickbot.
-*   **Technology**: TypeScript, React, Next.js, Material UI.
+The modern, production-grade interface for Rickbot, located in `src/nextjs_fe`.
+
+*   **Technology**: TypeScript, React, Next.js, Material UI (MUI).
 *   **Architecture**: Client-side application consuming the **FastAPI Backend**.
-*   **Planned Features**:
+*   **Features**:
     *   **Modern UX**: Enhanced aesthetics and responsiveness using Material UI (MUI).
-    *   **Advanced Chat**: Richer message formatting and potential support for multimodal inputs (audio/video).
-    *   **Optimized Performance**: leveraging Next.js server-side rendering (SSR) and static generation where appropriate.
-    *   **Independent Auth**: Will implement its own OAuth flow (Google Identities) or use a sidecar pattern.
+    *   **Dynamic Configuration**: Fetches available personalities dynamically from the backend (`/personas` endpoint), ensuring the UI is always in sync with the agent configuration.
+    *   **Real-time Interaction**: Uses Server-Sent Events (SSE) via the `/chat_stream` endpoint for a responsive, streaming chat experience.
+    *   **Multimodal Support**: Supports file uploads (images, text) alongside chat messages.
+    *   **Independent Auth**: (Planned) Will implement its own OAuth flow.
 
 ### API Backend
 
@@ -147,6 +149,7 @@ The central nervous system of the application. It is the primary entrypoint to t
 *   **Role**: Exposes the ADK agent as a set of RESTful endpoints.
 *   **Capabilities**:
     *   Stateless/Stateful conversation handling (via ADK).
+    *   **Dynamic Configuration**: Exposes `/personas` endpoint to drive UI configuration.
     *   Swagger/OpenAPI documentation auto-generation.
     *   Serves as the single source of truth for agent logic for all connected UIs.
 
