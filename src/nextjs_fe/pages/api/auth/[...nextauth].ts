@@ -18,10 +18,11 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials, req) {
         // In dev mode, we allow a mock user
         if (process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ALLOW_MOCK_AUTH === "true") {
+           const mockEmail = process.env.MOCK_AUTH_USER || "mock@example.com";
            return {
              id: "mock-123",
              name: "Mock User",
-             email: "mock@example.com",
+             email: mockEmail,
              image: "/avatars/dazbo.png"
            }
         }
