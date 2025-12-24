@@ -14,6 +14,7 @@ The following table summarizes the existing tests, their category, and their pur
 | `test_personality.py` | Unit | Tests the `Personality` data class and ensures personalities are loaded correctly from the YAML configuration. |
 | `test_auth_models.py` | Unit | Tests the `AuthUser` Pydantic model for user authentication data. |
 | `test_auth_dependency.py` | Unit | Verifies the token validation logic, including mock token support. |
+| `AuthButton.test.tsx` | Unit (Frontend) | Tests the `AuthButton` React component using Jest and React Testing Library. |
 | `test_api.py` | Integration | Contains tests for the FastAPI `/chat` endpoint. Includes a mocked test for basic success and a true integration test for multi-turn conversation memory. |
 | `test_personalities.py` | Integration | Runs a simple query against every available agent personality to ensure each one can be loaded and can respond. |
 | `test_rickbot_agent_multiturn.py` | Integration | Verifies the agent's conversation memory by directly using the ADK `Runner` for a two-turn conversation. |
@@ -21,12 +22,17 @@ The following table summarizes the existing tests, their category, and their pur
 
 ## Running Tests
 
-- We can run tests with:
+- We can run backend tests with:
   ```bash
   make test # unit tests only
   make test-all # all tests
   ```
-- **CI Environment Variable:** Setting `CI=true` is recommended when running tests in a CI/CD pipeline or as a non-interactive agent. It ensures that test runners (like `pytest` or `vitest`) run in a single-execution mode rather than a "watch" or "interactive" mode, and it can also be used to suppress interactive prompts or local-only configurations.
+- We can run frontend tests with:
+  ```bash
+  cd src/nextjs_fe
+  npm test
+  ```
+- **CI Environment Variable:** Setting `CI=true` is recommended when running tests in a CI/CD pipeline or as a non-interactive agent. It ensures that test runners (like `pytest` or `jest`) run in a single-execution mode rather than a "watch" or "interactive" mode, and it can also be used to suppress interactive prompts or local-only configurations.
 - Note that integration tests will fail if the development environment has not first been configured with the `setup-env.sh` script. This is because the test code will not have access to the required Google APIs.
 
 ### Testing with Verbose Output
