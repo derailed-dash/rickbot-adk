@@ -21,6 +21,9 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
     if not token:
          raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
+    # Debug: Print the token to see what we are receiving
+    logger.debug(f"Received token: {token[:20]}...")
+
     # 1. Check for Mock Token (Development Only)
     if token.startswith("mock:"):
         # In a real app, you'd check an environment variable to ensure this is only enabled in dev
