@@ -25,16 +25,16 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
     if token.startswith("mock:"):
         # In a real app, you'd check an environment variable to ensure this is only enabled in dev
         allow_mock = os.getenv("NEXT_PUBLIC_ALLOW_MOCK_AUTH")
-        # logger.debug(f"Mock auth check: token={token}, ALLOW_MOCK={allow_mock}")
         
         if allow_mock != "true":
-             logger.warning("Mock authentication attempted but disabled.")
+             logger.warning(f"Mock auth failed. ALLOW_MOCK={allow_mock}")
              raise HTTPException(status_code=401, detail="Mock authentication is disabled")
              
         try:
             # Format: mock:id:email:name
             parts = token.split(":")
             if len(parts) < 4:
+                 logger.warning(f"Mock token malformed: {token}")
                  raise HTTPException(status_code=401, detail="Malformed mock token")
             
             return AuthUser(
@@ -43,7 +43,8 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
                 name=parts[3],
                 provider="mock"
             )
-        except Exception:
+        except Exception as e:
+             logger.error(f"Mock auth exception: {e}")
              raise HTTPException(status_code=401, detail="Invalid mock token")
 
     # 2. Try Google ID Token Verification
