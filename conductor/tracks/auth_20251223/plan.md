@@ -24,7 +24,7 @@
 
 
 ## Phase 4: GitHub Auth & Final Polish
-- [ ] Task: Add GitHub OAuth provider to NextAuth.js configuration.
-- [ ] Task: Update Login component to support multiple providers.
+- [x] Task: Add GitHub OAuth provider to NextAuth.js configuration. [d8072a5]
+- [~] Task: Update Login component to support multiple providers.
 - [ ] Task: Refactor API error handling for auth failures (ensure clean UI feedback).
 - [ ] Task: Conductor - User Manual Verification 'GitHub Auth & Final Polish' (Protocol in workflow.md)
