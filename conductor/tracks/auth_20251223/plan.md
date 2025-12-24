@@ -16,11 +16,12 @@
 - [x] Task: Write Tests: Component tests for the Login button. [b83f08d]
 - [x] Task: Conductor - User Manual Verification 'Next.js Google Auth' (Protocol in workflow.md)
 
-## Phase 3: Connect Frontend to Backend
+## Phase 3: Connect Frontend to Backend [checkpoint: 5ad7c6f]
 - [x] Task: Update Next.js API calls to include the auth token in the Authorization header. [096703f]
 - [x] Task: Update FastAPI backend to verify the actual Google/GitHub JWTs (replacing mock logic). [29e3df3]
 - [x] Task: Write Tests: Integration test ensuring frontend can call protected API endpoint. [29e3df3]
 - [x] Task: Conductor - User Manual Verification 'Connect Frontend to Backend' (Protocol in workflow.md)
+
 
 ## Phase 4: GitHub Auth & Final Polish
 - [ ] Task: Add GitHub OAuth provider to NextAuth.js configuration.
