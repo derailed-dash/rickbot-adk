@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSession, signIn } from "next-auth/react"
 import {
     Box,
     TextField,
@@ -42,6 +43,7 @@ const initialPersonalities: Personality[] = [
 ];
 
 export default function Chat() {
+    const { data: session, status } = useSession()
     const [messages, setMessages] = useState<Message[]>([]);
     const [personalities, setPersonalities] = useState<Personality[]>(initialPersonalities);
     const [inputValue, setInputValue] = useState('');
@@ -72,8 +74,10 @@ export default function Chat() {
             }
         };
 
-        fetchPersonalities();
-    }, []);
+        if (session) {
+            fetchPersonalities();
+        }
+    }, [session]);
 
 
 
@@ -171,6 +175,40 @@ export default function Chat() {
             setFile(event.target.files[0]);
         }
     };
+
+    if (status === "loading") {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', bgcolor: '#121212' }}>
+                <LinearProgress sx={{ width: '50%' }} />
+            </Box>
+        )
+    }
+
+    if (!session) {
+        return (
+            <Box sx={{
+                height: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                p: 2,
+                backgroundImage: 'url(/avatars/rickbot-trans.png)',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                backgroundSize: 'contain',
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                backgroundBlendMode: 'darken',
+                color: 'white'
+            }}>
+                <Typography variant="h3" color="primary" gutterBottom>Rickbot ADK</Typography>
+                <Typography variant="h6" gutterBottom sx={{ mb: 4 }}>Wubba Lubba Dub Dub! Sign in to start chatting.</Typography>
+                <Button variant="contained" color="primary" size="large" onClick={() => signIn()}>
+                    Sign In
+                </Button>
+            </Box>
+        )
+    }
 
     return (
         <Box sx={{
