@@ -25,7 +25,7 @@ import uuid
 from collections.abc import AsyncGenerator
 from typing import Annotated
 
-from fastapi import FastAPI, Form, UploadFile
+from fastapi import FastAPI, Form, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
@@ -35,6 +35,8 @@ from pydantic import BaseModel
 from rickbot_agent.agent import get_agent
 from rickbot_agent.personality import get_personalities
 from rickbot_agent.services import get_artifact_service, get_session_service
+from rickbot_agent.auth import verify_token
+from rickbot_agent.auth_models import AuthUser
 from rickbot_utils.config import logger
 
 APP_NAME = "rickbot_api"
@@ -70,7 +72,7 @@ app.add_middleware(
 
 
 @app.get("/personas")
-def get_personas() -> list[Persona]:
+def get_personas(user: AuthUser = Depends(verify_token)) -> list[Persona]:
     """Returns a list of available chatbot personalities."""
     personalities = get_personalities()
     return [
@@ -93,12 +95,13 @@ async def chat(
     prompt: Annotated[str, Form()],
     session_id: Annotated[str | None, Form()] = None,
     personality: Annotated[str, Form()] = "Rick",
-    user_id: Annotated[str, Form()] = "api-user",
+    user: AuthUser = Depends(verify_token),
     file: UploadFile | None = None,
 ) -> ChatResponse:
     """Chat endpoint to interact with the Rickbot agent."""
+    user_id = user.email # Use email as user_id for ADK sessions
     logger.debug(f"Received chat request - "
-                 f"Personality: {personality}, User ID: {user_id}, Session ID: {session_id if session_id else 'None'}")
+                 f"Personality: {personality}, User: {user.email}, Session ID: {session_id if session_id else 'None'}")
 
     current_session_id = session_id if session_id else str(uuid.uuid4())
 
@@ -172,12 +175,13 @@ async def chat_stream(
     prompt: Annotated[str, Form()],
     session_id: Annotated[str | None, Form()] = None,
     personality: Annotated[str, Form()] = "Rick",
-    user_id: Annotated[str, Form()] = "api-user",
+    user: AuthUser = Depends(verify_token),
     file: UploadFile | None = None,
 ) -> StreamingResponse:
     """Streaming chat endpoint to interact with the Rickbot agent."""
+    user_id = user.email # Use email as user_id for ADK sessions
     logger.debug(f"Received chat stream request - "
-                 f"Personality: {personality}, User ID: {user_id}, Session ID: {session_id if session_id else 'None'}")
+                 f"Personality: {personality}, User: {user.email}, Session ID: {session_id if session_id else 'None'}")
 
     current_session_id = session_id if session_id else str(uuid.uuid4())
 
