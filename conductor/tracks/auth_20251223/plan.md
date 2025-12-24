@@ -1,6 +1,6 @@
 # Implementation Plan - Auth Track
 
-## Phase 1: Backend Preparation
+## Phase 1: Backend Preparation [checkpoint: 1ca8411]
 - [x] Task: Research and select FastAPI auth library (e.g., Authlib, FastAPI Users). [cb9e356]
 - [x] Task: Create a basic `AuthUser` model/schema. [3e2e3dd]
 - [x] Task: Implement a dependency for verifying mock tokens (for initial testing). [dbb7bc9]
