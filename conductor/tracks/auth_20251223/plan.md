@@ -9,8 +9,8 @@
 
 ## Phase 2: Next.js Google Auth
 - [x] Task: Install and configure NextAuth.js in the Next.js project. [4cd3efe]
-- [~] Task: Configure Google OAuth provider credentials (env vars).
-- [ ] Task: Create a Login/Logout button component.
+- [x] Task: Configure Google OAuth provider credentials (env vars). [0e18776]
+- [~] Task: Create a Login/Logout button component.
 - [ ] Task: Create a mechanism to allow mock user in local dev (similar to existing Streamlit approach)
 - [ ] Task: Implement a protected route/page that requires login.
 - [ ] Task: Write Tests: Component tests for the Login button.
