@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSession, signIn } from "next-auth/react"
+import { useSession, signIn, signOut } from "next-auth/react"
 import {
     Box,
     TextField,
@@ -75,8 +75,12 @@ export default function Chat() {
                 if (response.data && Array.isArray(response.data)) {
                     setPersonalities(response.data);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to fetch personalities:", error);
+                if (error.response?.status === 401 || error.response?.status === 403) {
+                    console.warn("Auth failure detected in fetchPersonalities. Signing out.");
+                    signOut();
+                }
             }
         };
 
@@ -116,14 +120,11 @@ export default function Chat() {
                 formData.append('file', file);
             }
 
-            // Streaming implementation
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/chat_stream`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-                body: formData,
-            });
+            if (response.status === 401 || response.status === 403) {
+                console.warn("Auth failure detected in handleSendMessage. Signing out.");
+                signOut();
+                return;
+            }
 
             if (!response.body) return;
 
