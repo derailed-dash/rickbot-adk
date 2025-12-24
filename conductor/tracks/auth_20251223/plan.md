@@ -27,4 +27,4 @@
 - [x] Task: Add GitHub OAuth provider to NextAuth.js configuration. [d8072a5]
 - [x] Task: Update Login component to support multiple providers. [d8072a5]
 - [x] Task: Refactor API error handling for auth failures (ensure clean UI feedback). [d83a2a0]
-- [ ] Task: Conductor - User Manual Verification 'GitHub Auth & Final Polish' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'GitHub Auth & Final Polish' (Protocol in workflow.md)

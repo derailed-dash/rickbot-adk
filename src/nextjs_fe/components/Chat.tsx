@@ -120,6 +120,15 @@ export default function Chat() {
                 formData.append('file', file);
             }
 
+            // Streaming implementation
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/chat_stream`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                body: formData,
+            });
+
             if (response.status === 401 || response.status === 403) {
                 console.warn("Auth failure detected in handleSendMessage. Signing out.");
                 signOut();
