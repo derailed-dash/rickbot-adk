@@ -5,7 +5,7 @@
 - [x] Task: Create a basic `AuthUser` model/schema. [3e2e3dd]
 - [x] Task: Implement a dependency for verifying mock tokens (for initial testing). [dbb7bc9]
 - [x] Task: Write Tests: Unit tests for token verification logic. [dbb7bc9]
-- [ ] Task: Conductor - User Manual Verification 'Backend Preparation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Backend Preparation' (Protocol in workflow.md)
 
 ## Phase 2: Next.js Google Auth
 - [ ] Task: Install and configure NextAuth.js in the Next.js project.

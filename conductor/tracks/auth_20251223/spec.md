@@ -7,6 +7,7 @@ The application currently allows unauthenticated access to the backend API and f
 1.  **Frontend Authentication:**
     -   Implement Google OAuth sign-in in the Next.js frontend.
     -   Implement GitHub OAuth sign-in in the Next.js frontend.
+    -   Implement a mechanism to allow mock user in local dev (similar to existing Streamlit approach)
     -   Ensure the user session is maintained securely.
 2.  **API Security:**
     -   Secure all backend API endpoints to require a valid authentication token.
