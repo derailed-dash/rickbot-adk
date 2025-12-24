@@ -18,8 +18,8 @@
 
 ## Phase 3: Connect Frontend to Backend
 - [x] Task: Update Next.js API calls to include the auth token in the Authorization header. [096703f]
-- [~] Task: Update FastAPI backend to verify the actual Google/GitHub JWTs (replacing mock logic).
-- [ ] Task: Write Tests: Integration test ensuring frontend can call protected API endpoint.
+- [x] Task: Update FastAPI backend to verify the actual Google/GitHub JWTs (replacing mock logic). [29e3df3]
+- [x] Task: Write Tests: Integration test ensuring frontend can call protected API endpoint. [29e3df3]
 - [ ] Task: Conductor - User Manual Verification 'Connect Frontend to Backend' (Protocol in workflow.md)
 
 ## Phase 4: GitHub Auth & Final Polish
