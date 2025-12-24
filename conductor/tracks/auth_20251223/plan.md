@@ -13,7 +13,7 @@
 - [x] Task: Create a Login/Logout button component. [36b3686]
 - [x] Task: Create a mechanism to allow mock user in local dev (similar to existing Streamlit approach) [71ee949]
 - [x] Task: Implement a protected route/page that requires login. [ab1c6bb]
-- [~] Task: Write Tests: Component tests for the Login button.
+- [x] Task: Write Tests: Component tests for the Login button. [b83f08d]
 - [ ] Task: Conductor - User Manual Verification 'Next.js Google Auth' (Protocol in workflow.md)
 
 ## Phase 3: Connect Frontend to Backend
