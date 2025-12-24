@@ -19,12 +19,7 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
     """
     token = creds.credentials
     if not token or token == "undefined":
-         # Debug: Print the token to see what we are receiving
-         logger.debug(f"Received empty or undefined token: {token}")
          raise HTTPException(status_code=403, detail="Not authenticated")
-
-    # Debug: Print the token to see what we are receiving
-    logger.debug(f"Received token: {token[:20]}...")
 
     # 1. Check for Mock Token (Development Only)
     if token.startswith("mock:"):

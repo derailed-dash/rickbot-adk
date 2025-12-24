@@ -32,7 +32,6 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, account, user }) {
-      console.log("JWT Callback - Account:", account ? account.provider : "None", "User:", user ? user.name : "None");
       // Persist the OAuth access_token to the token right after signin
       if (account) {
         token.accessToken = account.access_token
@@ -40,18 +39,16 @@ export const authOptions: NextAuthOptions = {
         token.provider = account.provider
         
         // Handle Mock Provider specifically when account is present
-        if (account.provider === 'credentials' && user) {
+        if (account.provider === 'mock' && user) {
              const cleanId = user.id.replace('mock-', '');
              token.idToken = `mock:${cleanId}:${user.email}:${user.name}`;
              token.provider = 'mock';
-             console.log("Mock token generated:", token.idToken);
         }
       }
       
       return token
     },
     async session({ session, token, user }) {
-      console.log("Session Callback - Token ID:", token.idToken ? "exists" : "MISSING");
       // Send properties to the client, like an access_token from a provider.
       session.accessToken = token.accessToken as string
       session.idToken = token.idToken as string
