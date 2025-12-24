@@ -25,12 +25,16 @@ import uuid
 from collections.abc import AsyncGenerator
 from typing import Annotated
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Form, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
 from google.genai.types import Blob, Content, Part
 from pydantic import BaseModel
+
+# Load environment variables from .env file
+load_dotenv()
 
 from rickbot_agent.agent import get_agent
 from rickbot_agent.personality import get_personalities
