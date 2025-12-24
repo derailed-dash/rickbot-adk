@@ -24,7 +24,11 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
     # 1. Check for Mock Token (Development Only)
     if token.startswith("mock:"):
         # In a real app, you'd check an environment variable to ensure this is only enabled in dev
-        if os.getenv("NEXT_PUBLIC_ALLOW_MOCK_AUTH") != "true" and os.getenv("NODE_ENV") != "development":
+        allow_mock = os.getenv("NEXT_PUBLIC_ALLOW_MOCK_AUTH")
+        # logger.debug(f"Mock auth check: token={token}, ALLOW_MOCK={allow_mock}")
+        
+        if allow_mock != "true":
+             logger.warning("Mock authentication attempted but disabled.")
              raise HTTPException(status_code=401, detail="Mock authentication is disabled")
              
         try:
