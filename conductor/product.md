@@ -15,6 +15,7 @@ A multi-personality AI chatbot built using Google Gemini and the Agent Developme
 
 ## Key Features
 - **Diverse Personas:** Support for multiple distinct personalities with dynamic selection via the API.
+- **Secure Authentication:** Integrated Google and GitHub OAuth for personalized and secure user sessions.
 - **Real-time Streaming:** Seamless, real-time response streaming for a more natural conversation flow.
 - **Multimodal Interactions:** Support for both text and image uploads, enabling rich, context-aware interactions.
 - **Decoupled Architecture:** A robust FastAPI backend that decouples the core agent logic from various user interfaces, such as the Next.js frontend.
