@@ -8,8 +8,8 @@
 - [x] Task: Conductor - User Manual Verification 'Backend Preparation' (Protocol in workflow.md)
 
 ## Phase 2: Next.js Google Auth
-- [ ] Task: Install and configure NextAuth.js in the Next.js project.
-- [ ] Task: Configure Google OAuth provider credentials (env vars).
+- [x] Task: Install and configure NextAuth.js in the Next.js project. [4cd3efe]
+- [~] Task: Configure Google OAuth provider credentials (env vars).
 - [ ] Task: Create a Login/Logout button component.
 - [ ] Task: Create a mechanism to allow mock user in local dev (similar to existing Streamlit approach)
 - [ ] Task: Implement a protected route/page that requires login.
