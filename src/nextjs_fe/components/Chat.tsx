@@ -65,7 +65,11 @@ export default function Chat() {
     useEffect(() => {
         const fetchPersonalities = async () => {
             try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/personas`);
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/personas`, {
+                    headers: {
+                        Authorization: `Bearer ${session?.idToken || session?.accessToken}`
+                    }
+                });
                 if (response.data && Array.isArray(response.data)) {
                     setPersonalities(response.data);
                 }
@@ -111,6 +115,9 @@ export default function Chat() {
             // Streaming implementation
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/chat_stream`, {
                 method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${session?.idToken || session?.accessToken}`
+                },
                 body: formData,
             });
 
