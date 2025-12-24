@@ -7,7 +7,7 @@
 - [x] Task: Write Tests: Unit tests for token verification logic. [dbb7bc9]
 - [x] Task: Conductor - User Manual Verification 'Backend Preparation' (Protocol in workflow.md)
 
-## Phase 2: Next.js Google Auth
+## Phase 2: Next.js Google Auth [checkpoint: 3d62912]
 - [x] Task: Install and configure NextAuth.js in the Next.js project. [4cd3efe]
 - [x] Task: Configure Google OAuth provider credentials (env vars). [0e18776]
 - [x] Task: Create a Login/Logout button component. [36b3686]
