@@ -38,16 +38,14 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = account.access_token
         token.idToken = account.id_token
         token.provider = account.provider
-      }
-      
-      // If signing in with the Mock provider (Credentials), generate the expected mock token
-      if (user && account && account.provider === 'credentials') {
-          // Backend expects format: "mock:id:email:name"
-          // We strip 'mock-' prefix from id if present to match backend expectation of integer-like id or just plain id
-          const cleanId = user.id.replace('mock-', '');
-          token.idToken = `mock:${cleanId}:${user.email}:${user.name}`;
-          token.provider = 'mock';
-          console.log("Mock token generated:", token.idToken);
+        
+        // Handle Mock Provider specifically when account is present
+        if (account.provider === 'credentials' && user) {
+             const cleanId = user.id.replace('mock-', '');
+             token.idToken = `mock:${cleanId}:${user.email}:${user.name}`;
+             token.provider = 'mock';
+             console.log("Mock token generated:", token.idToken);
+        }
       }
       
       return token
