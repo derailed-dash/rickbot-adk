@@ -18,8 +18,10 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
     - GitHub Access Tokens
     """
     token = creds.credentials
-    if not token:
-         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+    if not token or token == "undefined":
+         # Debug: Print the token to see what we are receiving
+         logger.debug(f"Received empty or undefined token: {token}")
+         raise HTTPException(status_code=403, detail="Not authenticated")
 
     # Debug: Print the token to see what we are receiving
     logger.debug(f"Received token: {token[:20]}...")
