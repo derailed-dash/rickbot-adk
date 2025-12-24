@@ -21,6 +21,7 @@ import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
+import AuthButton from './AuthButton';
 
 interface Message {
     id: string;
@@ -188,24 +189,27 @@ export default function Chat() {
         }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h4" color="primary">Rickbot ADK</Typography>
-                <FormControl sx={{ minWidth: 120 }}>
-                    <InputLabel id="personality-select-label">Personality</InputLabel>
-                    <Select
-                        labelId="personality-select-label"
-                        value={selectedPersonality}
-                        label="Personality"
-                        onChange={(e) => setSelectedPersonality(e.target.value)}
-                    >
-                        {personalities.map((p) => (
-                            <MenuItem key={p.name} value={p.name}>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Avatar src={p.avatar} sx={{ width: 24, height: 24, mr: 1 }} />
-                                    {p.name}
-                                </Box>
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <AuthButton />
+                    <FormControl sx={{ minWidth: 120 }}>
+                        <InputLabel id="personality-select-label">Personality</InputLabel>
+                        <Select
+                            labelId="personality-select-label"
+                            value={selectedPersonality}
+                            label="Personality"
+                            onChange={(e) => setSelectedPersonality(e.target.value)}
+                        >
+                            {personalities.map((p) => (
+                                <MenuItem key={p.name} value={p.name}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Avatar src={p.avatar} sx={{ width: 24, height: 24, mr: 1 }} />
+                                        {p.name}
+                                    </Box>
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
             </Box>
 
             <Paper elevation={3} sx={{ flexGrow: 1, overflow: 'auto', p: 2, mb: 2, bgcolor: 'rgba(30,30,30,0.9)' }}>
