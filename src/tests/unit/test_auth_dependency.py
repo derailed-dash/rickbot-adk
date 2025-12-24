@@ -1,14 +1,14 @@
 import pytest
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
-from src.rickbot_agent.auth_models import AuthUser
+from rickbot_agent.auth_models import AuthUser
 
 @pytest.mark.asyncio
 async def test_verify_mock_token_valid():
     try:
-        from src.rickbot_agent.auth import verify_token
+        from rickbot_agent.auth import verify_token
     except ImportError:
-        pytest.fail("Could not import verify_token from src.rickbot_agent.auth")
+        pytest.fail("Could not import verify_token from rickbot_agent.auth")
 
     # Mock token format: "mock:user_id:email:name"
     token = "mock:123:test@example.com:Test User"
@@ -25,7 +25,7 @@ async def test_verify_mock_token_valid():
 @pytest.mark.asyncio
 async def test_verify_mock_token_invalid_prefix():
     try:
-        from src.rickbot_agent.auth import verify_token
+        from rickbot_agent.auth import verify_token
     except ImportError:
         pytest.fail("Could not import verify_token")
 
@@ -39,7 +39,7 @@ async def test_verify_mock_token_invalid_prefix():
 @pytest.mark.asyncio
 async def test_verify_mock_token_malformed():
     try:
-        from src.rickbot_agent.auth import verify_token
+        from rickbot_agent.auth import verify_token
     except ImportError:
         pytest.fail("Could not import verify_token")
 

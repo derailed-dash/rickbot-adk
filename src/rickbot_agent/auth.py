@@ -4,7 +4,7 @@ from fastapi import HTTPException, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-from src.rickbot_agent.auth_models import AuthUser
+from rickbot_agent.auth_models import AuthUser
 from rickbot_utils.config import logger
 
 security = HTTPBearer()

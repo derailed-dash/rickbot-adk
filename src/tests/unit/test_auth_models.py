@@ -2,7 +2,7 @@ import pytest
 from pydantic import ValidationError
 # We assume the module will be created later
 try:
-    from src.rickbot_agent.auth_models import AuthUser
+    from rickbot_agent.auth_models import AuthUser
 except ImportError:
     pass
 

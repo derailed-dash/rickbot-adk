@@ -28,10 +28,9 @@ mock_agent_mod.get_agent.return_value = MagicMock()
 
 from src.main import app
 from fastapi.testclient import TestClient
-from src.rickbot_agent.auth_models import AuthUser
+from rickbot_agent.auth_models import AuthUser
 
 client = TestClient(app)
-
 @pytest.mark.asyncio
 async def test_chat_unauthenticated():
     response = client.post(
