@@ -64,10 +64,12 @@ export default function Chat() {
 
     useEffect(() => {
         const fetchPersonalities = async () => {
+            const token = session?.idToken || session?.accessToken || "";
+            // console.log("Token:", token);
             try {
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/personas`, {
                     headers: {
-                        Authorization: `Bearer ${session?.idToken || session?.accessToken}`
+                        Authorization: `Bearer ${token}`
                     }
                 });
                 if (response.data && Array.isArray(response.data)) {
@@ -102,6 +104,8 @@ export default function Chat() {
         setStreamingText('');
 
         try {
+            const token = session?.idToken || session?.accessToken || "";
+            
             const formData = new FormData();
             formData.append('prompt', newMessage.text);
             formData.append('personality', selectedPersonality);
@@ -116,7 +120,7 @@ export default function Chat() {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/chat_stream`, {
                 method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${session?.idToken || session?.accessToken}`
+                    Authorization: `Bearer ${token}`
                 },
                 body: formData,
             });
