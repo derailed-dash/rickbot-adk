@@ -1,7 +1,7 @@
 # Implementation Plan - Auth Track
 
 ## Phase 1: Backend Preparation
-- [ ] Task: Research and select FastAPI auth library (e.g., Authlib, FastAPI Users).
+- [x] Task: Research and select FastAPI auth library (e.g., Authlib, FastAPI Users). [cb9e356]
 - [ ] Task: Create a basic `AuthUser` model/schema.
 - [ ] Task: Implement a dependency for verifying mock tokens (for initial testing).
 - [ ] Task: Write Tests: Unit tests for token verification logic.
@@ -11,6 +11,7 @@
 - [ ] Task: Install and configure NextAuth.js in the Next.js project.
 - [ ] Task: Configure Google OAuth provider credentials (env vars).
 - [ ] Task: Create a Login/Logout button component.
+- [ ] Task: Create a mechanism to allow mock user in local dev (similar to existing Streamlit approach)
 - [ ] Task: Implement a protected route/page that requires login.
 - [ ] Task: Write Tests: Component tests for the Login button.
 - [ ] Task: Conductor - User Manual Verification 'Next.js Google Auth' (Protocol in workflow.md)
