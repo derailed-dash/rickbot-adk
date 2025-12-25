@@ -227,8 +227,12 @@ Rickbot uses OAuth for securing the application. You must configure OAuth creden
 **Local Development:**
 For local testing, simply use `.env` files. Ensure these are listed in `.gitignore` so they are never committed.
 
-*   **Backend:** Add `GOOGLE_CLIENT_ID` to your root `.env` file.
+*   **Backend:** Add `GOOGLE_CLIENT_ID` and `GITHUB_ID` to your root `.env` file.
 *   **Frontend:** Add all credentials to `src/nextjs_fe/.env.local`.
+
+# Mock Auth (Development only)
+NEXT_PUBLIC_ALLOW_MOCK_AUTH=true # Set to 'true' to enable the "Mock Login" provider and accept mock tokens in the backend. NEVER enable in production.
+MOCK_AUTH_USER=mock@example.com
 
 **Production (Cloud Run):**
 For production deployment, avoid embedding secrets in the container image or environment variables directly. Instead, use **Google Secret Manager**.
@@ -247,6 +251,8 @@ Non-sensitive values (Client IDs, URLs) can be set as standard environment varia
 ### DNS
 
 See [docs/design.md](docs/design.md) for details on DNS configuration.
+
+## Terraform
 
 The following commands describe how to run Terraform tasks, to deploy infrastructure. Note that I have now added a `terraform` target to my `Makefile`, so we can achieve the same result by simply running `make terraform` from the project root directory.
 
