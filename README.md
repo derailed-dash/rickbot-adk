@@ -222,33 +222,27 @@ Rickbot uses OAuth for securing the application. You must configure OAuth creden
     *   **Authorization callback URL:** `https://your-production-domain.com/api/auth/callback/github`
 5.  Register the application and generate a **Client Secret**. Copy the **Client ID** and **Client Secret**.
 
-#### 3. Environment Variables
+#### 3. Environment Variables & Secret Management
 
-You need to update two files with these credentials:
+**Local Development:**
+For local testing, simply use `.env` files. Ensure these are listed in `.gitignore` so they are never committed.
 
-**Backend (`.env`):**
-Required for token verification by the API.
-```bash
-# Add to your root .env file
-GOOGLE_CLIENT_ID=your-google-client-id
-# Note: GitHub token verification uses the GitHub API directly, so backend env vars are not strictly required for GitHub auth, but Good Practice.
-```
+*   **Backend:** Add `GOOGLE_CLIENT_ID` to your root `.env` file.
+*   **Frontend:** Add all credentials to `src/nextjs_fe/.env.local`.
 
-**Frontend (`src/nextjs_fe/.env.local`):**
-Required for NextAuth.js to handle the login flow.
-```bash
-# Google
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
+**Production (Cloud Run):**
+For production deployment, avoid embedding secrets in the container image or environment variables directly. Instead, use **Google Secret Manager**.
 
-# GitHub
-GITHUB_ID=your-github-client-id
-GITHUB_SECRET=your-github-client-secret
+1.  **Create Secrets:** Store your client secrets in Google Secret Manager:
+    *   `rickbot-nextauth-secret` (The random string for encryption)
+    *   `rickbot-google-client-secret`
+    *   `rickbot-github-client-secret`
+2.  **Mount Secrets:** Configure your Cloud Run service (via Terraform or Console) to mount these secrets as environment variables:
+    *   `NEXTAUTH_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-nextauth-secret/versions/latest`
+    *   `GOOGLE_CLIENT_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-google-client-secret/versions/latest`
+    *   `GITHUB_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-github-client-secret/versions/latest`
 
-# NextAuth Config
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET= # Generate with: openssl rand -base64 32
-```
+Non-sensitive values (Client IDs, URLs) can be set as standard environment variables in the Cloud Run configuration.
 
 ### DNS
 
