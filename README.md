@@ -189,7 +189,70 @@ The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to t
 
 See [docs/design.md](docs/design.md).
 
-## Deploying Infrastructure
+### OAuth Configuration
+
+Rickbot uses OAuth for securing the application. You must configure OAuth credentials for both Google and GitHub providers. It is recommended to create separate OAuth applications for Development (Dev) and Production (Prod) environments.
+
+#### 1. Google OAuth Setup
+
+1.  Go to the [Google Cloud Console > APIs & Services > Credentials](https://console.cloud.google.com/apis/credentials).
+2.  Click **Create Credentials** > **OAuth client ID**.
+3.  Select **Web application**.
+4.  **Dev Configuration:**
+    *   **Name:** `Rickbot-ADK-Dev`
+    *   **Authorized JavaScript origins:** `http://localhost:3000`
+    *   **Authorized redirect URIs:** `http://localhost:3000/api/auth/callback/google`
+5.  **Prod Configuration:**
+    *   **Name:** `Rickbot-ADK-Prod`
+    *   **Authorized JavaScript origins:** `https://your-production-domain.com`
+    *   **Authorized redirect URIs:** `https://your-production-domain.com/api/auth/callback/google`
+6.  Copy the **Client ID** and **Client Secret** for each.
+
+#### 2. GitHub OAuth Setup
+
+1.  Go to [GitHub Developer Settings > OAuth Apps](https://github.com/settings/developers).
+2.  Click **New OAuth App**.
+3.  **Dev Configuration:**
+    *   **Application Name:** `Rickbot-ADK-Dev`
+    *   **Homepage URL:** `http://localhost:3000`
+    *   **Authorization callback URL:** `http://localhost:3000/api/auth/callback/github`
+4.  **Prod Configuration:**
+    *   **Application Name:** `Rickbot-ADK-Prod`
+    *   **Homepage URL:** `https://your-production-domain.com`
+    *   **Authorization callback URL:** `https://your-production-domain.com/api/auth/callback/github`
+5.  Register the application and generate a **Client Secret**. Copy the **Client ID** and **Client Secret**.
+
+#### 3. Environment Variables
+
+You need to update two files with these credentials:
+
+**Backend (`.env`):**
+Required for token verification by the API.
+```bash
+# Add to your root .env file
+GOOGLE_CLIENT_ID=your-google-client-id
+# Note: GitHub token verification uses the GitHub API directly, so backend env vars are not strictly required for GitHub auth, but Good Practice.
+```
+
+**Frontend (`src/nextjs_fe/.env.local`):**
+Required for NextAuth.js to handle the login flow.
+```bash
+# Google
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# GitHub
+GITHUB_ID=your-github-client-id
+GITHUB_SECRET=your-github-client-secret
+
+# NextAuth Config
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET= # Generate with: openssl rand -base64 32
+```
+
+### DNS
+
+See [docs/design.md](docs/design.md) for details on DNS configuration.
 
 The following commands describe how to run Terraform tasks, to deploy infrastructure. Note that I have now added a `terraform` target to my `Makefile`, so we can achieve the same result by simply running `make terraform` from the project root directory.
 
