@@ -224,15 +224,31 @@ Rickbot uses OAuth for securing the application. You must configure OAuth creden
 
 #### 3. Environment Variables & Secret Management
 
-**Local Development:**
-For local testing, simply use `.env` files. Ensure these are listed in `.gitignore` so they are never committed.
+The project uses two separate environment configuration files to maintain separation between the Backend and Frontend.
 
-*   **Backend:** Add `GOOGLE_CLIENT_ID` and `GITHUB_ID` to your root `.env` file.
-*   **Frontend:** Add all credentials to `src/nextjs_fe/.env.local`.
+##### **Root Directory: `.env` (Python Backend)**
+This file configures the FastAPI server. Use `source scripts/setup-env.sh` to load these into your shell, or rely on `load_dotenv()` in the code.
 
-# Mock Auth (Development only)
-NEXT_PUBLIC_ALLOW_MOCK_AUTH=true # Set to 'true' to enable the "Mock Login" provider and accept mock tokens in the backend. NEVER enable in production.
-MOCK_AUTH_USER=mock@example.com
+| Variable | Purpose |
+| :--- | :--- |
+| `GOOGLE_CLIENT_ID` | Required to verify Google ID Tokens sent by the frontend. |
+| `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to accept mock tokens. |
+| `GOOGLE_CLOUD_PROJECT` | Used for ADK and Secret Manager access. |
+
+##### **`src/nextjs_fe/.env.local` (Next.js Frontend)**
+This file is used exclusively by the Next.js application.
+
+| Variable | Purpose |
+| :--- | :--- |
+| `NEXTAUTH_URL` | Base URL of your app (e.g., `http://localhost:3000`). |
+| `NEXTAUTH_SECRET` | Used by NextAuth to encrypt session cookies. |
+| `GOOGLE_CLIENT_ID` / `SECRET` | Credentials for Google OAuth. |
+| `GITHUB_ID` / `SECRET` | Credentials for GitHub OAuth. |
+| `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Enables the "Mock Login" provider in the UI. |
+| `MOCK_AUTH_USER` | (Optional) The email address assigned to the mock user identity. |
+| `NEXT_PUBLIC_API_URL` | URL of the backend API (e.g., `http://localhost:8000`). |
+
+> **Note on `MOCK_AUTH_USER`:** This is a frontend-only convenience variable. The frontend embeds this email into the mock token it generates. The backend simply reads whatever email is inside that token (if mock auth is enabled).
 
 **Production (Cloud Run):**
 For production deployment, avoid embedding secrets in the container image or environment variables directly. Instead, use **Google Secret Manager**.
