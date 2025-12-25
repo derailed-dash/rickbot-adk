@@ -15,7 +15,7 @@ Before diving into the implementation, it is crucial to understand the core tech
 
 ### Next.js
 
-[Next.js](https://nextjs.org/) is a meta-framework built on top of React. It handles the plumbing that React itself doesn't provide out of the box.
+[Next.js](https://nextjs.org/) is an opinionated meta-framework built on top of React. It handles the plumbing that React itself doesn't provide out of the box.
 
 *   **Why we chose it**: It provides a production-ready environment with features like:
     *   **File-system based routing**: Creating a file in `pages/` automatically creates a route.

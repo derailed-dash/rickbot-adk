@@ -155,12 +155,12 @@ docker run --rm -p 8080:8080 \
 
 The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to the FastAPI backend (`make api`) to provide a modern, chat-based interface.
 
-### Prerequisites
+#### Prerequisites
 
 - Node.js (v18 or later)
 - Python backend running (`make api`)
 
-### Running locally
+#### Running locally
 
 1.  **Start the Backend**:
     In one terminal, launch the FastAPI server:
@@ -179,7 +179,7 @@ The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to t
 3.  **Access the UI**:
     Open your browser to `http://localhost:3000`.
 
-### Key Features
+#### Key Features
 
 - **Dynamic Personas**: The UI fetches available personalities (Rick, Yoda, etc.) directly from the backend API (`/personas`).
 - **Streaming Responses**: Uses Server-Sent Events (SSE) for real-time streaming of agent responses.
@@ -226,7 +226,8 @@ Rickbot uses OAuth for securing the application. You must configure OAuth creden
 
 The project uses two separate environment configuration files to maintain separation between the Backend and Frontend.
 
-##### **Root Directory: `.env` (Python Backend)**
+##### Root Directory: `.env` (Python Backend)
+
 This file configures the FastAPI server. Use `source scripts/setup-env.sh` to load these into your shell, or rely on `load_dotenv()` in the code.
 
 | Variable | Purpose |
@@ -235,7 +236,8 @@ This file configures the FastAPI server. Use `source scripts/setup-env.sh` to lo
 | `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to accept mock tokens. |
 | `GOOGLE_CLOUD_PROJECT` | Used for ADK and Secret Manager access. |
 
-##### **`src/nextjs_fe/.env.local` (Next.js Frontend)**
+##### `src/nextjs_fe/.env.local` (Next.js Frontend)
+
 This file is used exclusively by the Next.js application.
 
 | Variable | Purpose |
@@ -251,6 +253,7 @@ This file is used exclusively by the Next.js application.
 > **Note on `MOCK_AUTH_USER`:** This is a frontend-only convenience variable. The frontend embeds this email into the mock token it generates. The backend simply reads whatever email is inside that token (if mock auth is enabled).
 
 **Production (Cloud Run):**
+
 For production deployment, avoid embedding secrets in the container image or environment variables directly. Instead, use **Google Secret Manager**.
 
 1.  **Create Secrets:** Store your client secrets in Google Secret Manager:

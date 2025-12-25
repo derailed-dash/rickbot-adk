@@ -102,7 +102,7 @@ graph TD
 
 The application supports multiple distinct interfaces, all interacting with the core agent logic.
 
-### Streamlit UI (Existing)
+### Streamlit UI
 
 The original user interface for rapid prototyping and demonstration. 
 This UI is defined in `src/streamlit_fe/app.py` and can be launched with `make streamlit`.
@@ -128,7 +128,7 @@ The application is designed to ensure a clean and robust separation of context w
 
 This approach ensures that each personality operates in a clean, isolated environment. It is a simple and robust pattern that aligns well with Streamlit's execution model, prioritizing a predictable state over the premature optimization of object re-creation.
 
-### React/Next.js UI (Primary)
+### React/Next.js UI
 
 The modern, production-grade interface for Rickbot, located in `src/nextjs_fe`.
 
@@ -139,7 +139,7 @@ The modern, production-grade interface for Rickbot, located in `src/nextjs_fe`.
     *   **Dynamic Configuration**: Fetches available personalities dynamically from the backend (`/personas` endpoint), ensuring the UI is always in sync with the agent configuration.
     *   **Real-time Interaction**: Uses Server-Sent Events (SSE) via the `/chat_stream` endpoint for a responsive, streaming chat experience.
     *   **Multimodal Support**: Supports file uploads (images, text) alongside chat messages.
-    *   **Independent Auth**: (Planned) Will implement its own OAuth flow.
+    *   **Independent Auth**: Implements its own OAuth flow.
 
 ### API Backend
 
@@ -166,7 +166,7 @@ Frontend user authentication is required for Rickbot.
 - Different credentials are used between Staging and Prod.
 - When running locally we use an environment variable `MOCK_AUTH_USER` to bypass real authentication. This is automatically set by `make streamlit`.
 
-#### OAuth with Next.js (Primary)
+#### OAuth with Next.js
 
 - **Framework**: **NextAuth.js**.
 - **Rationale**: NextAuth.js is the standard authentication solution for Next.js applications. It abstracts the complexity of OAuth flows, session management, and secure cookie handling. It supports multiple providers out-of-the-box and is highly extensible.
