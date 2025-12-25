@@ -1,8 +1,8 @@
-import pytest
-from unittest.mock import MagicMock, patch, AsyncMock
-import json
 import sys
+from unittest.mock import AsyncMock, MagicMock, patch
+
 from pydantic import BaseModel
+
 
 # Create a dummy Part class for Pydantic
 class MockPart(BaseModel):
@@ -13,96 +13,116 @@ class MockPart(BaseModel):
     def from_text(cls, text):
         return cls(text=text)
 
-# Mock config
-mock_config = MagicMock()
-mock_config.agent_name = "test_agent"
-mock_config.model = "test_model"
-mock_logger = MagicMock()
+import pytest
+from fastapi.testclient import TestClient
 
-# Patch modules
-with patch.dict(sys.modules, {
-    "google.auth": MagicMock(),
-    "google.cloud": MagicMock(),
-    "google.cloud.secretmanager": MagicMock(),
-    "rickbot_utils.config": MagicMock(config=mock_config, logger=mock_logger),
-    "rickbot_agent.agent": MagicMock(),
-    "rickbot_agent.services": MagicMock(),
-    "google.adk.runners": MagicMock(),
-    "google.genai.types": MagicMock(Part=MockPart, Content=MagicMock, Blob=MagicMock),
-}):
-    # Need to re-import main if it was already imported, but for this fresh run it's fine.
-    # However, since I am writing the file again, I need to make sure I import AFTER patching.
 
-    from rickbot_utils.config import logger
-    from rickbot_agent.agent import get_agent
-    from rickbot_agent.services import get_session_service, get_artifact_service
-    from google.adk.runners import Runner
+@pytest.fixture
+def client():
+    # Mock config
+    mock_config = MagicMock()
+    mock_config.agent_name = "test_agent"
+    mock_config.model = "test_model"
+    mock_logger = MagicMock()
 
-    # Mock session service
-    mock_session_service = AsyncMock()
-    mock_session = MagicMock()
-    mock_session_service.get_session.return_value = mock_session
-    mock_session_service.create_session.return_value = mock_session
-    get_session_service.return_value = mock_session_service
+    # Patch modules
+    with patch.dict(sys.modules, {
+        "google.auth": MagicMock(),
+        "google.cloud": MagicMock(),
+        "google.cloud.secretmanager": MagicMock(),
+        "rickbot_utils.config": MagicMock(config=mock_config, logger=mock_logger),
+        "rickbot_agent.agent": MagicMock(),
+        "rickbot_agent.services": MagicMock(),
+        "google.adk.runners": MagicMock(),
+        "google.genai.types": MagicMock(Part=MockPart, Content=MagicMock, Blob=MagicMock),
+    }):
+        from google.adk.runners import Runner
 
-    # Mock runner
-    mock_runner = MagicMock()
-    Runner.return_value = mock_runner
+        from rickbot_agent.services import get_session_service
 
-    # Import app
-    from src.main import app
-    from fastapi.testclient import TestClient
+        # Mock session service
+        mock_session_service = AsyncMock()
+        mock_session = MagicMock()
+        mock_session_service.get_session.return_value = mock_session
+        mock_session_service.create_session.return_value = mock_session
+        get_session_service.return_value = mock_session_service
 
-    client = TestClient(app)
+        # Mock runner
+        mock_runner = MagicMock()
+        Runner.return_value = mock_runner  # type: ignore
 
-    def test_read_root():
-        response = client.get("/")
-        assert response.status_code == 200
-        assert response.json() == {"Hello": "World"}
-
-    def test_chat_endpoint():
-        # Mock runner.run_async to yield events
+        # Helper to mock run_async on the runner instance
         async def mock_run_async(*args, **kwargs):
-            event = MagicMock()
-            event.is_final_response.return_value = True
-            event.content.parts = [MockPart(text="Hello from Rick")]
-            yield event
+             yield MagicMock() # default yield
 
         mock_runner.run_async = mock_run_async
 
-        response = client.post(
-            "/chat",
-            data={"prompt": "Hello", "personality": "Rick", "user_id": "test_user"}
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["response"] == "Hello from Rick"
-        assert "session_id" in data
+        from rickbot_agent.auth import verify_token
+        from rickbot_agent.auth_models import AuthUser
+        from src.main import app
 
-    def test_chat_stream_endpoint():
-        # Mock runner.run_async to yield events
-        async def mock_run_async(*args, **kwargs):
-            event = MagicMock()
-            event.is_model_response.return_value = True
-            part = MockPart(text="Chunk 1")
-            event.content.parts = [part]
-            yield event
+        # Mock Auth
+        mock_user = AuthUser(id="test_id", email="test@example.com", name="Test User", provider="mock")
+        app.dependency_overrides[verify_token] = lambda: mock_user
 
-            event2 = MagicMock()
-            event2.is_model_response.return_value = True
-            part2 = MockPart(text="Chunk 2")
-            event2.content.parts = [part2]
-            yield event2
+        # We define a custom client fixture that yields the client
+        # This ensures app is imported within the patch context
+        with TestClient(app) as c:
+             yield c, mock_runner
 
-        mock_runner.run_async = mock_run_async
+def test_read_root(client):
+    c, _ = client
+    response = c.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"Hello": "World"}
 
-        response = client.post(
-            "/chat_stream",
-            data={"prompt": "Hello", "personality": "Rick", "user_id": "test_user"}
-        )
-        assert response.status_code == 200
-        # Check streaming content
-        content = response.content.decode("utf-8")
-        assert "data: " in content
-        assert "Chunk 1" in content
-        assert "Chunk 2" in content
+def test_chat_endpoint(client):
+    c, mock_runner = client
+
+    # Mock runner.run_async to yield events
+    async def mock_run_async(*args, **kwargs):
+        event = MagicMock()
+        event.is_final_response.return_value = True
+        event.content.parts = [MockPart(text="Hello from Rick")]
+        yield event
+
+    mock_runner.run_async = mock_run_async
+
+    response = c.post(
+        "/chat",
+        data={"prompt": "Hello", "personality": "Rick", "user_id": "test_user"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["response"] == "Hello from Rick"
+    assert "session_id" in data
+
+def test_chat_stream_endpoint(client):
+    c, mock_runner = client
+
+    # Mock runner.run_async to yield events
+    async def mock_run_async(*args, **kwargs):
+        event = MagicMock()
+        event.is_model_response.return_value = True
+        part = MockPart(text="Chunk 1")
+        event.content.parts = [part]
+        yield event
+
+        event2 = MagicMock()
+        event2.is_model_response.return_value = True
+        part2 = MockPart(text="Chunk 2")
+        event2.content.parts = [part2]
+        yield event2
+
+    mock_runner.run_async = mock_run_async
+
+    response = c.post(
+        "/chat_stream",
+        data={"prompt": "Hello", "personality": "Rick", "user_id": "test_user"}
+    )
+    assert response.status_code == 200
+    # Check streaming content
+    content = response.content.decode("utf-8")
+    assert "data: " in content
+    assert "Chunk 1" in content
+    assert "Chunk 2" in content

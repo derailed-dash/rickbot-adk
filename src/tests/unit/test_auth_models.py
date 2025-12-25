@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 # We assume the module will be created later
 try:
     from rickbot_agent.auth_models import AuthUser

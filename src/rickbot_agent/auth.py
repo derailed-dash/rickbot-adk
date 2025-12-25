@@ -1,9 +1,11 @@
 import os
+
 import requests
-from fastapi import HTTPException, Depends
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
+
 from rickbot_agent.auth_models import AuthUser
 from rickbot_utils.config import logger
 
@@ -25,18 +27,18 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
     if token.startswith("mock:"):
         # In a real app, you'd check an environment variable to ensure this is only enabled in dev
         allow_mock = os.getenv("NEXT_PUBLIC_ALLOW_MOCK_AUTH")
-        
+
         if allow_mock != "true":
              logger.warning(f"Mock auth failed. ALLOW_MOCK={allow_mock}")
              raise HTTPException(status_code=401, detail="Mock authentication is disabled")
-             
+
         try:
             # Format: mock:id:email:name
             parts = token.split(":")
             if len(parts) < 4:
                  logger.warning(f"Mock token malformed: {token}")
                  raise HTTPException(status_code=401, detail="Malformed mock token")
-            
+
             return AuthUser(
                 id=parts[1],
                 email=parts[2],
@@ -45,7 +47,7 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
             )
         except Exception as e:
              logger.error(f"Mock auth exception: {e}")
-             raise HTTPException(status_code=401, detail="Invalid mock token")
+             raise HTTPException(status_code=401, detail="Invalid mock token") from e
 
     # 2. Try Google ID Token Verification
     try:
@@ -53,7 +55,7 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
         google_client_id = os.getenv("GOOGLE_CLIENT_ID")
         if google_client_id:
             idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), google_client_id)
-            
+
             return AuthUser(
                 id=idinfo['sub'],
                 email=idinfo['email'],
@@ -99,6 +101,6 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
             )
     except Exception as e:
         logger.error(f"Error verifying GitHub token: {e}")
-    
+
     # Default reject
     raise HTTPException(status_code=401, detail="Invalid authentication credentials")

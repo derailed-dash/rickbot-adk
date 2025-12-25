@@ -56,9 +56,15 @@ class Personality:
                 logger.info("Successfully retrieved.")
             except Exception as e:
                 logger.error(f"Unable to retrieve '{secret_name}' from Secret Manager.")
-                raise ValueError(
-                    f"{system_prompt_file} not found and could not access '{secret_name}' from Secret Manager: {e}"
-                ) from e
+
+                # Check for Test Mode
+                if os.environ.get("RICKBOT_TEST_MODE") == "true":
+                    logger.warning(f"TEST MODE: Using dummy prompt for {self.name} because secret was not found.")
+                    self.system_instruction = f"You are {self.name}. (DUMMY PROMPT FOR TESTING)"
+                else:
+                    raise ValueError(
+                        f"{system_prompt_file} not found and could not access '{secret_name}' from Secret Manager: {e}"
+                    ) from e
 
     def __repr__(self) -> str:
         return (f"{self.__class__.__name__}"

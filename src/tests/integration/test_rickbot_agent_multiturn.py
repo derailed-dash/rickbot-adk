@@ -12,7 +12,7 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import errors
 from google.genai import types as genai_types
 
-from rickbot_agent.agent import root_agent
+from rickbot_agent.agent import get_agent
 
 APP_NAME = "test_rickbot"
 
@@ -38,7 +38,8 @@ async def test_rickbot_agent_response():
     await session_service.create_session(
         app_name=APP_NAME, user_id="test_user", session_id="test_session"
     )
-    runner = Runner(agent=root_agent, app_name=APP_NAME, session_service=session_service)
+    agent = get_agent("Rick")
+    runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_service)
     query = "What is the meaning of life?"
     response_text: str | None = ""
     async for event in runner.run_async(
@@ -86,7 +87,8 @@ async def test_rickbot_agent_two_turn_conversation():
     await session_service.create_session(
         app_name=APP_NAME, user_id="test_user", session_id="test_session"
     )
-    runner = Runner(agent=root_agent, app_name=APP_NAME, session_service=session_service)
+    agent = get_agent("Rick")
+    runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_service)
     queries = ["Hello, my name is Dazbo", "What is my name?"]
     responses = []
     for query in queries:

@@ -71,7 +71,11 @@ select = [
     "RUF", # ruff specific rules
 ]
 # ignore line too long, too complex, two blank lines, trailing whitespace 
-ignore = ["C901", "E302", "W291"]
+ignore = ["C901", "E302", "W291", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/main.py" = ["E402"]
+"src/tests/*" = ["E402"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]
@@ -92,11 +96,11 @@ ignore_missing_imports = true      # Suppress errors about unresolved imports.
 explicit_package_bases = true      # Enforce explicit declaration of package bases.
 disable_error_code = ["misc", "no-any-return", "no-untyped-def"]
 
-exclude = [".venv"]
+exclude = [".venv", "node_modules", "src/nextjs_fe"]
 
 [tool.codespell]
 ignore-words-list = "rouge"
-skip = "./locust_env/*,uv.lock,.venv,./src/frontend,**/*.ipynb"
+skip = "./locust_env/*,uv.lock,.venv,./src/frontend,**/*.ipynb,**/node_modules,**/.next,./src/nextjs_fe/out,**/*.excalidraw,**/package-lock.json"
 
 
 [build-system]

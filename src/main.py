@@ -26,7 +26,7 @@ from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Form, UploadFile, Depends
+from fastapi import Depends, FastAPI, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
@@ -37,10 +37,10 @@ from pydantic import BaseModel
 load_dotenv()
 
 from rickbot_agent.agent import get_agent
-from rickbot_agent.personality import get_personalities
-from rickbot_agent.services import get_artifact_service, get_session_service
 from rickbot_agent.auth import verify_token
 from rickbot_agent.auth_models import AuthUser
+from rickbot_agent.personality import get_personalities
+from rickbot_agent.services import get_artifact_service, get_session_service
 from rickbot_utils.config import logger
 
 APP_NAME = "rickbot_api"

@@ -1,7 +1,9 @@
 import pytest
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
+
 from rickbot_agent.auth_models import AuthUser
+
 
 @pytest.mark.asyncio
 async def test_verify_mock_token_valid():
@@ -12,10 +14,10 @@ async def test_verify_mock_token_valid():
 
     # Mock token format: "mock:user_id:email:name"
     token = "mock:123:test@example.com:Test User"
-    
+
     creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
     user = await verify_token(creds)
-    
+
     assert isinstance(user, AuthUser)
     assert user.id == "123"
     assert user.email == "test@example.com"
@@ -31,7 +33,7 @@ async def test_verify_mock_token_invalid_prefix():
 
     token = "invalid:123:test@example.com:Test User"
     creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
-    
+
     with pytest.raises(HTTPException) as excinfo:
         await verify_token(creds)
     assert excinfo.value.status_code == 401
@@ -45,7 +47,7 @@ async def test_verify_mock_token_malformed():
 
     token = "mock:broken"
     creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
-    
+
     with pytest.raises(HTTPException) as excinfo:
         await verify_token(creds)
     assert excinfo.value.status_code == 401

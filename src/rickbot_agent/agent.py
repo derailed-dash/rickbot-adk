@@ -79,4 +79,4 @@ def get_agent(personality_name: str) -> Agent:
     return _get_cached_agent_for_personality(personality)
 
 # For backwards compatibility or direct access if needed, though get_agent is preferred.
-root_agent = get_agent("Rick")
+# root_agent = get_agent("Rick") # REMOVED to avoid side-effects at import time
