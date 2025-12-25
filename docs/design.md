@@ -157,11 +157,23 @@ The central nervous system of the application. It is the primary entrypoint to t
 
 Frontend user authentication is required for Rickbot.
 
-#### OAuth with Streamlit
+#### OAuth with Next.js (New)
 
-- With the Streamlit frontend this is achieved using Streamlit\'s integrated OIDC authentication. 
-- We use Google Auth Platform as the OAuth2 Auth provider.
-- OAuth credentials are obtained from the Google Auth Platform and stored in Google Secret Manager.
-- When the application is first launched, these credentials are read and dynamically written to the `.streamlit/secrets.toml`, which is how the Streamlit OIDC works. We must supply the `oauth2callback` URI as well as the OAuth client ID and secret.
-- Different credentials are used between Staging and Prod.
-- When running locally we use an environment variable `MOCK_AUTH_USER` to bypass real authentication. This is automatically set by `make streamlit`.
+- **Framework**: **NextAuth.js**.
+- **Rationale**: NextAuth.js is the standard authentication solution for Next.js applications. It abstracts the complexity of OAuth flows, session management, and secure cookie handling. It supports multiple providers out-of-the-box and is highly extensible.
+- **Implementation**:
+    - **Frontend (Next.js)**: 
+        - Configured with `GoogleProvider` and `GitHubProvider` for external authentication.
+        - Uses a custom `CredentialsProvider` for a "Mock Login" flow during local development, enabling offline testing.
+        - Session state is managed via secure HTTP-only cookies encrypted with `NEXTAUTH_SECRET`.
+        - The `useSession` hook provides reactive access to user state in React components.
+    - **Backend (FastAPI)**:
+        - The backend is stateless regarding authentication but enforces authorization.
+        - Endpoints are secured using `HTTPBearer` dependency.
+        - It validates the tokens passed by the frontend:
+            - **Google Tokens**: Verified using `google-auth` library against the Google ID Token issuer.
+            - **GitHub Tokens**: Verified by calling the GitHub User API.
+            - **Mock Tokens**: Verified by parsing a custom mock token format (enabled only in dev environments).
+- **Configuration**:
+    - **Local Development**: OAuth credentials (Client ID/Secret) are loaded from `.env.local`.
+    - **Production**: Credentials are securely fetched from **Google Secret Manager** and injected as environment variables into the Cloud Run container.
