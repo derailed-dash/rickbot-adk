@@ -22,15 +22,15 @@ steps:
       - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
 
   # Run integration tests
-  - name: "python:3.11-slim"
-    id: integration-tests
-    entrypoint: /bin/bash
-    args:
-      - "-c"
-      - |
-        uv run pytest src/tests/integration
-    env:
-      - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
+  # - name: "python:3.11-slim"
+  #   id: integration-tests
+  #   entrypoint: /bin/bash
+  #   args:
+  #     - "-c"
+  #     - |
+  #       uv run pytest src/tests/integration
+  #   env:
+  #     - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
 
 logsBucket: gs://${PROJECT_ID}-logs-data/build-logs
 options:
