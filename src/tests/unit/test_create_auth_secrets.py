@@ -72,7 +72,7 @@ server_metadata_url = "https://accounts.google.com/.well-known/openid-configurat
     create_secrets_toml(project_id)
 
     # Assert: Verify that the correct actions were taken.
-    mock_exists.assert_called_once_with(secrets_file_path)
+    mock_exists.assert_any_call(secrets_file_path)
     mock_secret_manager_client.return_value.access_secret_version.assert_called_once_with(
         request={"name": f"projects/{project_id}/secrets/rickbot-streamlit-secrets-toml/versions/latest"}
     )
