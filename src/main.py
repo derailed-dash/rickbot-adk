@@ -23,6 +23,7 @@ Notes:
 import json
 import uuid
 from collections.abc import AsyncGenerator
+from os import getenv
 from typing import Annotated
 
 from dotenv import load_dotenv
@@ -68,7 +69,7 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

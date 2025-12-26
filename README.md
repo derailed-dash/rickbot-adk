@@ -245,7 +245,7 @@ This file is used exclusively by the Next.js application.
 | `NEXTAUTH_URL` | Base URL of your app (e.g., `http://localhost:3000`). |
 | `NEXTAUTH_SECRET` | Used by NextAuth to encrypt session cookies. |
 | `GOOGLE_CLIENT_ID` / `SECRET` | Credentials for Google OAuth. |
-| `GITHUB_ID` / `SECRET` | Credentials for GitHub OAuth. |
+| `GITHUB_CLIENT_ID` / `SECRET` | Credentials for GitHub OAuth. |
 | `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Enables the "Mock Login" provider in the UI. |
 | `MOCK_AUTH_USER` | (Optional) The email address assigned to the mock user identity. |
 | `NEXT_PUBLIC_API_URL` | URL of the backend API (e.g., `http://localhost:8000`). |
@@ -263,7 +263,7 @@ For production deployment, avoid embedding secrets in the container image or env
 2.  **Mount Secrets:** Configure your Cloud Run service (via Terraform or Console) to mount these secrets as environment variables:
     *   `NEXTAUTH_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-nextauth-secret/versions/latest`
     *   `GOOGLE_CLIENT_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-google-client-secret/versions/latest`
-    *   `GITHUB_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-github-client-secret/versions/latest`
+    *   `GITHUB_CLIENT_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-github-client-secret/versions/latest`
 
 Non-sensitive values (Client IDs, URLs) can be set as standard environment variables in the Cloud Run configuration.
 
