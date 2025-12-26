@@ -16,6 +16,7 @@ logging.getLogger("google_genai").setLevel(logging.ERROR)
 agent_name = "rickbot_agent"
 logger = setup_logger(agent_name)
 
+
 @dataclass
 class Config:
     """Holds application configuration."""
@@ -26,6 +27,7 @@ class Config:
     model: str
     genai_use_vertexai: bool
 
+
 @cache
 def get_config() -> Config:
     """Return a dictionary of the current config."""
@@ -33,9 +35,7 @@ def get_config() -> Config:
     _, project_id = google.auth.default()
     if not project_id:
         raise ValueError("GCP Project ID not set. Have you run scripts/setup-env.sh?")
-    location = os.environ.setdefault(
-        "GOOGLE_CLOUD_LOCATION", "global"
-    )  # assume set as env var, but fail back to global
+    location = os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "global")  # assume set as env var, but fail back to global
     model = os.environ.setdefault("MODEL", "gemini-2.5-flash")
     genai_use_vertexai = os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "True").lower() == "true"
 
@@ -52,5 +52,6 @@ def get_config() -> Config:
         model=model,
         genai_use_vertexai=genai_use_vertexai,
     )
+
 
 config = get_config()

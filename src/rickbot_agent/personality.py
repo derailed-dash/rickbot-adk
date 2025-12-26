@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 def get_avatar(name: str) -> str:
     return str(SCRIPT_DIR / f"media/{name}.png")
 
+
 @dataclass(unsafe_hash=True)
 class Personality:
     """Represents a distinct chatbot personality, encapsulating its configuration."""
@@ -49,9 +50,7 @@ class Personality:
             try:
                 google_project = os.environ.get("GOOGLE_CLOUD_PROJECT")
                 if not google_project:
-                    raise ValueError(
-                        "GOOGLE_CLOUD_PROJECT environment variable not set, and local prompt file not found."
-                    )
+                    raise ValueError("GOOGLE_CLOUD_PROJECT environment variable not set, and local prompt file not found.")
                 self.system_instruction = retrieve_secret(google_project, secret_name)
                 logger.info("Successfully retrieved.")
             except Exception as e:
@@ -67,8 +66,10 @@ class Personality:
                     ) from e
 
     def __repr__(self) -> str:
-        return (f"{self.__class__.__name__}"
-                f"(name={self.name!r},title={self.title!r},overview={self.overview!r},temperature={self.temperature!r})")
+        return (
+            f"{self.__class__.__name__}"
+            f"(name={self.name!r},title={self.title!r},overview={self.overview!r},temperature={self.temperature!r})"
+        )
 
     def __str__(self) -> str:
         return f"{self.name}: {self.overview}"
@@ -83,6 +84,7 @@ def _load_personalities(yaml_file: str) -> dict[str, Personality]:
             personality = Personality(**this_peep)
             peeps[personality.name] = personality
     return peeps
+
 
 @lru_cache(maxsize=1)
 def get_personalities() -> dict[str, Personality]:

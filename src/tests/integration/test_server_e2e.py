@@ -59,14 +59,12 @@ def start_server() -> subprocess.Popen[str]:
         text=True,
         bufsize=1,
         env=env,
-        cwd=os.getcwd(), 
+        cwd=os.getcwd(),
     )
 
     # Start threads to log stdout and stderr in real-time
     threading.Thread(target=log_output, args=(process.stdout, logger.info), daemon=True).start()
-    threading.Thread(
-        target=log_output, args=(process.stderr, logger.error), daemon=True
-    ).start()
+    threading.Thread(target=log_output, args=(process.stderr, logger.error), daemon=True).start()
 
     return process
 
@@ -115,7 +113,7 @@ def test_chat_endpoint(server_fixture: subprocess.Popen[str]) -> None:
     logger.info("Starting /chat test")
 
     # Enable mock auth via header if supported or assume mock auth logic in app
-    # For now we use the mock usage pattern: 
+    # For now we use the mock usage pattern:
     # The server in production (and here) uses verify_token.
     # We need to rely on the MOCK AUTH environment variable if we want to bypass real auth,
     # OR we need to supply a valid mock token if NEXT_PUBLIC_ALLOW_MOCK_AUTH is enabled.
@@ -128,16 +126,10 @@ def test_chat_endpoint(server_fixture: subprocess.Popen[str]) -> None:
     # We'll use the Mock Auth credentials format, assuming NEXT_PUBLIC_ALLOW_MOCK_AUTH is set in .env
     # or passed in. Let's assume .env is loaded by the app.
 
-    headers = {
-        "Authorization": "Bearer mock:123:test@example.com:Tester"
-    }
+    headers = {"Authorization": "Bearer mock:123:test@example.com:Tester"}
 
     # Standard form data for /chat
-    data = {
-        "prompt": "Hello Rick!",
-        "personality": "Rick",
-        "session_id": "test_session_chat"
-    }
+    data = {"prompt": "Hello Rick!", "personality": "Rick", "session_id": "test_session_chat"}
 
     response = requests.post(CHAT_URL, data=data, headers=headers)
     assert response.status_code == 200, f"Chat failed: {response.text}"
@@ -151,15 +143,9 @@ def test_chat_stream_endpoint(server_fixture: subprocess.Popen[str]) -> None:
     """Test the /chat_stream endpoint."""
     logger.info("Starting /chat_stream test")
 
-    headers = {
-        "Authorization": "Bearer mock:123:test@example.com:Tester"
-    }
+    headers = {"Authorization": "Bearer mock:123:test@example.com:Tester"}
 
-    data = {
-        "prompt": "Tell me a joke.",
-        "personality": "Rick",
-        "session_id": "test_session_stream"
-    }
+    data = {"prompt": "Tell me a joke.", "personality": "Rick", "session_id": "test_session_stream"}
 
     response = requests.post(STREAM_URL, data=data, headers=headers, stream=True)
     assert response.status_code == 200, f"Chat stream failed: {response.text}"

@@ -47,9 +47,7 @@ def create_secrets_toml(google_project_id: str) -> None:
         logger.info(f"Successfully created {secrets_file_path}")
 
     except Exception as e:
-        raise ValueError(
-            f"Error accessing secret '{secret_name}' from Secret Manager: {e}"
-        ) from e
+        raise ValueError(f"Error accessing secret '{secret_name}' from Secret Manager: {e}") from e
 
 
 if __name__ == "__main__":

@@ -41,6 +41,7 @@ def clear_streamlit_cache() -> None:
         # or caching is not active in the test environment.
         pass
 
+
 @patch("src.rickbot_utils.secret_utils.secretmanager.SecretManagerServiceClient")
 @patch("os.path.exists")
 @patch("os.makedirs")

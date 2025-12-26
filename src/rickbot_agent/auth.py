@@ -11,6 +11,7 @@ from rickbot_utils.config import logger
 
 security = HTTPBearer()
 
+
 async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) -> AuthUser:
     """
     Verifies the authentication token and returns an AuthUser object.
@@ -21,7 +22,7 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
     """
     token = creds.credentials
     if not token or token == "undefined":
-         raise HTTPException(status_code=403, detail="Not authenticated")
+        raise HTTPException(status_code=403, detail="Not authenticated")
 
     # 1. Check for Mock Token (Development Only)
     if token.startswith("mock:"):
@@ -29,25 +30,20 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
         allow_mock = os.getenv("NEXT_PUBLIC_ALLOW_MOCK_AUTH")
 
         if allow_mock != "true":
-             logger.warning(f"Mock auth failed. ALLOW_MOCK={allow_mock}")
-             raise HTTPException(status_code=401, detail="Mock authentication is disabled")
+            logger.warning(f"Mock auth failed. ALLOW_MOCK={allow_mock}")
+            raise HTTPException(status_code=401, detail="Mock authentication is disabled")
 
         try:
             # Format: mock:id:email:name
             parts = token.split(":")
             if len(parts) < 4:
-                 logger.warning(f"Mock token malformed: {token}")
-                 raise HTTPException(status_code=401, detail="Malformed mock token")
+                logger.warning(f"Mock token malformed: {token}")
+                raise HTTPException(status_code=401, detail="Malformed mock token")
 
-            return AuthUser(
-                id=parts[1],
-                email=parts[2],
-                name=parts[3],
-                provider="mock"
-            )
+            return AuthUser(id=parts[1], email=parts[2], name=parts[3], provider="mock")
         except Exception as e:
-             logger.error(f"Mock auth exception: {e}")
-             raise HTTPException(status_code=401, detail="Invalid mock token") from e
+            logger.error(f"Mock auth exception: {e}")
+            raise HTTPException(status_code=401, detail="Invalid mock token") from e
 
     # 2. Try Google ID Token Verification
     try:
@@ -56,12 +52,7 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
         if google_client_id:
             idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), google_client_id)
 
-            return AuthUser(
-                id=idinfo['sub'],
-                email=idinfo['email'],
-                name=idinfo.get('name', idinfo['email']),
-                provider="google"
-            )
+            return AuthUser(id=idinfo["sub"], email=idinfo["email"], name=idinfo.get("name", idinfo["email"]), provider="google")
     except ValueError:
         # Not a valid Google token or verification failed, continue to next provider
         pass
@@ -71,33 +62,27 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
     # 3. Try GitHub Access Token Verification
     try:
         # GitHub tokens are opaque, we must call their API
-        github_response = requests.get(
-            "https://api.github.com/user",
-            headers={"Authorization": f"token {token}"},
-            timeout=5
-        )
+        github_response = requests.get("https://api.github.com/user", headers={"Authorization": f"token {token}"}, timeout=5)
         if github_response.status_code == 200:
             user_data = github_response.json()
             # GitHub email might be private, so we might need another call if email is null
             email = user_data.get("email")
             if not email:
-                 # Try to get emails
-                 emails_resp = requests.get(
-                     "https://api.github.com/user/emails",
-                     headers={"Authorization": f"token {token}"},
-                     timeout=5
-                 )
-                 if emails_resp.status_code == 200:
-                     emails = emails_resp.json()
-                     # Find primary or first
-                     primary_email = next((e['email'] for e in emails if e['primary']), emails[0]['email'] if emails else None)
-                     email = primary_email
+                # Try to get emails
+                emails_resp = requests.get(
+                    "https://api.github.com/user/emails", headers={"Authorization": f"token {token}"}, timeout=5
+                )
+                if emails_resp.status_code == 200:
+                    emails = emails_resp.json()
+                    # Find primary or first
+                    primary_email = next((e["email"] for e in emails if e["primary"]), emails[0]["email"] if emails else None)
+                    email = primary_email
 
             return AuthUser(
-                id=str(user_data['id']),
+                id=str(user_data["id"]),
                 email=email or f"{user_data['login']}@github.com",
-                name=user_data.get('name') or user_data['login'],
-                provider="github"
+                name=user_data.get("name") or user_data["login"],
+                provider="github",
             )
     except Exception as e:
         logger.error(f"Error verifying GitHub token: {e}")

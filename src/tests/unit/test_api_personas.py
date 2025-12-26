@@ -18,11 +18,13 @@ def client():
     with TestClient(app) as c:
         yield c
 
+
 # Mock data behaving like Personality objects
 class MockPersonality:
     def __init__(self, name, menu_name):
         self.name = name
         self.menu_name = menu_name
+
 
 @patch("src.main.get_personalities")
 def test_get_personas(mock_get_personalities, client):

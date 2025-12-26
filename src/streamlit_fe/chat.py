@@ -23,9 +23,7 @@ ROOT_DIR = Path(__file__).parent.parent
 USER_AVATAR = str(ROOT_DIR / "rickbot_agent/media/morty.png")
 
 
-async def get_agent_response(
-    runner: Runner, prompt: str, uploaded_files: list[Any], rate_limiter: RateLimiter
-) -> None:
+async def get_agent_response(runner: Runner, prompt: str, uploaded_files: list[Any], rate_limiter: RateLimiter) -> None:
     """
     Handles user input and generates the bot's response using the Rickbot ADK agent.
     """
@@ -39,8 +37,7 @@ async def get_agent_response(
     user_message: dict[str, Any] = {"role": "user", "content": prompt}
     if uploaded_files:
         user_message["attachments"] = [
-            {"data": uploaded_file.getvalue(), "mime_type": uploaded_file.type or ""}
-            for uploaded_file in uploaded_files
+            {"data": uploaded_file.getvalue(), "mime_type": uploaded_file.type or ""} for uploaded_file in uploaded_files
         ]
     st.session_state.messages.append(user_message)
 
@@ -59,9 +56,7 @@ async def get_agent_response(
     message_parts = [Part(text=prompt)]
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            message_parts.append(
-                Part(inline_data=Blob(data=uploaded_file.getvalue(), mime_type=uploaded_file.type))
-            )
+            message_parts.append(Part(inline_data=Blob(data=uploaded_file.getvalue(), mime_type=uploaded_file.type)))
 
     new_message = Content(role="user", parts=message_parts)
 
@@ -173,9 +168,7 @@ def render_chat(rate_limiter: RateLimiter, adk_runner: Runner) -> None:
         if st.button("Clear Chat History", use_container_width=True):
             st.session_state.messages = []
             st.session_state.session_id = str(uuid.uuid4())
-            st.session_state.adk_runner = asyncio.run(
-                initialize_adk_runner(st.session_state.current_personality)
-            )
+            st.session_state.adk_runner = asyncio.run(initialize_adk_runner(st.session_state.current_personality))
             st.session_state.file_uploader_key += 1
             st.rerun()
 

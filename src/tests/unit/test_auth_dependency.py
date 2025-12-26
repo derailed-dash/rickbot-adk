@@ -24,6 +24,7 @@ async def test_verify_mock_token_valid():
     assert user.name == "Test User"
     assert user.provider == "mock"
 
+
 @pytest.mark.asyncio
 async def test_verify_mock_token_invalid_prefix():
     try:
@@ -37,6 +38,7 @@ async def test_verify_mock_token_invalid_prefix():
     with pytest.raises(HTTPException) as excinfo:
         await verify_token(creds)
     assert excinfo.value.status_code == 401
+
 
 @pytest.mark.asyncio
 async def test_verify_mock_token_malformed():

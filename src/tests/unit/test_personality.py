@@ -35,11 +35,13 @@ import rickbot_agent.personality as personality_module
 # Define a dummy path for testing purposes
 TEST_SCRIPT_DIR = Path("/tmp/test_rickbot_agent")
 
+
 @pytest.fixture(autouse=True)
 def mock_script_dir():
     """Mocks SCRIPT_DIR to a temporary directory for testing."""
     with patch("rickbot_agent.personality.SCRIPT_DIR", TEST_SCRIPT_DIR):
         yield
+
 
 @pytest.fixture
 def mock_personalities_yaml():
@@ -76,6 +78,7 @@ def test_get_avatar() -> None:
     expected_path = str(TEST_SCRIPT_DIR / "media/rick.png")
     assert personality_module.get_avatar("rick") == expected_path
 
+
 @patch("rickbot_agent.personality.retrieve_secret")
 @patch("os.path.exists", return_value=False)  # Simulate no local file
 def test_personality_from_secret_manager(mock_exists, mock_retrieve_secret) -> None:
@@ -95,6 +98,7 @@ def test_personality_from_secret_manager(mock_exists, mock_retrieve_secret) -> N
         mock_retrieve_secret.assert_called_once_with("test-project", "rick-system-prompt")
         assert personality.avatar == str(TEST_SCRIPT_DIR / "media/rick.png")
 
+
 @patch("os.path.exists", return_value=True)  # Simulate local file exists
 @patch("builtins.open", new_callable=mock_open, read_data="System instruction from local file.")
 def test_personality_from_local_file(mock_open_file, mock_exists) -> None:
@@ -112,6 +116,7 @@ def test_personality_from_local_file(mock_open_file, mock_exists) -> None:
     mock_open_file.assert_called_once_with(TEST_SCRIPT_DIR / "data/system_prompts/yoda.txt", encoding="utf-8")
     assert personality.avatar == str(TEST_SCRIPT_DIR / "media/yoda.png")
 
+
 @patch("os.path.exists", return_value=False)
 def test_personality_no_google_project_env_var(mock_exists) -> None:
     """Tests ValueError when GOOGLE_CLOUD_PROJECT is not set and local file is not found."""
@@ -126,6 +131,7 @@ def test_personality_no_google_project_env_var(mock_exists) -> None:
                 prompt_question="What's up, Morty?",
                 temperature=0.7,
             )
+
 
 @patch("rickbot_agent.personality.retrieve_secret", side_effect=Exception("Secret Manager error"))
 @patch("os.path.exists", return_value=False)
@@ -143,6 +149,7 @@ def test_personality_secret_retrieval_exception(mock_exists, mock_retrieve_secre
             temperature=0.7,
         )
         assert "DUMMY PROMPT FOR TESTING" in personality.system_instruction
+
 
 @patch("rickbot_agent.personality.retrieve_secret", return_value="Mocked secret content")
 @patch("os.path.exists", return_value=False)  # Ensure it tries to get from secret manager
@@ -168,7 +175,7 @@ def test_load_personalities(mock_exists, mock_retrieve_secret) -> None:
     with patch("builtins.open", mock_open(read_data=mock_yaml_content)) as mocked_file_open:
         # We need to ensure that the yaml load reads the right structure
         # The code expects a dictionary keyed by name from YAML, or list?
-        # Let's check personalities.yaml structure. It is a dictionary in the real file? 
+        # Let's check personalities.yaml structure. It is a dictionary in the real file?
         # Actually in test_personality.py fixture it was a list: "- name: Rick"
         # Im checking personalities.yaml in the file list earlier...
         # Wait - I should strictly match what the real code expects.
@@ -177,9 +184,7 @@ def test_load_personalities(mock_exists, mock_retrieve_secret) -> None:
         # Let's assume list for now as per previous fixture, but let's check the code:
         # personality_module._load_personalities returns a dict.
 
-        personalities = personality_module._load_personalities(
-            str(TEST_SCRIPT_DIR / "data/personalities.yaml")
-        )
+        personalities = personality_module._load_personalities(str(TEST_SCRIPT_DIR / "data/personalities.yaml"))
         assert "Rick" in personalities
         assert "Yoda" in personalities
         assert personalities["Rick"].name == "Rick"
@@ -187,6 +192,7 @@ def test_load_personalities(mock_exists, mock_retrieve_secret) -> None:
         assert personalities["Rick"].temperature == 0.7
         assert personalities["Yoda"].temperature == 0.5
         mocked_file_open.assert_called_once_with(str(TEST_SCRIPT_DIR / "data/personalities.yaml"), encoding="utf-8")
+
 
 @patch("rickbot_agent.personality._load_personalities")
 def test_get_personalities_caching(mock_load_personalities) -> None:

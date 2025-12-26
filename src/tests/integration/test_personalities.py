@@ -15,6 +15,7 @@ from rickbot_agent.agent import get_agent
 # which would trigger credential loading before conftest.py sets the Test Mode env var.
 KNOWN_PERSONALITIES = ["Rick", "Yoda", "Donald", "Yasmin", "Jack", "Dazbo"]
 
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("personality_name", KNOWN_PERSONALITIES)
 # The @tenacity.retry decorator is used to automatically retry the test if it

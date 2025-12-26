@@ -26,7 +26,7 @@ from collections.abc import AsyncGenerator
 from os import getenv
 from typing import Annotated
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -35,8 +35,7 @@ from google.genai.types import Blob, Content, Part
 from pydantic import BaseModel
 
 # Load environment variables from .env file
-load_dotenv()
-
+# load_dotenv()
 from rickbot_agent.agent import get_agent
 from rickbot_agent.auth import verify_token
 from rickbot_agent.auth_models import AuthUser
@@ -89,6 +88,7 @@ def get_personas(user: AuthUser = Depends(verify_token)) -> list[Persona]:
         for p in personalities.values()
     ]
 
+
 # Initialize services and runner on startup
 logger.debug("Initialising services...")
 session_service = get_session_service()
@@ -104,21 +104,19 @@ async def chat(
     file: UploadFile | None = None,
 ) -> ChatResponse:
     """Chat endpoint to interact with the Rickbot agent."""
-    user_id = user.email # Use email as user_id for ADK sessions
-    logger.debug(f"Received chat request - "
-                 f"Personality: {personality}, User: {user.email}, Session ID: {session_id if session_id else 'None'}")
+    user_id = user.email  # Use email as user_id for ADK sessions
+    logger.debug(
+        f"Received chat request - "
+        f"Personality: {personality}, User: {user.email}, Session ID: {session_id if session_id else 'None'}"
+    )
 
     current_session_id = session_id if session_id else str(uuid.uuid4())
 
     # Get the session, or create it if it doesn't exist
-    session = await session_service.get_session(
-        session_id=current_session_id, user_id=user_id, app_name=APP_NAME
-    )
+    session = await session_service.get_session(session_id=current_session_id, user_id=user_id, app_name=APP_NAME)
     if not session:
         logger.debug(f"Creating new session: {current_session_id}")
-        session = await session_service.create_session(
-            session_id=current_session_id, user_id=user_id, app_name=APP_NAME
-        )
+        session = await session_service.create_session(session_id=current_session_id, user_id=user_id, app_name=APP_NAME)
     else:
         logger.debug(f"Found existing session: {current_session_id}")
 
@@ -161,7 +159,7 @@ async def chat(
         if event.is_final_response() and event.content and event.content.parts:
             for part in event.content.parts:
                 if part.text:
-                    final_msg += part.text 
+                    final_msg += part.text
                 elif part.inline_data:  # Check for other types of parts (e.g., images)
                     response_attachments.append(part)
 
@@ -184,21 +182,19 @@ async def chat_stream(
     file: UploadFile | None = None,
 ) -> StreamingResponse:
     """Streaming chat endpoint to interact with the Rickbot agent."""
-    user_id = user.email # Use email as user_id for ADK sessions
-    logger.debug(f"Received chat stream request - "
-                 f"Personality: {personality}, User: {user.email}, Session ID: {session_id if session_id else 'None'}")
+    user_id = user.email  # Use email as user_id for ADK sessions
+    logger.debug(
+        f"Received chat stream request - "
+        f"Personality: {personality}, User: {user.email}, Session ID: {session_id if session_id else 'None'}"
+    )
 
     current_session_id = session_id if session_id else str(uuid.uuid4())
 
     # Get the session, or create it if it doesn't exist
-    session = await session_service.get_session(
-        session_id=current_session_id, user_id=user_id, app_name=APP_NAME
-    )
+    session = await session_service.get_session(session_id=current_session_id, user_id=user_id, app_name=APP_NAME)
     if not session:
         logger.debug(f"Creating new session: {current_session_id}")
-        session = await session_service.create_session(
-            session_id=current_session_id, user_id=user_id, app_name=APP_NAME
-        )
+        session = await session_service.create_session(session_id=current_session_id, user_id=user_id, app_name=APP_NAME)
     else:
         logger.debug(f"Found existing session: {current_session_id}")
 
@@ -238,15 +234,14 @@ async def chat_stream(
             session_id=current_session_id,
             new_message=new_message,
         ):
-             # For model responses, we want to stream the chunks
-             # If `event` has text, we send it.
-             if event.content and event.content.parts:
+            # For model responses, we want to stream the chunks
+            # If `event` has text, we send it.
+            if event.content and event.content.parts:
                 for part in event.content.parts:
                     if part.text:
                         yield f"data: {json.dumps({'chunk': part.text})}\n\n"
 
         yield f"data: {json.dumps({'done': True})}\n\n"
-
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 

@@ -70,12 +70,11 @@ select = [
     "UP", # pyupgrade
     "RUF", # ruff specific rules
 ]
-# ignore line too long, too complex, two blank lines, trailing whitespace 
-ignore = ["C901", "E302", "W291", "B008"]
-
-[tool.ruff.lint.per-file-ignores]
-"src/main.py" = ["E402"]
-"src/tests/*" = ["E402"]
+# B008: Do not perform function call `Depends` in argument defaults. Required for FastAPI.
+# C901: Function is too complex. Ignoring for now to allow complex logic in auth and chat.
+# W291: Trailing whitespace. Ignoring to allow trailing whitespace in multiline strings (e.g. app.py).
+# E302: Expected 2 blank lines, found 1.
+ignore = ["B008", "C901", "W291", "E302"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]

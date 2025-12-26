@@ -33,6 +33,7 @@ search_agent = Agent(
     tools=[google_search],
 )
 
+
 def create_agent(personality: Personality) -> Agent:
     """Creates and returns an agent with the given personality."""
     logger.debug(f"Creating agent for personality: {personality.name}")
@@ -46,11 +47,10 @@ def create_agent(personality: Personality) -> Agent:
         model=config.model,
         instruction=instruction,
         tools=[AgentTool(agent=search_agent)],
-        generate_content_config=GenerateContentConfig(
-            temperature=personality.temperature, top_p=1, max_output_tokens=8192
-        ),
-        output_key="last_turn_response"
+        generate_content_config=GenerateContentConfig(temperature=personality.temperature, top_p=1, max_output_tokens=8192),
+        output_key="last_turn_response",
     )
+
 
 @functools.cache
 def _get_cached_agent_for_personality(personality: Personality) -> Agent:
@@ -60,6 +60,7 @@ def _get_cached_agent_for_personality(personality: Personality) -> Agent:
     """
     logger.info(f"Lazily creating and caching agent for personality: {personality.name}")
     return create_agent(personality)
+
 
 def get_agent(personality_name: str) -> Agent:
     """
@@ -77,6 +78,7 @@ def get_agent(personality_name: str) -> Agent:
 
     # Call the cached helper function
     return _get_cached_agent_for_personality(personality)
+
 
 # For backwards compatibility or direct access if needed, though get_agent is preferred.
 # root_agent = get_agent("Rick") # REMOVED to avoid side-effects at import time

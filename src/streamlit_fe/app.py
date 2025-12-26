@@ -41,9 +41,7 @@ def render_login_screen(mock_user: bool = False, mock_user_email: str | None = N
         Chat with Rick or other personalities, ask your questions, and feel free to upload content as part of your discussion.
         """
     )
-    st.markdown(
-        ":eyes: We do not store any user data, prompts or responses. Read our [Privacy Policy](/privacy_policy)."
-    )
+    st.markdown(":eyes: We do not store any user data, prompts or responses. Read our [Privacy Policy](/privacy_policy).")
     st.divider()
     if mock_user:
         st.markdown(":lock: Click to start your mock session.")

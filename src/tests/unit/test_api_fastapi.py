@@ -1,6 +1,7 @@
-import sys
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
 
@@ -13,68 +14,62 @@ class MockPart(BaseModel):
     def from_text(cls, text):
         return cls(text=text)
 
-import pytest
-from fastapi.testclient import TestClient
-
 
 @pytest.fixture
 def client():
-    # Mock config
-    mock_config = MagicMock()
-    mock_config.agent_name = "test_agent"
-    mock_config.model = "test_model"
-    mock_logger = MagicMock()
+    # Helper to mock Runner
+    mock_runner = MagicMock()
 
-    # Patch modules
-    with patch.dict(sys.modules, {
-        "google.auth": MagicMock(),
-        "google.cloud": MagicMock(),
-        "google.cloud.secretmanager": MagicMock(),
-        "rickbot_utils.config": MagicMock(config=mock_config, logger=mock_logger),
-        "rickbot_agent.agent": MagicMock(),
-        "rickbot_agent.services": MagicMock(),
-        "google.adk.runners": MagicMock(),
-        "google.genai.types": MagicMock(Part=MockPart, Content=MagicMock, Blob=MagicMock),
-    }):
-        from google.adk.runners import Runner
+    # Patch the GLOBAL session_service in src.main which is already initialized
+    # We must patch the OBJECT, not the module factory function, because the module is already loaded.
+    # However, since we just need it to work during the test, patching the symbol in src.main is enough?
+    # No, src.main.session_service is assigned at import time.
+    # To mock it, we should patch "src.main.session_service" directly.
 
-        from rickbot_agent.services import get_session_service
+    # Mock session service
+    mock_session_service = AsyncMock()
+    mock_session = MagicMock()
+    mock_session_service.get_session.return_value = mock_session
+    mock_session_service.create_session.return_value = mock_session
 
-        # Mock session service
-        mock_session_service = AsyncMock()
-        mock_session = MagicMock()
-        mock_session_service.get_session.return_value = mock_session
-        mock_session_service.create_session.return_value = mock_session
-        get_session_service.return_value = mock_session_service
-
-        # Mock runner
-        mock_runner = MagicMock()
-        Runner.return_value = mock_runner  # type: ignore
-
-        # Helper to mock run_async on the runner instance
-        async def mock_run_async(*args, **kwargs):
-             yield MagicMock() # default yield
-
-        mock_runner.run_async = mock_run_async
-
-        from rickbot_agent.auth import verify_token
+    # Use patch context managers for specific targets in src.main where they are imported
+    with (
+        patch("src.main.get_agent", return_value=MagicMock()),
+        patch("src.main.Runner", return_value=mock_runner),
+        patch("src.main.session_service", new=mock_session_service),
+        patch("src.main.artifact_service"),
+    ):
+        # Mock Auth User
         from rickbot_agent.auth_models import AuthUser
+
+        mock_user = AuthUser(id="test_id", email="test@example.com", name="Test User", provider="mock")
+        # We can't override dependency_overrides easily inside valid importing context if app is top-level
+        # But we can patch the verify_token function to return our user
+        # Note: Depends(verify_token) calls verify_token(creds)
+        # However, FastAPI dependencies are simpler to override via app.dependency_overrides if verify_token is the dependency
+
+        # But wait, verify_token takes creds.
+        # For unit testing the endpoint logic (bypassing auth), dependency_overrides is best.
+        # But here we are patched.
+
+        # Use the REAL verify_token function as the key for dependency overrides
+        # We need to import it from where it's defined or where src.main imported it from UNPATCHED
+        from rickbot_agent.auth import verify_token
         from src.main import app
 
-        # Mock Auth
-        mock_user = AuthUser(id="test_id", email="test@example.com", name="Test User", provider="mock")
+        # Override the dependency
         app.dependency_overrides[verify_token] = lambda: mock_user
 
-        # We define a custom client fixture that yields the client
-        # This ensures app is imported within the patch context
         with TestClient(app) as c:
-             yield c, mock_runner
+            yield c, mock_runner
+
 
 def test_read_root(client):
     c, _ = client
     response = c.get("/")
     assert response.status_code == 200
     assert response.json() == {"Hello": "World"}
+
 
 def test_chat_endpoint(client):
     c, mock_runner = client
@@ -88,38 +83,35 @@ def test_chat_endpoint(client):
 
     mock_runner.run_async = mock_run_async
 
-    response = c.post(
-        "/chat",
-        data={"prompt": "Hello", "personality": "Rick", "user_id": "test_user"}
-    )
+    response = c.post("/chat", data={"prompt": "Hello", "personality": "Rick", "user_id": "test_user"})
     assert response.status_code == 200
     data = response.json()
     assert data["response"] == "Hello from Rick"
     assert "session_id" in data
+
 
 def test_chat_stream_endpoint(client):
     c, mock_runner = client
 
     # Mock runner.run_async to yield events
     async def mock_run_async(*args, **kwargs):
-        event = MagicMock()
-        event.is_model_response.return_value = True
-        part = MockPart(text="Chunk 1")
-        event.content.parts = [part]
-        yield event
+        # We need to mimic the event structure src/main.py expects
+        # event.content.parts -> part.text
 
+        # Chunk 1
+        event1 = MagicMock()
+        # The code checks: if event.content and event.content.parts:
+        event1.content.parts = [MockPart(text="Chunk 1")]
+        yield event1
+
+        # Chunk 2
         event2 = MagicMock()
-        event2.is_model_response.return_value = True
-        part2 = MockPart(text="Chunk 2")
-        event2.content.parts = [part2]
+        event2.content.parts = [MockPart(text="Chunk 2")]
         yield event2
 
     mock_runner.run_async = mock_run_async
 
-    response = c.post(
-        "/chat_stream",
-        data={"prompt": "Hello", "personality": "Rick", "user_id": "test_user"}
-    )
+    response = c.post("/chat_stream", data={"prompt": "Hello", "personality": "Rick", "user_id": "test_user"})
     assert response.status_code == 200
     # Check streaming content
     content = response.content.decode("utf-8")
