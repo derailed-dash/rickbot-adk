@@ -70,8 +70,11 @@ select = [
     "UP", # pyupgrade
     "RUF", # ruff specific rules
 ]
-# ignore line too long, too complex, two blank lines, trailing whitespace 
-ignore = ["C901", "E302", "W291"]
+# B008: Do not perform function call `Depends` in argument defaults. Required for FastAPI.
+# C901: Function is too complex. Ignoring for now to allow complex logic in auth and chat.
+# W291: Trailing whitespace. Ignoring to allow trailing whitespace in multiline strings (e.g. app.py).
+# E302: Expected 2 blank lines, found 1.
+ignore = ["B008", "C901", "W291", "E302"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]
@@ -92,11 +95,11 @@ ignore_missing_imports = true      # Suppress errors about unresolved imports.
 explicit_package_bases = true      # Enforce explicit declaration of package bases.
 disable_error_code = ["misc", "no-any-return", "no-untyped-def"]
 
-exclude = [".venv"]
+exclude = [".venv", "node_modules", "src/nextjs_fe"]
 
 [tool.codespell]
 ignore-words-list = "rouge"
-skip = "./locust_env/*,uv.lock,.venv,./src/frontend,**/*.ipynb"
+skip = "./locust_env/*,uv.lock,.venv,./src/frontend,**/*.ipynb,**/node_modules,**/.next,./src/nextjs_fe/out,**/*.excalidraw,**/package-lock.json"
 
 
 [build-system]

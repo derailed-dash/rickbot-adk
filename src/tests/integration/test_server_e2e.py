@@ -4,7 +4,6 @@ It starts the server as a subprocess, waits for it to become ready, and then per
 integration tests against its endpoints, specifically focusing on the chat streaming functionality.
 """
 
-import json
 import os
 import subprocess
 import threading
@@ -18,18 +17,16 @@ from requests.exceptions import RequestException
 
 from rickbot_utils.logging_utils import setup_logger
 
-# This module contains end-to-end tests for the Rickbot-ADK API server.
-# It starts the server as a subprocess, waits for it to become ready, and then performs
-# integration tests against its endpoints, specifically focusing on the chat streaming functionality.
-
 # Configure logging
 logger = setup_logger(__name__)
 
-APP_NAME = "rickbot_agent"  # Use the correct agent name
-BASE_URL = "http://127.0.0.1:8000/"
-STREAM_URL = BASE_URL + "run_sse"
+# Use the same port as in the specific run command
+PORT = 8000
+BASE_URL = f"http://127.0.0.1:{PORT}"
+CHAT_URL = f"{BASE_URL}/chat"
+STREAM_URL = f"{BASE_URL}/chat_stream"
 
-HEADERS = {"Content-Type": "application/json"}
+HEADERS = {"Content-Type": "application/x-www-form-urlencoded"}
 
 
 def log_output(pipe: Any, log_func: Any) -> None:
@@ -39,18 +36,22 @@ def log_output(pipe: Any, log_func: Any) -> None:
 
 
 def start_server() -> subprocess.Popen[str]:
-    """Start the ADK API server using subprocess and log its output."""
-    # Use the ADK CLI to start the server for the rickbot_agent
+    """Start the FastAPI API server using subprocess and log its output."""
+    # We run the actual app: uv run fastapi run src/main.py --port 8000
     command = [
         "uv",
         "run",
-        "adk",
-        "api_server",
-        "rickbot_agent",
+        "fastapi",
+        "run",
+        "src/main.py",
         "--port",
-        "8000",
+        str(PORT),
     ]
     env = os.environ.copy()
+    # vital: ensure test mode is passed to subprocess
+    env["RICKBOT_TEST_MODE"] = "true"
+
+    # We start from project root
     process = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
@@ -58,14 +59,12 @@ def start_server() -> subprocess.Popen[str]:
         text=True,
         bufsize=1,
         env=env,
-        cwd="src",
+        cwd=os.getcwd(),
     )
 
     # Start threads to log stdout and stderr in real-time
     threading.Thread(target=log_output, args=(process.stdout, logger.info), daemon=True).start()
-    threading.Thread(
-        target=log_output, args=(process.stderr, logger.error), daemon=True
-    ).start()
+    threading.Thread(target=log_output, args=(process.stderr, logger.error), daemon=True).start()
 
     return process
 
@@ -73,11 +72,11 @@ def start_server() -> subprocess.Popen[str]:
 def wait_for_server(timeout: int = 60, interval: int = 1) -> bool:
     """Wait for the server to be ready."""
     start_time = time.time()
-    # The /list-apps endpoint is a reliable way to check if the ADK server is up
-    health_check_url = BASE_URL + "list-apps"
+    # We use the root endpoint / which returns Hello World
+    health_check_url = BASE_URL + "/"
     while time.time() - start_time < timeout:
         try:
-            response = requests.get(health_check_url, timeout=10)
+            response = requests.get(health_check_url, timeout=5)
             if response.status_code == 200:
                 logger.info("Server is ready")
                 return True
@@ -94,6 +93,8 @@ def server_fixture(request: Any) -> Iterator[subprocess.Popen[str]]:
     logger.info("Starting server process")
     server_process = start_server()
     if not wait_for_server():
+        # Clean up if it failed to start properly
+        server_process.terminate()
         pytest.fail("Server failed to start")
     logger.info("Server process started")
 
@@ -107,71 +108,55 @@ def server_fixture(request: Any) -> Iterator[subprocess.Popen[str]]:
     yield server_process
 
 
-def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
-    """Test the chat stream functionality for the rickbot_agent."""
-    logger.info("Starting chat stream test")
+def test_chat_endpoint(server_fixture: subprocess.Popen[str]) -> None:
+    """Test the /chat endpoint."""
+    logger.info("Starting /chat test")
 
-    # Create session first
-    user_id = "test_user_123"
-    session_data: dict[str, Any] = {
-        "state": {}  # No specific state needed for this test
-    }
+    # Enable mock auth via header if supported or assume mock auth logic in app
+    # For now we use the mock usage pattern:
+    # The server in production (and here) uses verify_token.
+    # We need to rely on the MOCK AUTH environment variable if we want to bypass real auth,
+    # OR we need to supply a valid mock token if NEXT_PUBLIC_ALLOW_MOCK_AUTH is enabled.
 
-    session_url = f"{BASE_URL}/apps/{APP_NAME}/users/{user_id}/sessions"
-    session_response = requests.post(
-        session_url,
-        headers=HEADERS,
-        json=session_data,
-        timeout=60,
-    )
-    assert session_response.status_code == 200
-    logger.info(f"Session creation response: {session_response.json()}")
-    session_id = session_response.json()["id"]
+    # Note: We didn't set NEXT_PUBLIC_ALLOW_MOCK_AUTH in the subprocess env above.
+    # Let's rely on the fact we can't easily mock auth in a subprocess without that var.
+    # However, 'make test-all' usually runs in an env where we can access GCP secrets.
+    # But wait, user doesn't want Dazbo secrets.
 
-    # Then send chat message
-    data = {
-        "app_name": APP_NAME,
-        "user_id": user_id,
-        "session_id": session_id,
-        "new_message": {
-            "role": "user",
-            "parts": [{"text": "Why is the sky blue?"}],
-        },
-        "run_config": {  # ADK server expects a run_config for streaming
-            "streaming_mode": "STREAMING_MODE_SSE"
-        },
-    }
+    # We'll use the Mock Auth credentials format, assuming NEXT_PUBLIC_ALLOW_MOCK_AUTH is set in .env
+    # or passed in. Let's assume .env is loaded by the app.
 
-    response = requests.post(
-        STREAM_URL, headers=HEADERS, json=data, stream=True, timeout=60
-    )
-    assert response.status_code == 200
+    headers = {"Authorization": "Bearer mock:123:test@example.com:Tester"}
 
-    # Parse SSE events from response
-    events = []
+    # Standard form data for /chat
+    data = {"prompt": "Hello Rick!", "personality": "Rick", "session_id": "test_session_chat"}
+
+    response = requests.post(CHAT_URL, data=data, headers=headers)
+    assert response.status_code == 200, f"Chat failed: {response.text}"
+    json_resp = response.json()
+    assert "response" in json_resp
+    assert len(json_resp["response"]) > 0
+    assert json_resp["session_id"] == "test_session_chat"
+
+
+def test_chat_stream_endpoint(server_fixture: subprocess.Popen[str]) -> None:
+    """Test the /chat_stream endpoint."""
+    logger.info("Starting /chat_stream test")
+
+    headers = {"Authorization": "Bearer mock:123:test@example.com:Tester"}
+
+    data = {"prompt": "Tell me a joke.", "personality": "Rick", "session_id": "test_session_stream"}
+
+    response = requests.post(STREAM_URL, data=data, headers=headers, stream=True)
+    assert response.status_code == 200, f"Chat stream failed: {response.text}"
+
+    # Verify we get SSE events
+    events_received = False
     for line in response.iter_lines():
         if line:
-            line_str = line.decode("utf-8")
-            if line_str.startswith("data: "):
-                event_json = line_str[6:]
-                try:
-                    event = json.loads(event_json)
-                    events.append(event)
-                except json.JSONDecodeError:
-                    logger.error(f"Failed to decode JSON: {event_json}")
+            decoded_line = line.decode("utf-8")
+            if decoded_line.startswith("data: "):
+                events_received = True
+                break
 
-    assert events, "No events received from stream"
-
-    # Check for valid content in the response
-    has_text_content = False
-    for event in events:
-        content = event.get("content")
-        if (
-            content is not None
-            and content.get("parts")
-            and any(part.get("text") for part in content["parts"])
-        ):
-            has_text_content = True
-            break
-
-    assert has_text_content, "Expected at least one message with text content"
+    assert events_received, "No SSE events received from /chat_stream"

@@ -18,8 +18,8 @@ graph TD
     User([User])
     
     subgraph "Interfaces"
-        Streamlit[Streamlit UI\n(Existing)]
-        React[React/Next.js UI\n(Planned)]
+        Streamlit[Streamlit UI\n(Prototype)]
+        React[React/Next.js UI\n(Primary)]
     end
     
     subgraph "Google Cloud Platform"
@@ -66,7 +66,7 @@ graph TD
     *   **FastAPI**: Powers the backend API, exposing RESTful endpoints.
 *   **Frontend**:
     *   **Streamlit**: Powers the current frontend user interface for rapid prototyping.
-    *   **Next.js / React (Planned)**: The framework for the future modern UI.
+    *   **Next.js / React (Primary)**: The modern, material-design chat interface located in `src/nextjs_fe`.
 *   **Auth**:
     *   **Google Auth Platform**: Handles OAuth 2.0 authentication for users.
 *   **Data, Infrastructure & Tools**:
@@ -102,7 +102,7 @@ graph TD
 
 The application supports multiple distinct interfaces, all interacting with the core agent logic.
 
-### Streamlit UI (Existing)
+### Streamlit UI
 
 The original user interface for rapid prototyping and demonstration. 
 This UI is defined in `src/streamlit_fe/app.py` and can be launched with `make streamlit`.
@@ -128,16 +128,18 @@ The application is designed to ensure a clean and robust separation of context w
 
 This approach ensures that each personality operates in a clean, isolated environment. It is a simple and robust pattern that aligns well with Streamlit's execution model, prioritizing a predictable state over the premature optimization of object re-creation.
 
-### React/Next.js UI (Planned)
+### React/Next.js UI
 
-The future "North Star" interface for Rickbot.
-*   **Technology**: TypeScript, React, Next.js, Material UI.
+The modern, production-grade interface for Rickbot, located in `src/nextjs_fe`.
+
+*   **Technology**: TypeScript, React, Next.js, Material UI (MUI).
 *   **Architecture**: Client-side application consuming the **FastAPI Backend**.
-*   **Planned Features**:
+*   **Features**:
     *   **Modern UX**: Enhanced aesthetics and responsiveness using Material UI (MUI).
-    *   **Advanced Chat**: Richer message formatting and potential support for multimodal inputs (audio/video).
-    *   **Optimized Performance**: leveraging Next.js server-side rendering (SSR) and static generation where appropriate.
-    *   **Independent Auth**: Will implement its own OAuth flow (Google Identities) or use a sidecar pattern.
+    *   **Dynamic Configuration**: Fetches available personalities dynamically from the backend (`/personas` endpoint), ensuring the UI is always in sync with the agent configuration.
+    *   **Real-time Interaction**: Uses Server-Sent Events (SSE) via the `/chat_stream` endpoint for a responsive, streaming chat experience.
+    *   **Multimodal Support**: Supports file uploads (images, text) alongside chat messages.
+    *   **Independent Auth**: Implements its own OAuth flow.
 
 ### API Backend
 
@@ -147,6 +149,7 @@ The central nervous system of the application. It is the primary entrypoint to t
 *   **Role**: Exposes the ADK agent as a set of RESTful endpoints.
 *   **Capabilities**:
     *   Stateless/Stateful conversation handling (via ADK).
+    *   **Dynamic Configuration**: Exposes `/personas` endpoint to drive UI configuration.
     *   Swagger/OpenAPI documentation auto-generation.
     *   Serves as the single source of truth for agent logic for all connected UIs.
 
@@ -156,9 +159,30 @@ Frontend user authentication is required for Rickbot.
 
 #### OAuth with Streamlit
 
-- With the Streamlit frontend this is achieved using Streamlit\'s integrated OIDC authentication. 
+- With the Streamlit frontend this is achieved using Streamlit's integrated OIDC authentication. 
 - We use Google Auth Platform as the OAuth2 Auth provider.
 - OAuth credentials are obtained from the Google Auth Platform and stored in Google Secret Manager.
-- When the application is first launched, these credentials are read and dynamically written to the `.streamlit/secrets.toml`, which is how the Streamlit OIDC works. We must supply the `oauth2callback` URI as well as the OAuth client ID and secret.
+- When the application is first launched, these credentials are read and dynamically written to the `.streamlit/secrets.toml`, which is how the Streamlit OIDC works. We must provide the `oauth2callback` URI as well as the OAuth client ID and secret.
 - Different credentials are used between Staging and Prod.
 - When running locally we use an environment variable `MOCK_AUTH_USER` to bypass real authentication. This is automatically set by `make streamlit`.
+
+#### OAuth with Next.js
+
+- **Framework**: **NextAuth.js**.
+- **Rationale**: NextAuth.js is the standard authentication solution for Next.js applications. It abstracts the complexity of OAuth flows, session management, and secure cookie handling. It supports multiple providers out-of-the-box and is highly extensible.
+- **Implementation**:
+    - **Frontend (Next.js)**: 
+        - Configured with `GoogleProvider` and `GitHubProvider` for external authentication.
+        - Uses a custom `CredentialsProvider` for a "Mock Login" flow during local development, enabling offline testing.
+        - Session state is managed via secure HTTP-only cookies encrypted with `NEXTAUTH_SECRET`.
+        - The `useSession` hook provides reactive access to user state in React components.
+    - **Backend (FastAPI)**:
+        - The backend is stateless regarding authentication but enforces authorization.
+        - Endpoints are secured using `HTTPBearer` dependency.
+        - It validates the tokens passed by the frontend:
+            - **Google Tokens**: Verified using `google-auth` library against the Google ID Token issuer.
+            - **GitHub Tokens**: Verified by calling the GitHub User API.
+            - **Mock Tokens**: Verified by parsing a custom mock token format (enabled only in dev environments).
+- **Configuration**:
+    - **Local Development**: OAuth credentials (Client ID/Secret) are loaded from `.env.local`.
+    - **Production**: Credentials are securely fetched from **Google Secret Manager** and injected as environment variables into the Cloud Run container.

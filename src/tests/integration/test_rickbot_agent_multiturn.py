@@ -12,7 +12,7 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import errors
 from google.genai import types as genai_types
 
-from rickbot_agent.agent import root_agent
+from rickbot_agent.agent import get_agent
 
 APP_NAME = "test_rickbot"
 
@@ -35,18 +35,15 @@ APP_NAME = "test_rickbot"
 async def test_rickbot_agent_response():
     """Tests that the rickbot agent returns a non-empty response."""
     session_service = InMemorySessionService()
-    await session_service.create_session(
-        app_name=APP_NAME, user_id="test_user", session_id="test_session"
-    )
-    runner = Runner(agent=root_agent, app_name=APP_NAME, session_service=session_service)
+    await session_service.create_session(app_name=APP_NAME, user_id="test_user", session_id="test_session")
+    agent = get_agent("Rick")
+    runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_service)
     query = "What is the meaning of life?"
     response_text: str | None = ""
     async for event in runner.run_async(
         user_id="test_user",
         session_id="test_session",
-        new_message=genai_types.Content(
-            role="user", parts=[genai_types.Part.from_text(text=query)]
-        ),
+        new_message=genai_types.Content(role="user", parts=[genai_types.Part.from_text(text=query)]),
     ):
         if event.is_final_response():
             if event.content and event.content.parts and len(event.content.parts) > 0:
@@ -83,10 +80,9 @@ async def test_rickbot_agent_two_turn_conversation():
     (the user's name) and use it in the second turn to answer a question.
     """
     session_service = InMemorySessionService()
-    await session_service.create_session(
-        app_name=APP_NAME, user_id="test_user", session_id="test_session"
-    )
-    runner = Runner(agent=root_agent, app_name=APP_NAME, session_service=session_service)
+    await session_service.create_session(app_name=APP_NAME, user_id="test_user", session_id="test_session")
+    agent = get_agent("Rick")
+    runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_service)
     queries = ["Hello, my name is Dazbo", "What is my name?"]
     responses = []
     for query in queries:
@@ -101,11 +97,7 @@ async def test_rickbot_agent_two_turn_conversation():
             ),
         ):
             if event.is_final_response():
-                if (
-                    event.content
-                    and event.content.parts
-                    and len(event.content.parts) > 0
-                ):
+                if event.content and event.content.parts and len(event.content.parts) > 0:
                     response_text = event.content.parts[0].text
                     print(f"Response: {response_text}")
                 else:

@@ -13,6 +13,7 @@ app_name = os.environ.setdefault("APP_NAME", "rickbot_st_ui")
 
 logger = setup_logger(app_name)
 
+
 @dataclass
 class Config:
     """Configuration for the application, loaded from environment variables."""
@@ -21,6 +22,7 @@ class Config:
     google_project_id: str  # used for Google Auth
     auth_required: bool
     rate_limit_qpm: int  # queries per minute
+
 
 @st.cache_resource
 def get_config() -> Config:
@@ -40,5 +42,6 @@ def get_config() -> Config:
         auth_required=auth_required,
         rate_limit_qpm=rate_limit,
     )
+
 
 config = get_config()

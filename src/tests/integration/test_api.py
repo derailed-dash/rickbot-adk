@@ -40,6 +40,8 @@ from google.genai import errors
 from src.main import app
 
 client = TestClient(app)
+MOCK_TOKEN = "mock:123:test@example.com:Tester"
+HEADERS = {"Authorization": f"Bearer {MOCK_TOKEN}"}
 
 
 class MockEvent:
@@ -83,6 +85,7 @@ def test_chat_endpoint_success(MockRunner):
         response = client.post(
             "/chat",
             data={"prompt": "Hello", "personality": "Rick"},
+            headers=HEADERS,
         )
 
         # Assert the response
@@ -104,6 +107,7 @@ async def test_chat_endpoint_multiturn_integration():
     response1 = client.post(
         "/chat",
         data={"prompt": "Hi, my name is Dazbo.", "personality": "Rick"},
+        headers=HEADERS,
     )
     assert response1.status_code == 200
     json_response1 = response1.json()
@@ -118,6 +122,7 @@ async def test_chat_endpoint_multiturn_integration():
             "personality": "Rick",
             "session_id": session_id,
         },
+        headers=HEADERS,
     )
     assert response2.status_code == 200
     json_response2 = response2.json()

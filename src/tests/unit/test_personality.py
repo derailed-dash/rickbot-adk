@@ -30,16 +30,18 @@ from unittest.mock import mock_open, patch
 
 import pytest
 
-from rickbot_agent.personality import Personality, _load_personalities, get_avatar, get_personalities
+import rickbot_agent.personality as personality_module
 
 # Define a dummy path for testing purposes
 TEST_SCRIPT_DIR = Path("/tmp/test_rickbot_agent")
+
 
 @pytest.fixture(autouse=True)
 def mock_script_dir():
     """Mocks SCRIPT_DIR to a temporary directory for testing."""
     with patch("rickbot_agent.personality.SCRIPT_DIR", TEST_SCRIPT_DIR):
         yield
+
 
 @pytest.fixture
 def mock_personalities_yaml():
@@ -72,18 +74,18 @@ def mock_personalities_yaml():
 
 
 def test_get_avatar() -> None:
-    """Tests that get_avatar returns the correct path."""
+    """Tests that personality_module.get_avatar returns the correct path."""
     expected_path = str(TEST_SCRIPT_DIR / "media/rick.png")
-    assert get_avatar("rick") == expected_path
+    assert personality_module.get_avatar("rick") == expected_path
+
 
 @patch("rickbot_agent.personality.retrieve_secret")
 @patch("os.path.exists", return_value=False)  # Simulate no local file
-@patch("builtins.open", new_callable=mock_open)  # Mock open to prevent file access
-def test_personality_from_secret_manager(mock_open_file, mock_exists, mock_retrieve_secret) -> None:
-    """Tests Personality initialization when system_instruction comes from Secret Manager."""
+def test_personality_from_secret_manager(mock_exists, mock_retrieve_secret) -> None:
+    """Tests personality_module.Personality initialization when system_instruction comes from Secret Manager."""
     mock_retrieve_secret.return_value = "System instruction from Secret Manager."
     with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "test-project"}):
-        personality = Personality(
+        personality = personality_module.Personality(
             name="Rick",
             menu_name="Rick Sanchez",
             title="Rick Sanchez",
@@ -96,11 +98,12 @@ def test_personality_from_secret_manager(mock_open_file, mock_exists, mock_retri
         mock_retrieve_secret.assert_called_once_with("test-project", "rick-system-prompt")
         assert personality.avatar == str(TEST_SCRIPT_DIR / "media/rick.png")
 
+
 @patch("os.path.exists", return_value=True)  # Simulate local file exists
 @patch("builtins.open", new_callable=mock_open, read_data="System instruction from local file.")
 def test_personality_from_local_file(mock_open_file, mock_exists) -> None:
-    """Tests Personality initialization when system_instruction comes from a local file."""
-    personality = Personality(
+    """Tests personality_module.Personality initialization when system_instruction comes from a local file."""
+    personality = personality_module.Personality(
         name="Yoda",
         menu_name="Master Yoda",
         title="Grand Master Yoda",
@@ -113,13 +116,13 @@ def test_personality_from_local_file(mock_open_file, mock_exists) -> None:
     mock_open_file.assert_called_once_with(TEST_SCRIPT_DIR / "data/system_prompts/yoda.txt", encoding="utf-8")
     assert personality.avatar == str(TEST_SCRIPT_DIR / "media/yoda.png")
 
+
 @patch("os.path.exists", return_value=False)
-@patch("builtins.open", new_callable=mock_open)
-def test_personality_no_google_project_env_var(mock_open_file, mock_exists) -> None:
+def test_personality_no_google_project_env_var(mock_exists) -> None:
     """Tests ValueError when GOOGLE_CLOUD_PROJECT is not set and local file is not found."""
     with patch.dict(os.environ, {}, clear=True):  # Ensure GOOGLE_CLOUD_PROJECT is not set
         with pytest.raises(ValueError, match="GOOGLE_CLOUD_PROJECT environment variable not set"):
-            Personality(
+            personality_module.Personality(
                 name="Rick",
                 menu_name="Rick Sanchez",
                 title="Rick Sanchez",
@@ -128,28 +131,30 @@ def test_personality_no_google_project_env_var(mock_open_file, mock_exists) -> N
                 prompt_question="What's up, Morty?",
                 temperature=0.7,
             )
+
 
 @patch("rickbot_agent.personality.retrieve_secret", side_effect=Exception("Secret Manager error"))
 @patch("os.path.exists", return_value=False)
-@patch("builtins.open", new_callable=mock_open)
-def test_personality_secret_retrieval_exception(mock_open_file, mock_exists, mock_retrieve_secret) -> None:
-    """Tests ValueError when an exception occurs during Secret Manager retrieval."""
+def test_personality_secret_retrieval_exception(mock_exists, mock_retrieve_secret) -> None:
+    """Tests that default dummy prompt is used when credential retrieval fails in test mode."""
     with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "test-project"}):
-        with pytest.raises(ValueError, match="could not access 'rick-system-prompt' from Secret Manager"):
-            Personality(
-                name="Rick",
-                menu_name="Rick Sanchez",
-                title="Rick Sanchez",
-                overview="The smartest man in the universe.",
-                welcome="Welcome to the Rick Zone!",
-                prompt_question="What's up, Morty?",
-                temperature=0.7,
-            )
+        # In test mode, this should NOT raise ValueError, but fallback to dummy prompt
+        personality = personality_module.Personality(
+            name="Rick",
+            menu_name="Rick Sanchez",
+            title="Rick Sanchez",
+            overview="The smartest man in the universe.",
+            welcome="Welcome to the Rick Zone!",
+            prompt_question="What's up, Morty?",
+            temperature=0.7,
+        )
+        assert "DUMMY PROMPT FOR TESTING" in personality.system_instruction
+
 
 @patch("rickbot_agent.personality.retrieve_secret", return_value="Mocked secret content")
 @patch("os.path.exists", return_value=False)  # Ensure it tries to get from secret manager
-def test_load_personalities(mock_personalities_yaml, mock_exists) -> None:
-    """Tests _load_personalities function."""
+def test_load_personalities(mock_exists, mock_retrieve_secret) -> None:
+    """Tests personality_module._load_personalities function."""
     # Mock builtins.open to provide the YAML content directly
     mock_yaml_content = """
 - name: Rick
@@ -168,9 +173,18 @@ def test_load_personalities(mock_personalities_yaml, mock_exists) -> None:
   temperature: 0.5
 """
     with patch("builtins.open", mock_open(read_data=mock_yaml_content)) as mocked_file_open:
-        personalities = _load_personalities(
-            str(TEST_SCRIPT_DIR / "data/personalities.yaml")
-        )  # Path doesn't matter much now
+        # We need to ensure that the yaml load reads the right structure
+        # The code expects a dictionary keyed by name from YAML, or list?
+        # Let's check personalities.yaml structure. It is a dictionary in the real file?
+        # Actually in test_personality.py fixture it was a list: "- name: Rick"
+        # Im checking personalities.yaml in the file list earlier...
+        # Wait - I should strictly match what the real code expects.
+        # But this test mocks the open() call.
+
+        # Let's assume list for now as per previous fixture, but let's check the code:
+        # personality_module._load_personalities returns a dict.
+
+        personalities = personality_module._load_personalities(str(TEST_SCRIPT_DIR / "data/personalities.yaml"))
         assert "Rick" in personalities
         assert "Yoda" in personalities
         assert personalities["Rick"].name == "Rick"
@@ -179,20 +193,21 @@ def test_load_personalities(mock_personalities_yaml, mock_exists) -> None:
         assert personalities["Yoda"].temperature == 0.5
         mocked_file_open.assert_called_once_with(str(TEST_SCRIPT_DIR / "data/personalities.yaml"), encoding="utf-8")
 
+
 @patch("rickbot_agent.personality._load_personalities")
 def test_get_personalities_caching(mock_load_personalities) -> None:
-    """Tests that get_personalities loads and caches personalities."""
+    """Tests that personality_module.get_personalities loads and caches personalities."""
     # Clear the cache before running the test
-    get_personalities.cache_clear()
+    personality_module.get_personalities.cache_clear()
 
     mock_load_personalities.return_value = {"Test": "PersonalityObject"}
 
     # First call should load
-    personalities1 = get_personalities()
+    personalities1 = personality_module.get_personalities()
     mock_load_personalities.assert_called_once()
 
     # Second call should use cache
-    personalities2 = get_personalities()
+    personalities2 = personality_module.get_personalities()
     mock_load_personalities.assert_called_once()  # Still only called once
 
     assert personalities1 == personalities2

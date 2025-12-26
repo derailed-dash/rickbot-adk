@@ -1,5 +1,9 @@
-# Byte-compiled / optimized / DLL files
+.next/
+node_modules/
+.venv/
 __pycache__/
+*.log
+
 *.py[cod]
 *.pyc
 *$py.class
@@ -61,7 +65,6 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -156,8 +159,6 @@ tmp*
 
 # Node
 **/node_modules
-npm-debug.log
-yarn-error.log
 
 # IDEs and editors
 .idea/
@@ -183,7 +184,6 @@ yarn-error.log
 /connect.lock
 /coverage
 /libpeerconnection.log
-testem.log
 /typings
 
 # System files

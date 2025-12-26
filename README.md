@@ -151,11 +151,127 @@ docker run --rm -p 8080:8080 \
    $SERVICE_NAME:$VERSION
 ```
 
+### Running the React UI
+
+The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to the FastAPI backend (`make api`) to provide a modern, chat-based interface.
+
+#### Prerequisites
+
+- Node.js (v18 or later)
+- Python backend running (`make api`)
+
+#### Running locally
+
+1.  **Start the Backend**:
+    In one terminal, launch the FastAPI server:
+    ```bash
+    make api
+    ```
+
+2.  **Start the Frontend**:
+    In a separate terminal, navigate to the frontend directory and start the dev server:
+    ```bash
+    cd src/nextjs_fe
+    npm install
+    npm run dev
+    ```
+
+3.  **Access the UI**:
+    Open your browser to `http://localhost:3000`.
+
+#### Key Features
+
+- **Dynamic Personas**: The UI fetches available personalities (Rick, Yoda, etc.) directly from the backend API (`/personas`).
+- **Streaming Responses**: Uses Server-Sent Events (SSE) for real-time streaming of agent responses.
+- **File Uploads**: Supports uploading images and text files for multimodal interactions.
+
 ## Application Design
 
 See [docs/design.md](docs/design.md).
 
-## Deploying Infrastructure
+### OAuth Configuration
+
+Rickbot uses OAuth for securing the application. You must configure OAuth credentials for both Google and GitHub providers. It is recommended to create separate OAuth applications for Development (Dev) and Production (Prod) environments.
+
+#### 1. Google OAuth Setup
+
+1.  Go to the [Google Cloud Console > APIs & Services > Credentials](https://console.cloud.google.com/apis/credentials).
+2.  Click **Create Credentials** > **OAuth client ID**.
+3.  Select **Web application**.
+4.  **Dev Configuration:**
+    *   **Name:** `Rickbot-ADK-Dev`
+    *   **Authorized JavaScript origins:** `http://localhost:3000`
+    *   **Authorized redirect URIs:** `http://localhost:3000/api/auth/callback/google`
+5.  **Prod Configuration:**
+    *   **Name:** `Rickbot-ADK-Prod`
+    *   **Authorized JavaScript origins:** `https://your-production-domain.com`
+    *   **Authorized redirect URIs:** `https://your-production-domain.com/api/auth/callback/google`
+6.  Copy the **Client ID** and **Client Secret** for each.
+
+#### 2. GitHub OAuth Setup
+
+1.  Go to [GitHub Developer Settings > OAuth Apps](https://github.com/settings/developers).
+2.  Click **New OAuth App**.
+3.  **Dev Configuration:**
+    *   **Application Name:** `Rickbot-ADK-Dev`
+    *   **Homepage URL:** `http://localhost:3000`
+    *   **Authorization callback URL:** `http://localhost:3000/api/auth/callback/github`
+4.  **Prod Configuration:**
+    *   **Application Name:** `Rickbot-ADK-Prod`
+    *   **Homepage URL:** `https://your-production-domain.com`
+    *   **Authorization callback URL:** `https://your-production-domain.com/api/auth/callback/github`
+5.  Register the application and generate a **Client Secret**. Copy the **Client ID** and **Client Secret**.
+
+#### 3. Environment Variables & Secret Management
+
+The project uses two separate environment configuration files to maintain separation between the Backend and Frontend.
+
+##### Root Directory: `.env` (Python Backend)
+
+This file configures the FastAPI server. Use `source scripts/setup-env.sh` to load these into your shell, or rely on `load_dotenv()` in the code.
+
+| Variable | Purpose |
+| :--- | :--- |
+| `GOOGLE_CLIENT_ID` | Required to verify Google ID Tokens sent by the frontend. |
+| `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to accept mock tokens. |
+| `GOOGLE_CLOUD_PROJECT` | Used for ADK and Secret Manager access. |
+
+##### `src/nextjs_fe/.env.local` (Next.js Frontend)
+
+This file is used exclusively by the Next.js application.
+
+| Variable | Purpose |
+| :--- | :--- |
+| `NEXTAUTH_URL` | Base URL of your app (e.g., `http://localhost:3000`). |
+| `NEXTAUTH_SECRET` | Used by NextAuth to encrypt session cookies. |
+| `GOOGLE_CLIENT_ID` / `SECRET` | Credentials for Google OAuth. |
+| `GITHUB_CLIENT_ID` / `SECRET` | Credentials for GitHub OAuth. |
+| `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Enables the "Mock Login" provider in the UI. |
+| `MOCK_AUTH_USER` | (Optional) The email address assigned to the mock user identity. |
+| `NEXT_PUBLIC_API_URL` | URL of the backend API (e.g., `http://localhost:8000`). |
+
+> **Note on `MOCK_AUTH_USER`:** This is a frontend-only convenience variable. The frontend embeds this email into the mock token it generates. The backend simply reads whatever email is inside that token (if mock auth is enabled).
+
+**Production (Cloud Run):**
+
+For production deployment, avoid embedding secrets in the container image or environment variables directly. Instead, use **Google Secret Manager**.
+
+1.  **Create Secrets:** Store your client secrets in Google Secret Manager:
+    *   `rickbot-nextauth-secret` (The random string for encryption)
+    *   `rickbot-google-client-secret`
+    *   `rickbot-github-client-secret`
+2.  **Mount Secrets:** Configure your Cloud Run service (via Terraform or Console) to mount these secrets as environment variables:
+    *   `NEXTAUTH_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-nextauth-secret/versions/latest`
+    *   `GOOGLE_CLIENT_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-google-client-secret/versions/latest`
+    *   `GITHUB_CLIENT_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-github-client-secret/versions/latest`
+
+Non-sensitive values (Client IDs, URLs) can be set as standard environment variables in the Cloud Run configuration.
+
+### DNS
+
+See [docs/design.md](docs/design.md) for details on DNS configuration.
+
+## Terraform
 
 The following commands describe how to run Terraform tasks, to deploy infrastructure. Note that I have now added a `terraform` target to my `Makefile`, so we can achieve the same result by simply running `make terraform` from the project root directory.
 

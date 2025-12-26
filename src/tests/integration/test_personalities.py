@@ -10,11 +10,14 @@ from google.genai import errors
 from google.genai.types import Content, Part
 
 from rickbot_agent.agent import get_agent
-from rickbot_agent.personality import get_personalities
+
+# Hardcode the list of known personalities to avoid executing get_personalities() during collection
+# which would trigger credential loading before conftest.py sets the Test Mode env var.
+KNOWN_PERSONALITIES = ["Rick", "Yoda", "Donald", "Yasmin", "Jack", "Dazbo"]
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("personality_name", get_personalities().keys())
+@pytest.mark.parametrize("personality_name", KNOWN_PERSONALITIES)
 # The @tenacity.retry decorator is used to automatically retry the test if it
 # fails with a `google.genai.errors.ClientError`, which typically happens
 # when the API rate limit is exceeded (429 RESOURCE_EXHAUSTED).
