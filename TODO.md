@@ -51,12 +51,10 @@
 - [x] Optimise image creation with multilayer Dockerfile
 - [x] Create new React/Next.js UI, which makes use of the FastAPI
 - [ ] Fix UI elements of the React UI
-- [ ] Implement OAuth for our API calls - Google and GitHub?
+- [x] Implement OAuth for our API calls - Google and GitHub?
 - [ ] Implement rate limiting for our API calls
 - [ ] Implement multimodal interactions with ArtifactService
-- [ ] Implement OAuth Login (Google Identities) for the React frontend, potentially as sidecar container
 - [ ] Load reference material as context to Dazbo
 - [ ] Restrict access to certain personalities.
-- [ ] Investigate adding other auth methods.
 - [ ] Ensure React UI works on mobile.
 - [ ] Add voice / live.
