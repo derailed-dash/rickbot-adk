@@ -54,6 +54,7 @@
 - [x] Implement OAuth for our API calls - Google and GitHub?
 - [ ] Implement rate limiting for our API calls
 - [ ] Implement multimodal interactions with ArtifactService
+- [ ] Investigate moving frontend to existing Cloud Run service, and deploying backend to a separate service.
 - [ ] Load reference material as context to Dazbo
 - [ ] Restrict access to certain personalities.
 - [ ] Ensure React UI works on mobile.
