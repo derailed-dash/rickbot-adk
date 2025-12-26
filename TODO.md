@@ -50,6 +50,7 @@
 - [x] Add integration tests for FastAPI
 - [x] Optimise image creation with multilayer Dockerfile
 - [x] Create new React/Next.js UI, which makes use of the FastAPI
+- [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Fix UI elements of the React UI
 - [x] Implement OAuth for our API calls - Google and GitHub?
 - [ ] Implement rate limiting for our API calls
