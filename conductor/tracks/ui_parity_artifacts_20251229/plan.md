@@ -15,7 +15,7 @@
 - [x] Task: Conductor - User Manual Verification 'Public Pages & Base UI' (Protocol in workflow.md)
 
 ## Phase 3: Tool Usage & Feedback
-- [ ] Task: Update the FastAPI response to include tool execution status.
+- [x] Task: Update the FastAPI response to include tool execution status. [52493a9]
 - [ ] Task: Update the Next.js Chat component to display "Thinking/Tool Usage" states (e.g., "Searching Google...").
 - [ ] Task: Write Tests: Component tests for tool usage status display.
 - [ ] Task: Documentation: Update `@src/tests/README.md` with new component tests for tool usage.
