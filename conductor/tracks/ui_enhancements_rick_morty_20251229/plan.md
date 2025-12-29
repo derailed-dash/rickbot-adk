@@ -15,7 +15,7 @@
 - [x] Task: Replace Plumbus icon with Mr. Meeseeks Box SVG icon. 3368c43
 - [x] Task: Conductor - User Manual Verification 'Meeseeks Box "New Chat" Icon' (Protocol in workflow.md) 3368c43
 
-## Phase 3: Animated Portal Gun Send Button
+## Phase 3: Animated Portal Gun Send Button [checkpoint: b4dc813]
 - [x] Task: Implement the Portal Gun SVG and the CSS/Framer Motion animation for the portal opening effect. 84ca67c
 - [x] Task: Integrate the animation into the `handleSendMessage` flow in `src/nextjs_fe/components/Chat.tsx`. 84ca67c
 - [x] Task: Refine Portal Animation: Match R&M aesthetic (gooey, swirling organic shapes). 84ca67c
