@@ -478,20 +478,23 @@ export default function Chat() {
                 />
                 <Button 
                     variant="contained" 
-                    endIcon={<PortalGunIcon sx={{ fontSize: 40 }} />} 
                     onClick={handleSendMessage} 
                     disabled={loading && !streamingText}
                     sx={{ 
                         height: 56,
-                        minWidth: '100px',
+                        minWidth: '120px',
                         bgcolor: '#333', 
                         color: '#fff',
                         '&:hover': {
                             bgcolor: '#444'
-                        }
+                        },
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
                     }}
                 >
                     Send
+                    <PortalGunIcon sx={{ fontSize: 48 }} />
                 </Button>
             </Box>
 
