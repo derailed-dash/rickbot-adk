@@ -6,7 +6,7 @@
 - [x] Task: Propose and document the Artifact/Media upload and retrieval architecture in `docs/design.md`.
 - [x] Task: Conductor - User Manual Verification 'Research and Architecture' (Protocol in workflow.md)
 
-## Phase 2: Public Pages & Base UI
+## Phase 2: Public Pages & Base UI [checkpoint: 17ebb49]
 - [x] Task: Create the Privacy Policy page (`/pages/privacy.tsx`) and ensure it's publicly accessible.
 - [x] Task: Link the Privacy Policy page from the Login screen and Chat Footer.
 - [x] Task: Implement the "Clear Chat" button and backend session reset logic.
