@@ -1,10 +1,10 @@
 # Implementation Plan - Next.js UI Parity & Artifacts
 
 ## Phase 1: Research and Architecture
-- [ ] Task: Research ADK Artifacts usage with FastAPI and Next.js.
-- [ ] Task: Analyze current Streamlit media handling and gaps.
-- [ ] Task: Propose and document the Artifact/Media upload and retrieval architecture in `docs/design.md`.
-- [ ] Task: Conductor - User Manual Verification 'Research and Architecture' (Protocol in workflow.md)
+- [x] Task: Research ADK Artifacts usage with FastAPI and Next.js.
+- [x] Task: Analyze current Streamlit media handling and gaps.
+- [x] Task: Propose and document the Artifact/Media upload and retrieval architecture in `docs/design.md`.
+- [x] Task: Conductor - User Manual Verification 'Research and Architecture' (Protocol in workflow.md)
 
 ## Phase 2: Public Pages & Base UI
 - [ ] Task: Create the Privacy Policy page (`/pages/privacy.tsx`) and ensure it's publicly accessible.
