@@ -23,3 +23,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: UI Enhancements: Rick and Morty Aesthetic
 *Link: [./conductor/archive/ui_enhancements_rick_morty_20251229/](./conductor/archive/ui_enhancements_rick_morty_20251229/)*
+
+---
+
+## [~] Track: UI Refinements: Enhanced Layout & Assets
+*Link: [./conductor/tracks/ui_refinements_layout_assets_20251229/](./conductor/tracks/ui_refinements_layout_assets_20251229/)*
