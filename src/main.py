@@ -156,6 +156,13 @@ async def chat(
         session_id=current_session_id,
         new_message=new_message,
     ):
+        # Log tool calls and transfers
+        if function_calls := event.get_function_calls():
+            for fc in function_calls:
+                logger.info(f"Session {current_session_id} calling tool: {fc.name}")
+        if event.actions and event.actions.transfer_to_agent:
+            logger.info(f"Session {current_session_id} transferring to agent: {event.actions.transfer_to_agent}")
+
         if event.is_final_response() and event.content and event.content.parts:
             for part in event.content.parts:
                 if part.text:
@@ -234,6 +241,15 @@ async def chat_stream(
             session_id=current_session_id,
             new_message=new_message,
         ):
+            # Check for tool calls
+            if function_calls := event.get_function_calls():
+                for fc in function_calls:
+                    yield f"data: {json.dumps({'tool_call': {'name': fc.name, 'args': fc.args}})}\n\n"
+            
+            # Check for agent transfers
+            if event.actions and event.actions.transfer_to_agent:
+                yield f"data: {json.dumps({'agent_transfer': event.actions.transfer_to_agent})}\n\n"
+
             # For model responses, we want to stream the chunks
             # If `event` has text, we send it.
             if event.content and event.content.parts:
