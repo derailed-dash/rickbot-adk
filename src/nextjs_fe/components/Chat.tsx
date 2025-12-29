@@ -16,7 +16,8 @@ import {
     FormControl,
     InputLabel,
     IconButton,
-    LinearProgress
+    LinearProgress,
+    Badge
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -294,7 +295,9 @@ export default function Chat() {
                 <Typography variant="h4" color="primary">Rickbot</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <IconButton color="secondary" onClick={handleClearChat} title="Start New Chat">
-                        <PlumbusIcon />
+                        <Badge badgeContent="+" color="primary" overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+                            <PlumbusIcon sx={{ fontSize: 40 }} />
+                        </Badge>
                     </IconButton>
                     <AuthButton />
                     <FormControl sx={{ minWidth: 120 }}>
