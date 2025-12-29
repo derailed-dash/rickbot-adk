@@ -2,8 +2,8 @@
 
 ## Phase 1: Theme & Portal Green Styling
 - [x] Task: Update the Material UI theme definition in `src/nextjs_fe/pages/_app.tsx` (or where theme is defined) to use the new Portal Green palette. ff8a4f4
-- [~] Task: Update `src/nextjs_fe/components/Chat.tsx` to ensure component-level overrides (like the Persona Profile border) use the new theme colors.
-- [ ] Task: Write Tests: Add a snapshot or style-based test in `src/nextjs_fe/__tests__/Chat.test.tsx` to verify the primary color application.
+- [x] Task: Update `src/nextjs_fe/components/Chat.tsx` to ensure component-level overrides (like the Persona Profile border) use the new theme colors.
+- [x] Task: Write Tests: Add a snapshot or style-based test in `src/nextjs_fe/__tests__/Chat.test.tsx` to verify the primary color application. dbebd9d
 - [ ] Task: Conductor - User Manual Verification 'Theme & Portal Green Styling' (Protocol in workflow.md)
 
 ## Phase 2: Plumbus "New Chat" Icon
