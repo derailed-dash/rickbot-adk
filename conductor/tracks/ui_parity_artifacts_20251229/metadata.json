@@ -1,0 +1,8 @@
+{
+  "track_id": "ui_parity_artifacts_20251229",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2025-12-29T11:00:00Z",
+  "updated_at": "2025-12-29T11:00:00Z",
+  "description": "Next.js UI Parity with Streamlit and ADK Artifact Integration"
+}
