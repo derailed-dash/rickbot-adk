@@ -18,6 +18,7 @@ A multi-personality AI chatbot built using Google Gemini and the Agent Developme
 - **Secure Authentication:** Integrated Google and GitHub OAuth for personalized and secure user sessions.
 - **Real-time Streaming:** Seamless, real-time response streaming for a more natural conversation flow.
 - **Multimodal Interactions:** Support for both text and image uploads, enabling rich, context-aware interactions.
+- **Thematic UI:** A highly stylized interface featuring "Portal Green" accents, show-themed icons (like the Meeseeks Box), and custom animations (like the Portal Gun effect) that ground the experience in the Rick and Morty universe.
 - **Decoupled Architecture:** A robust FastAPI backend that decouples the core agent logic from various user interfaces, such as the Next.js frontend.
 
 ## Success Criteria

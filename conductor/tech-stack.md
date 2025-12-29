@@ -14,7 +14,7 @@
 - **Main UI:** **Next.js (React/TypeScript).** A modern, responsive web application for the primary chat interface.
 - **Authentication:** **NextAuth.js.** For handling client-side OAuth sessions and secure communication with the backend.
 - **Internal/Admin UI:** **Streamlit.** Used for rapid prototyping and internal testing of agent behaviors.
-- **Styling:** **MUI (Material UI) / Tailwind CSS.** For a polished and consistent visual design.
+- **Styling:** **MUI (Material UI), Tailwind CSS, and Framer Motion.** For a polished, animated, and consistent visual design.
 
 ## Infrastructure & DevOps
 - **Cloud Provider:** **Google Cloud Platform (GCP).**
