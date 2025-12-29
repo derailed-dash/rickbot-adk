@@ -1,34 +1,12 @@
 import * as React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Typography, Container, Button, Paper, Divider } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#90caf9',
-    },
-    secondary: {
-      main: '#f48fb1',
-    },
-    background: {
-        default: '#121212',
-        paper: '#1e1e1e'
-    }
-  },
-  typography: {
-      fontFamily: 'Courier New, monospace',
-  }
-});
-
 export default function PrivacyPolicy() {
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
+    <>
       <Head>
         <title>Privacy Policy - Rickbot</title>
         <meta name="description" content="Privacy Policy for Rickbot" />
@@ -118,6 +96,6 @@ export default function PrivacyPolicy() {
           </Typography>
         </Paper>
       </Container>
-    </ThemeProvider>
+    </>
   );
 }
