@@ -21,7 +21,6 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import MeeseeksBoxIcon from './MeeseeksBoxIcon';
 import PortalGunIcon from './PortalGunIcon';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -301,7 +300,12 @@ export default function Chat() {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <IconButton color="secondary" onClick={handleClearChat} title="Start New Chat">
                         <Badge badgeContent="+" color="primary" overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                            <MeeseeksBoxIcon sx={{ fontSize: 40 }} />
+                            <Box 
+                                component="img" 
+                                src="/meeseeks.webp" 
+                                sx={{ width: 40, height: 40 }} 
+                                data-testid="meeseeks-box-icon"
+                            />
                         </Badge>
                     </IconButton>
                     <AuthButton />

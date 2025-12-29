@@ -165,7 +165,9 @@ describe('Chat', () => {
 
   it('renders the Meeseeks Box icon for the New Chat button with a Badge', () => {
     render(<Chat />)
-    expect(screen.getByTestId('meeseeks-box-icon')).toBeInTheDocument()
+    const icon = screen.getByTestId('meeseeks-box-icon')
+    expect(icon).toBeInTheDocument()
+    expect(icon).toHaveAttribute('src', '/meeseeks.webp')
     expect(screen.getByText('+')).toBeInTheDocument() // Check for Badge content
     expect(screen.getByTitle('Start New Chat')).toBeInTheDocument()
   })
