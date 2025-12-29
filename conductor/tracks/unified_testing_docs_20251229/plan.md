@@ -1,0 +1,24 @@
+# Implementation Plan - Unified Testing Documentation
+
+## Phase 1: Documentation Scaffolding & Migration
+- [x] Task: Create `docs/testing.md` and initialize the table of contents and structure.
+- [ ] Task: Migrate existing Python test guidance and configuration details from `src/tests/README.md`.
+- [ ] Task: Remove `src/tests/README.md` and ensure any references to it are updated.
+- [ ] Task: Conductor - User Manual Verification 'Documentation Scaffolding & Migration' (Protocol in workflow.md)
+
+## Phase 2: Frontend Testing & Strategy
+- [ ] Task: Document the React/Next.js testing stack (Jest, React Testing Library) and execution steps.
+- [ ] Task: Document the general testing strategy, including Test Mode, `conftest.py`, and CI environment usage.
+- [ ] Task: Update the "Running Tests" section to clearly distinguish between Backend and Frontend commands.
+- [ ] Task: Conductor - User Manual Verification 'Frontend Testing & Strategy' (Protocol in workflow.md)
+
+## Phase 3: Authentication & Manual Verification
+- [ ] Task: Create a step-by-step guide for retrieving a Bearer token from Browser Developer Tools.
+- [ ] Task: Document the usage of Mock Tokens (`mock:id:email:name`) for local development.
+- [ ] Task: Provide authenticated `curl` examples for all endpoints, specifically highlighting Artifact retrieval using `$AUTH_TOKEN`.
+- [ ] Task: Conductor - User Manual Verification 'Authentication & Manual Verification' (Protocol in workflow.md)
+
+## Phase 4: Final Review & Integration
+- [ ] Task: Perform a final proofread of `docs/testing.md` for clarity and technical accuracy.
+- [ ] Task: Verify that all `curl` commands and shell snippets are correct and functional.
+- [ ] Task: Conductor - User Manual Verification 'Final Review & Integration' (Protocol in workflow.md)
