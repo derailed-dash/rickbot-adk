@@ -7,10 +7,10 @@
 - [x] Task: Conductor - User Manual Verification 'Documentation Scaffolding & Migration' (Protocol in workflow.md)
 
 ## Phase 2: Frontend Testing & Strategy
-- [ ] Task: Document the React/Next.js testing stack (Jest, React Testing Library) and execution steps.
-- [ ] Task: Document the general testing strategy, including Test Mode, `conftest.py`, and CI environment usage.
-- [ ] Task: Update the "Running Tests" section to clearly distinguish between Backend and Frontend commands.
-- [ ] Task: Conductor - User Manual Verification 'Frontend Testing & Strategy' (Protocol in workflow.md)
+- [x] Task: Document the React/Next.js testing stack (Jest, React Testing Library) and execution steps.
+- [x] Task: Document the general testing strategy, including Test Mode, `conftest.py`, and CI environment usage.
+- [x] Task: Update the "Running Tests" section to clearly distinguish between Backend and Frontend commands.
+- [~] Task: Conductor - User Manual Verification 'Frontend Testing & Strategy' (Protocol in workflow.md)
 
 ## Phase 3: Authentication & Manual Verification
 - [ ] Task: Create a step-by-step guide for retrieving a Bearer token from Browser Developer Tools.

@@ -3,19 +3,45 @@
 This document serves as the comprehensive guide for testing strategy, execution, and manual verification for the Rickbot-ADK project.
 
 ## Table of Contents
+0. [General Testing Principles](#general-testing-principles)
+   - [CI-Aware Execution](#ci-aware-execution)
+   - [Running Tests (All Commands)](#running-tests-all-commands)
 1. [Backend Testing Strategy](#backend-testing-strategy)
    - [Test Summary](#test-summary)
    - [Configuration & Test Mode](#configuration--test-mode)
-   - [Running Backend Tests](#running-backend-tests)
 2. [Frontend Testing Strategy](#frontend-testing-strategy)
    - [Stack Overview](#stack-overview)
-   - [Running Frontend Tests](#running-frontend-tests)
+   - [Writing Frontend Tests](#writing-frontend-tests)
 3. [Authentication & Session Management](#authentication--session-management)
    - [Retrieving Bearer Tokens](#retrieving-bearer-tokens)
    - [Mock Tokens](#mock-tokens)
 4. [Manual API Verification](#manual-api-verification)
    - [Using Curl with Authentication](#using-curl-with-authentication)
    - [Artifact Retrieval](#artifact-retrieval)
+
+---
+
+## General Testing Principles
+
+Regardless of the component being tested (Backend or Frontend), the following principles apply:
+
+### CI-Aware Execution
+
+All test runners should be aware of the `CI` environment variable. When `CI=true`:
+- Test runners must execute once and exit (no watch mode).
+- Interactive prompts must be suppressed.
+- Output should be optimized for logs.
+
+### Running Tests (All Commands)
+
+#### Backend (Python)
+- Run unit tests: `make test`
+- Run all tests (Unit + Integration): `make test-all`
+- Run specific test file: `uv run pytest -v -s src/tests/unit/test_config.py`
+
+#### Frontend (React/Next.js)
+- Run all tests: `cd src/nextjs_fe && npm test`
+- Run in watch mode: `cd src/nextjs_fe && npm run test:watch`
 
 ---
 
@@ -56,31 +82,28 @@ The `src/tests/conftest.py` file is a global Pytest configuration that:
 1.  Sets `RICKBOT_TEST_MODE=true` for the entire test session.
 2.  Ensures consistent environment variables are available for both unit and integration tests.
 
-### Running Backend Tests
-
-- We can run backend tests with:
-  ```bash
-  make test # unit tests only
-  make test-all # all tests
-  ```
-
-- **CI Environment Variable:** Setting `CI=true` is recommended when running tests in a CI/CD pipeline or as a non-interactive agent. It ensures that test runners (like `pytest`) run in a single-execution mode rather than a "watch" or "interactive" mode, and it can also be used to suppress interactive prompts or local-only configurations.
-- Note that integration tests will fail if the development environment has not first been configured with the `setup-env.sh` script. This is because the test code will not have access to the required Google APIs.
-
-#### Testing with Verbose Output
-
-If we want to run tests verbosely, we can do this:
-
-```bash
-uv run pytest -v -s src/tests/unit/test_config.py
-uv run pytest -v -s src/tests/unit/test_personality.py
-uv run pytest -v -s src/tests/integration/test_rickbot_agent_multiturn.py
-uv run pytest -v -s src/tests/integration/test_server_e2e.py
-uv run pytest -v -s src/tests/integration/test_personalities.py
-```
+---
 
 ## Frontend Testing Strategy
-*(Pending implementation)*
+
+The Rickbot-ADK frontend is built with Next.js and is tested using a modern React testing stack.
+
+### Stack Overview
+
+- **Jest**: The primary test runner and assertion library.
+- **React Testing Library (RTL)**: Used for rendering components and interacting with them in a way that mimics user behavior.
+- **jest-environment-jsdom**: Provides a browser-like environment for testing React components.
+- **next/jest**: Official Next.js integration for Jest, which automatically configures transform and environment settings.
+
+### Writing Frontend Tests
+
+Frontend tests are located in `src/nextjs_fe/__tests__/`. We follow these conventions:
+
+- **Component Tests**: Focused on individual UI components (e.g., `AuthButton.test.tsx`).
+- **Page Tests**: Focused on full pages and their accessibility (e.g., `Privacy.test.tsx`).
+- **User-Centric Testing**: Prefer testing behavior (what the user sees and does) over implementation details (internal state or props).
+
+---
 
 ## Authentication & Session Management
 *(Pending implementation)*
