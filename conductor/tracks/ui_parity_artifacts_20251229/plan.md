@@ -1,6 +1,6 @@
 # Implementation Plan - Next.js UI Parity & Artifacts
 
-## Phase 1: Research and Architecture
+## Phase 1: Research and Architecture [checkpoint: 87b6f09]
 - [x] Task: Research ADK Artifacts usage with FastAPI and Next.js.
 - [x] Task: Analyze current Streamlit media handling and gaps.
 - [x] Task: Propose and document the Artifact/Media upload and retrieval architecture in `docs/design.md`.
