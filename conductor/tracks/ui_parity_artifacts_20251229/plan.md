@@ -14,15 +14,15 @@
 - [x] Task: Documentation: Update `@src/tests/README.md` to include new test files and categories (e.g., Privacy, Clear Chat).
 - [x] Task: Conductor - User Manual Verification 'Public Pages & Base UI' (Protocol in workflow.md)
 
-## Phase 3: Tool Usage & Feedback
+## Phase 3: Tool Usage & Feedback [checkpoint: 0a9ff74]
 - [x] Task: Update the FastAPI response to include tool execution status. [52493a9]
-- [ ] Task: Update the Next.js Chat component to display "Thinking/Tool Usage" states (e.g., "Searching Google...").
-- [ ] Task: Write Tests: Component tests for tool usage status display.
-- [ ] Task: Documentation: Update `@src/tests/README.md` with new component tests for tool usage.
+- [x] Task: Update the Next.js Chat component to display "Thinking/Tool Usage" states (e.g., "Searching Google...").
+- [x] Task: Write Tests: Component tests for tool usage status display.
+- [x] Task: Documentation: Update `@src/tests/README.md` with new component tests for tool usage.
 - [ ] Task: Conductor - User Manual Verification 'Tool Usage & Feedback' (Protocol in workflow.md)
 
 ## Phase 4: ADK Artifacts & Media Handling
-- [ ] Task: Implement backend endpoints for file upload and Artifact creation.
+- [x] Task: Implement backend endpoints for file upload and Artifact creation. [ccbceb3]
 - [ ] Task: Update the Chat interface to support multi-file uploads.
 - [ ] Task: Implement inline rendering for Images and Video in the chat messages.
 - [ ] Task: Implement generic file cards for other "viewable" media types.
