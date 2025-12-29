@@ -1,6 +1,6 @@
 # Implementation Plan - UI Enhancements: Rick and Morty Aesthetic
 
-## Phase 1: Theme & Portal Green Styling
+## Phase 1: Theme & Portal Green Styling [checkpoint: 9e36922]
 - [x] Task: Update the Material UI theme definition in `src/nextjs_fe/pages/_app.tsx` (or where theme is defined) to use the new Portal Green palette. ff8a4f4
 - [x] Task: Update `src/nextjs_fe/components/Chat.tsx` to ensure component-level overrides (like the Persona Profile border) use the new theme colors.
 - [x] Task: Write Tests: Add a snapshot or style-based test in `src/nextjs_fe/__tests__/Chat.test.tsx` to verify the primary color application. dbebd9d
