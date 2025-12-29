@@ -6,11 +6,14 @@
 - [x] Task: Write Tests: Add a snapshot or style-based test in `src/nextjs_fe/__tests__/Chat.test.tsx` to verify the primary color application. dbebd9d
 - [x] Task: Conductor - User Manual Verification 'Theme & Portal Green Styling' (Protocol in workflow.md) dbebd9d
 
-## Phase 2: Plumbus "New Chat" Icon
-- [ ] Task: Source or create a stylized Plumbus SVG/Icon component.
-- [ ] Task: Replace `DeleteSweepIcon` in `src/nextjs_fe/components/Chat.tsx` with the new Plumbus icon.
-- [ ] Task: Write Tests: Update `Chat.test.tsx` to verify the presence of the Plumbus icon (via aria-label or test-id).
-- [ ] Task: Conductor - User Manual Verification 'Plumbus "New Chat" Icon' (Protocol in workflow.md)
+## Phase 2: Plumbus / Meeseeks Box "New Chat" Icon
+- [x] Task: Source or create a stylized Plumbus SVG/Icon component. d303724
+- [x] Task: Replace `DeleteSweepIcon` in `src/nextjs_fe/components/Chat.tsx` with the new Plumbus icon. d303724
+- [x] Task: Write Tests: Update `Chat.test.tsx` to verify the presence of the Plumbus icon (via aria-label or test-id). d303724
+- [x] Task: Refine Plumbus Icon: Increase size and add 'New Chat' visual clue (Badge/+). d303724
+- [x] Task: Conductor - User Manual Verification 'Plumbus "New Chat" Icon' (Protocol in workflow.md) d303724
+- [x] Task: Replace Plumbus icon with Mr. Meeseeks Box SVG icon. 3368c43
+- [x] Task: Conductor - User Manual Verification 'Meeseeks Box "New Chat" Icon' (Protocol in workflow.md) 3368c43
 
 ## Phase 3: Animated Portal Gun Send Button
 - [ ] Task: Implement the Portal Gun SVG and the CSS/Framer Motion animation for the portal opening effect.
