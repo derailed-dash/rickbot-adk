@@ -162,4 +162,23 @@ describe('Chat', () => {
         expect(images.some(img => img.getAttribute('src') === 'mock-url')).toBeTruthy()
     })
   })
+
+  it('applies the Portal Green primary color to key elements', () => {
+    // We need to wrap in ThemeProvider to test the actual theme application
+    const { ThemeProvider } = require('@mui/material/styles')
+    const theme = require('../styles/theme').default
+
+    render(
+        <ThemeProvider theme={theme}>
+            <Chat />
+        </ThemeProvider>
+    )
+
+    // The Rickbot title should use primary color
+    // We target the H4 specifically to avoid ambiguity if 'Rickbot' appears elsewhere
+    const title = screen.getByRole('heading', { name: /Rickbot/i, level: 4 })
+    
+    // #39FF14 is rgb(57, 255, 20)
+    expect(title).toHaveStyle({ color: 'rgb(57, 255, 20)' }) 
+  })
 })
