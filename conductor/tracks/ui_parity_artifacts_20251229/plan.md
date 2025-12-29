@@ -19,13 +19,13 @@
 - [x] Task: Update the Next.js Chat component to display "Thinking/Tool Usage" states (e.g., "Searching Google...").
 - [x] Task: Write Tests: Component tests for tool usage status display.
 - [x] Task: Documentation: Update `@src/tests/README.md` with new component tests for tool usage.
-- [ ] Task: Conductor - User Manual Verification 'Tool Usage & Feedback' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Tool Usage & Feedback' (Protocol in workflow.md)
 
-## Phase 4: ADK Artifacts & Media Handling
+## Phase 4: ADK Artifacts & Media Handling [checkpoint: 898f58b]
 - [x] Task: Implement backend endpoints for file upload and Artifact creation. [ccbceb3]
-- [ ] Task: Update the Chat interface to support multi-file uploads.
-- [ ] Task: Implement inline rendering for Images and Video in the chat messages.
-- [ ] Task: Implement generic file cards for other "viewable" media types.
-- [ ] Task: Write Tests: Integration tests for file upload -> Artifact creation -> UI rendering.
-- [ ] Task: Documentation: Update `@src/tests/README.md` with new integration tests for artifacts and media handling.
-- [ ] Task: Conductor - User Manual Verification 'ADK Artifacts & Media Handling' (Protocol in workflow.md)
+- [x] Task: Update the Chat interface to support multi-file uploads.
+- [x] Task: Implement inline rendering for Images and Video in the chat messages.
+- [x] Task: Implement generic file cards for other "viewable" media types.
+- [x] Task: Write Tests: Integration tests for file upload -> Artifact creation -> UI rendering.
+- [x] Task: Documentation: Update `@src/tests/README.md` with new integration tests for artifacts and media handling.
+- [x] Task: Conductor - User Manual Verification 'ADK Artifacts & Media Handling' (Protocol in workflow.md)
