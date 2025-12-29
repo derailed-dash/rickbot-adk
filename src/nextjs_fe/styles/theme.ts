@@ -7,7 +7,7 @@ const theme = createTheme({
       main: '#39FF14', // Neon Portal Green
     },
     secondary: {
-      main: '#90E900', // Secondary Green
+      main: '#b026ff', // Neon Purple
     },
     background: {
       default: '#121212',

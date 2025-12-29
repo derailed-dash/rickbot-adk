@@ -257,12 +257,12 @@ export default function Chat() {
                 justifyContent: 'center',
                 alignItems: 'center',
                 p: 2,
-                backgroundImage: 'url(/avatars/rickbot-trans.png)',
-                backgroundRepeat: 'no-repeat',
+                backgroundImage: 'url(/galaxy_bg.png)',
+                backgroundRepeat: 'repeat',
                 backgroundPosition: 'center',
-                backgroundSize: 'contain',
+                backgroundSize: 'auto',
                 backgroundColor: 'rgba(0,0,0,0.8)',
-                backgroundBlendMode: 'darken',
+                backgroundBlendMode: 'overlay',
                 color: 'white'
             }}>
                 <Typography variant="h3" color="primary" gutterBottom>Rickbot</Typography>
@@ -287,15 +287,15 @@ export default function Chat() {
             maxWidth: 'md',
             margin: '0 auto',
             p: 2,
-            backgroundImage: 'url(/avatars/rickbot-trans.png)',
-            backgroundRepeat: 'no-repeat',
+            backgroundImage: 'url(/galaxy_bg.png)',
+            backgroundRepeat: 'repeat',
             backgroundPosition: 'center',
-            backgroundSize: 'contain',
+            backgroundSize: 'auto',
             backgroundColor: 'rgba(0,0,0,0.8)',
             backgroundBlendMode: 'darken'
         }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="primary">Rickbot</Typography>
+                <Typography variant="h4" color="primary" sx={{ textShadow: '0 0 10px rgba(57, 255, 20, 0.5)', fontWeight: 'bold' }}>Rickbot</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <IconButton color="secondary" onClick={handleClearChat} title="Start New Chat">
                         <Badge badgeContent="+" color="primary" overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
@@ -309,7 +309,7 @@ export default function Chat() {
                     </IconButton>
                     <AuthButton />
                     <FormControl sx={{ minWidth: 120 }}>
-                        <InputLabel id="personality-select-label">Personality</InputLabel>
+                        <InputLabel id="personality-select-label" sx={{ color: 'secondary.main' }}>Personality</InputLabel>
                         <Select
                             labelId="personality-select-label"
                             value={selectedPersonality.name}
@@ -317,6 +317,13 @@ export default function Chat() {
                             onChange={(e) => {
                                 const newP = personalities.find(p => p.name === e.target.value);
                                 if (newP) setSelectedPersonality(newP);
+                            }}
+                            sx={{ 
+                                color: 'secondary.main',
+                                '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(176, 38, 255, 0.5)' },
+                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#b026ff' },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#b026ff' },
+                                '.MuiSvgIcon-root': { color: '#b026ff' }
                             }}
                         >
                             {personalities.map((p) => (
@@ -337,7 +344,7 @@ export default function Chat() {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Avatar 
                         src={selectedPersonality.avatar} 
-                        sx={{ width: 64, height: 64, border: '2px solid', borderColor: 'primary.main' }} 
+                        sx={{ width: 64, height: 64 }} 
                     />
                     <Box>
                         <Typography variant="h6" color="primary.main" sx={{ fontWeight: 'bold' }}>

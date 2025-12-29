@@ -192,7 +192,7 @@ describe('Chat', () => {
     const { ThemeProvider } = require('@mui/material/styles')
     const theme = require('../styles/theme').default
 
-    render(
+    const { container } = render(
         <ThemeProvider theme={theme}>
             <Chat />
         </ThemeProvider>
@@ -204,5 +204,10 @@ describe('Chat', () => {
     
     // #39FF14 is rgb(57, 255, 20)
     expect(title).toHaveStyle({ color: 'rgb(57, 255, 20)' }) 
+
+    // Verify background image (we check the root box which should have the image)
+    // The root Box is the first element in the container
+    const rootBox = container.firstChild
+    expect(rootBox).toHaveStyle({ backgroundImage: 'url(/galaxy_bg.png)' })
   })
 })
