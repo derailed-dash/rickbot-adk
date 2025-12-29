@@ -145,7 +145,7 @@ Before marking any task complete, verify:
 - [ ] Type safety is enforced (e.g., type hints, TypeScript types, Go types)
 - [ ] No linting or static analysis errors (using the project's configured tools)
 - [ ] Works correctly on mobile (if applicable)
-- [ ] Documentation updated to reflect changes (including `README.md` and `src/tests/README.md`)
+- [ ] Documentation updated to reflect changes (including `README.md` and `docs/testing.md`)
 - [ ] No security vulnerabilities introduced
 
 ## Development Commands

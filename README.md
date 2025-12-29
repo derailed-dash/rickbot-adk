@@ -116,7 +116,7 @@ For full command options and usage, refer to the [Makefile](Makefile).
 ###  Testing
 
 - All tests are in the `src/tests` folder.
-- The tests and how to run them are documented in `src/tests/README.md`.
+- The tests and how to run them are documented in `docs/testing.md`.
 
 ### Running ADK Dev Tools
 
