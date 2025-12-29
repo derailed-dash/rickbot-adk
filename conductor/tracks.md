@@ -17,7 +17,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 ## [x] Track: Unified Testing Documentation
 *Link: [./conductor/archive/unified_testing_docs_20251229/](./conductor/archive/unified_testing_docs_20251229/)*
 
---- 
-
-## [~] Track: Persona Metadata Integration
-*Link: [./conductor/tracks/persona_metadata_20251229/](./conductor/tracks/persona_metadata_20251229/)*
+## [x] Track: Persona Metadata Integration
+*Link: [./conductor/archive/persona_metadata_20251229/](./conductor/archive/persona_metadata_20251229/)*

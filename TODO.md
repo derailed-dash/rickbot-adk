@@ -52,9 +52,9 @@
 - [x] Create new React/Next.js UI, which makes use of the FastAPI
 - [x] Implement OAuth for our API calls - Google and GitHub?
 - [ ] Fix UI elements of the React UI
-- [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Implement rate limiting for our API calls
 - [ ] Implement multimodal interactions with ArtifactService
+- [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Investigate moving frontend to existing Cloud Run service, and deploying backend to a separate service.
 - [ ] Load reference material as context to Dazbo
 - [ ] Restrict access to certain personalities.
