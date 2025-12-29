@@ -35,7 +35,15 @@ describe('Chat', () => {
 
   beforeEach(() => {
     ;(useSession as jest.Mock).mockReturnValue(mockSession)
-    ;(axios.get as jest.Mock).mockResolvedValue({ data: [{ name: 'Rick', description: 'Rick Sanchez', avatar: '/avatars/rick.png' }] })
+    ;(axios.get as jest.Mock).mockResolvedValue({ data: [{ 
+        name: 'Rick', 
+        description: 'Rick Sanchez', 
+        avatar: '/avatars/rick.png',
+        title: "I'm Rickbot!",
+        overview: "Smartest man",
+        welcome: "Whatever",
+        prompt_question: "What do you want?"
+    }] })
     ;(global.fetch as jest.Mock).mockResolvedValue({
         status: 200,
         body: {
@@ -66,7 +74,7 @@ describe('Chat', () => {
   it('includes Authorization header in handleSendMessage', async () => {
     render(<Chat />)
     
-    const input = screen.getByPlaceholderText('Type a message...')
+    const input = screen.getByPlaceholderText('What do you want?')
     fireEvent.change(input, { target: { value: 'Hi' } })
     fireEvent.click(screen.getByText('Send'))
 
@@ -86,7 +94,7 @@ describe('Chat', () => {
     render(<Chat />)
     
     // Send a message first to populate state
-    const input = screen.getByPlaceholderText('Type a message...')
+    const input = screen.getByPlaceholderText('What do you want?')
     fireEvent.change(input, { target: { value: 'Hi' } })
     fireEvent.click(screen.getByText('Send'))
     
@@ -121,7 +129,7 @@ describe('Chat', () => {
     })
 
     render(<Chat />)
-    const input = screen.getByPlaceholderText('Type a message...')
+    const input = screen.getByPlaceholderText('What do you want?')
     fireEvent.change(input, { target: { value: 'Search something' } })
     fireEvent.click(screen.getByText('Send'))
 

@@ -38,10 +38,22 @@ interface Personality {
     name: string;
     description: string;
     avatar: string;
+    title: string;
+    overview: string;
+    welcome: string;
+    prompt_question: string;
 }
 
 const initialPersonalities: Personality[] = [
-    { name: 'Rick', description: 'Rick Sanchez', avatar: '/avatars/rick.png' }
+    { 
+        name: 'Rick', 
+        description: 'Rick Sanchez', 
+        avatar: '/avatars/rick.png',
+        title: "I'm Rickbot! Wubba Lubba Dub Dub!",
+        overview: "I'm Rick Sanchez. The smartest man in the universe. Cynical and sarcastic. People are dumb.",
+        welcome: "Ask me something. Or don't. Whatever.",
+        prompt_question: "What do you want?"
+    }
 ];
 
 export default function Chat() {
@@ -49,7 +61,7 @@ export default function Chat() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [personalities, setPersonalities] = useState<Personality[]>(initialPersonalities);
     const [inputValue, setInputValue] = useState('');
-    const [selectedPersonality, setSelectedPersonality] = useState('Rick');
+    const [selectedPersonality, setSelectedPersonality] = useState<Personality>(initialPersonalities[0]);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [botAction, setBotAction] = useState<string | null>(null);
@@ -77,6 +89,11 @@ export default function Chat() {
                 });
                 if (response.data && Array.isArray(response.data)) {
                     setPersonalities(response.data);
+                    // Update selected personality object if it was the default or exists in the new list
+                    const updatedSelected = response.data.find((p: Personality) => p.name === selectedPersonality.name);
+                    if (updatedSelected) {
+                        setSelectedPersonality(updatedSelected);
+                    }
                 }
             } catch (error: any) {
                 console.error("Failed to fetch personalities:", error);
@@ -116,7 +133,7 @@ export default function Chat() {
             
             const formData = new FormData();
             formData.append('prompt', newMessage.text);
-            formData.append('personality', selectedPersonality);
+            formData.append('personality', selectedPersonality.name);
             if (sessionId) {
                 formData.append('session_id', sessionId);
             }
@@ -185,7 +202,7 @@ export default function Chat() {
                 id: (Date.now() + 1).toString(),
                 text: accumulatedText,
                 sender: 'bot',
-                personality: selectedPersonality
+                personality: selectedPersonality.name
             };
             setMessages(prev => [...prev, botMessage]);
             setStreamingText('');
@@ -198,7 +215,7 @@ export default function Chat() {
                 id: (Date.now() + 1).toString(),
                 text: "Sorry, I encountered an error.",
                 sender: 'bot',
-                personality: selectedPersonality
+                personality: selectedPersonality.name
             };
              setMessages(prev => [...prev, errorMessage]);
         } finally {
@@ -284,9 +301,12 @@ export default function Chat() {
                         <InputLabel id="personality-select-label">Personality</InputLabel>
                         <Select
                             labelId="personality-select-label"
-                            value={selectedPersonality}
+                            value={selectedPersonality.name}
                             label="Personality"
-                            onChange={(e) => setSelectedPersonality(e.target.value)}
+                            onChange={(e) => {
+                                const newP = personalities.find(p => p.name === e.target.value);
+                                if (newP) setSelectedPersonality(newP);
+                            }}
                         >
                             {personalities.map((p) => (
                                 <MenuItem key={p.name} value={p.name}>
@@ -300,6 +320,27 @@ export default function Chat() {
                     </FormControl>
                 </Box>
             </Box>
+
+            {/* Persona Profile Area */}
+            <Paper elevation={3} sx={{ p: 2, mb: 2, bgcolor: 'rgba(30,30,30,0.95)', borderLeft: '4px solid', borderColor: 'primary.main' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar 
+                        src={selectedPersonality.avatar} 
+                        sx={{ width: 64, height: 64, border: '2px solid', borderColor: 'primary.main' }} 
+                    />
+                    <Box>
+                        <Typography variant="h6" color="primary.main" sx={{ fontWeight: 'bold' }}>
+                            {selectedPersonality.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.primary" sx={{ mb: 0.5 }}>
+                            {selectedPersonality.overview}
+                        </Typography>
+                        <Typography variant="caption" color="secondary.main" sx={{ fontStyle: 'italic' }}>
+                            {selectedPersonality.welcome}
+                        </Typography>
+                    </Box>
+                </Box>
+            </Paper>
 
             <Paper elevation={3} sx={{ flexGrow: 1, overflow: 'auto', p: 2, mb: 2, bgcolor: 'rgba(30,30,30,0.9)' }}>
                 <List>
@@ -351,12 +392,12 @@ export default function Chat() {
                     {loading && (
                          <ListItem alignItems="flex-start">
                             <ListItemAvatar>
-                                <Avatar src={`/avatars/${selectedPersonality.toLowerCase()}.png`} />
+                                <Avatar src={`/avatars/${selectedPersonality.name.toLowerCase()}.png`} />
                             </ListItemAvatar>
                             <ListItemText
                                 primary={
                                     <Box component="span" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                                        {selectedPersonality}
+                                        {selectedPersonality.name}
                                     </Box>
                                 }
                                 secondary={
@@ -411,7 +452,7 @@ export default function Chat() {
                 <TextField
                     fullWidth
                     variant="outlined"
-                    placeholder="Type a message..."
+                    placeholder={selectedPersonality.prompt_question}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={(e) => {
