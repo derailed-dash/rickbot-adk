@@ -21,7 +21,6 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import PortalGunIcon from './PortalGunIcon';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
@@ -487,6 +486,7 @@ export default function Chat() {
                     sx={{ 
                         height: 56,
                         minWidth: '120px',
+                        pl: 3,
                         bgcolor: '#333', 
                         color: '#fff',
                         '&:hover': {
@@ -498,7 +498,12 @@ export default function Chat() {
                     }}
                 >
                     Send
-                    <PortalGunIcon sx={{ fontSize: 48 }} />
+                    <Box 
+                        component="img" 
+                        src="/portal_gun_trans.png" 
+                        sx={{ height: 40 }} 
+                        data-testid="portal-gun-icon"
+                    />
                 </Button>
             </Box>
 

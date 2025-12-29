@@ -176,7 +176,7 @@ describe('Chat', () => {
     render(<Chat />)
     const icon = screen.getByTestId('portal-gun-icon')
     expect(icon).toBeInTheDocument()
-    expect(icon).toHaveAttribute('src', '/portal_gun.png')
+    expect(icon).toHaveAttribute('src', '/portal_gun_trans.png')
 
     const input = screen.getByPlaceholderText('What do you want?')
     fireEvent.change(input, { target: { value: 'Hi' } })
