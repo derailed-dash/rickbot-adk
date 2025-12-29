@@ -56,6 +56,7 @@
 - [ ] Implement rate limiting for our API calls
 - [ ] Implement multimodal interactions with ArtifactService
 - [ ] Review env var changes and update Deployment / TF accordingly
+- [ ] Ensure Gemini model references are updated
 - [ ] Investigate moving frontend to existing Cloud Run service, and deploying backend to a separate service.
 - [ ] Load reference material as context to Dazbo
 - [ ] Restrict access to certain personalities.
