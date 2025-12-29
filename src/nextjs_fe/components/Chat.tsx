@@ -57,6 +57,40 @@ const initialPersonalities: Personality[] = [
     }
 ];
 
+interface AttachmentItemProps {
+    file: File;
+}
+
+const AttachmentItem: React.FC<AttachmentItemProps> = ({ file }) => {
+    const [objectUrl, setObjectUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        setObjectUrl(url);
+
+        return () => {
+            URL.revokeObjectURL(url);
+        };
+    }, [file]);
+
+    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+         if (!objectUrl) return null;
+         if (file.type.startsWith('image/')) {
+            return <Box component="img" src={objectUrl} sx={{ maxWidth: '100%', maxHeight: '300px', borderRadius: 1, display: 'block' }} />;
+         } else {
+            return <Box component="video" src={objectUrl} controls sx={{ maxWidth: '100%', maxHeight: '300px', borderRadius: 1, display: 'block' }} />;
+         }
+    } else {
+        return (
+            <Paper variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.05)' }}>
+                <AttachFileIcon fontSize="small" />
+                <Typography variant="caption">{file.name}</Typography>
+            </Paper>
+        );
+    }
+};
+
 export default function Chat() {
     const { data: session, status } = useSession()
     const [messages, setMessages] = useState<Message[]>([]);
@@ -392,19 +426,7 @@ export default function Chat() {
                                             <Box sx={{ mb: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                                                 {msg.attachments.map((att, i) => {
                                                     if (!(att instanceof File)) return null;
-                                                    const url = URL.createObjectURL(att);
-                                                    if (att.type.startsWith('image/')) {
-                                                        return <Box key={i} component="img" src={url} sx={{ maxWidth: '100%', maxHeight: '300px', borderRadius: 1, display: 'block' }} />;
-                                                    } else if (att.type.startsWith('video/')) {
-                                                        return <Box key={i} component="video" src={url} controls sx={{ maxWidth: '100%', maxHeight: '300px', borderRadius: 1, display: 'block' }} />;
-                                                    } else {
-                                                        return (
-                                                            <Paper key={i} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.05)' }}>
-                                                                <AttachFileIcon fontSize="small" />
-                                                                <Typography variant="caption">{att.name}</Typography>
-                                                            </Paper>
-                                                        );
-                                                    }
+                                                    return <AttachmentItem key={i} file={att} />;
                                                 })}
                                             </Box>
                                         )}

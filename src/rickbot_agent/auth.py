@@ -51,12 +51,7 @@ async def verify_token(creds: HTTPAuthorizationCredentials = Depends(security)) 
         google_client_id = os.getenv("GOOGLE_CLIENT_ID")
         if google_client_id:
             # Add clock skew to handle minor time differences
-            idinfo = id_token.verify_oauth2_token(
-                token, 
-                google_requests.Request(), 
-                google_client_id,
-                clock_skew_in_seconds=10
-            )
+            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), google_client_id, clock_skew_in_seconds=10)
 
             return AuthUser(id=idinfo["sub"], email=idinfo["email"], name=idinfo.get("name", idinfo["email"]), provider="google")
     except ValueError:

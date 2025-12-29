@@ -35,22 +35,8 @@ def test_get_personas(mock_get_personalities, client):
     """Test the /personas endpoint with mocked data."""
     # Setup mock return value
     mock_personalities = {
-        "Rick": MockPersonality(
-            "Rick",
-            "Rick Sanchez",
-            "I'm Rickbot!",
-            "Smartest man",
-            "Whatever",
-            "What do you want?"
-        ),
-        "Yoda": MockPersonality(
-            "Yoda",
-            "Yoda",
-            "Yoda I am",
-            "Wise teacher",
-            "Do or do not",
-            "Speak your mind"
-        ),
+        "Rick": MockPersonality("Rick", "Rick Sanchez", "I'm Rickbot!", "Smartest man", "Whatever", "What do you want?"),
+        "Yoda": MockPersonality("Yoda", "Yoda", "Yoda I am", "Wise teacher", "Do or do not", "Speak your mind"),
     }
     mock_get_personalities.return_value = mock_personalities
 
@@ -70,7 +56,7 @@ def test_get_personas(mock_get_personalities, client):
     rick = next(p for p in data if p["name"] == "Rick")
     assert rick["description"] == "Rick Sanchez"
     assert rick["avatar"] == "/avatars/rick.png"
-    
+
     # Assert new fields are present
     assert rick["title"] == "I'm Rickbot!"
     assert rick["overview"] == "Smartest man"

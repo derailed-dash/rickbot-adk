@@ -100,6 +100,42 @@ session_service = get_session_service()
 artifact_service = get_artifact_service()
 
 
+async def _process_files(
+    files: list[UploadFile],
+    user_id: str,
+    session_id: str,
+    artifact_service,
+) -> list[Part]:
+    """Helper function to process uploaded files."""
+    parts = []
+    if files:
+        for f in files:
+            if not f.filename:
+                continue
+            logger.debug(f"Processing uploaded file: {f.filename} ({f.content_type})")
+            file_content = await f.read()
+
+            # Save as Artifact (User-scoped)
+            artifact_filename = f"user:{f.filename}"
+            mime_type = f.content_type or "application/octet-stream"
+            artifact_part = Part.from_bytes(data=file_content, mime_type=mime_type)
+            await artifact_service.save_artifact(
+                app_name=APP_NAME,
+                user_id=user_id,
+                session_id=session_id,
+                filename=artifact_filename,
+                artifact=artifact_part,
+            )
+
+            # Create a Part object for the agent to process
+            parts.append(artifact_part)
+    # No warning needed for empty list, only if files is explicitly None (which shouldn't happen with default=[])
+    elif files is None:
+        logger.warning("files was None")
+
+    return parts
+
+
 @app.post("/chat")
 async def chat(
     prompt: Annotated[str, Form()],
@@ -133,28 +169,8 @@ async def chat(
     parts = [Part.from_text(text=prompt)]
 
     # Add any files to the message
-    if files:
-        for f in files:
-            if not f.filename:
-                continue
-            logger.debug(f"Processing uploaded file: {f.filename} ({f.content_type})")
-            file_content = await f.read()
-
-            # Save as Artifact (User-scoped)
-            artifact_filename = f"user:{f.filename}"
-            artifact_part = Part.from_bytes(data=file_content, mime_type=f.content_type)
-            await artifact_service.save_artifact(
-                app_name=APP_NAME,
-                user_id=user_id,
-                session_id=current_session_id,
-                filename=artifact_filename,
-                artifact=artifact_part,
-            )
-
-            # Create a Part object for the agent to process
-            parts.append(artifact_part)
-    elif files is not None:
-        logger.warning("files was set to None - will not be processed")
+    file_parts = await _process_files(files, user_id, current_session_id, artifact_service)
+    parts.extend(file_parts)
 
     # Associate the role with the message
     new_message = Content(role="user", parts=parts)
@@ -233,28 +249,8 @@ async def chat_stream(
     parts = [Part.from_text(text=prompt)]
 
     # Add any files to the message
-    if files:
-        for f in files:
-            if not f.filename:
-                continue
-            logger.debug(f"Processing uploaded file: {f.filename} ({f.content_type})")
-            file_content = await f.read()
-
-            # Save as Artifact (User-scoped)
-            artifact_filename = f"user:{f.filename}"
-            artifact_part = Part.from_bytes(data=file_content, mime_type=f.content_type)
-            await artifact_service.save_artifact(
-                app_name=APP_NAME,
-                user_id=user_id,
-                session_id=current_session_id,
-                filename=artifact_filename,
-                artifact=artifact_part,
-            )
-
-            # Create a Part object for the agent to process
-            parts.append(artifact_part)
-    elif files is not None:
-        logger.warning("files was set to None - will not be processed")
+    file_parts = await _process_files(files, user_id, current_session_id, artifact_service)
+    parts.extend(file_parts)
 
     # Associate the role with the message
     new_message = Content(role="user", parts=parts)
