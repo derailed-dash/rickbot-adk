@@ -174,7 +174,9 @@ describe('Chat', () => {
 
   it('renders the Portal Gun icon for the Send button and triggers animation', async () => {
     render(<Chat />)
-    expect(screen.getByTestId('portal-gun-icon')).toBeInTheDocument()
+    const icon = screen.getByTestId('portal-gun-icon')
+    expect(icon).toBeInTheDocument()
+    expect(icon).toHaveAttribute('src', '/portal_gun.png')
 
     const input = screen.getByPlaceholderText('What do you want?')
     fireEvent.change(input, { target: { value: 'Hi' } })
