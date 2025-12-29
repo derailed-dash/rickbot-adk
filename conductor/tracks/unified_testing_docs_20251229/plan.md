@@ -18,7 +18,7 @@
 - [x] Task: Provide authenticated `curl` examples for all endpoints, specifically highlighting Artifact retrieval using `$AUTH_TOKEN`.
 - [x] Task: Conductor - User Manual Verification 'Authentication & Manual Verification' (Protocol in workflow.md)
 
-## Phase 4: Final Review & Integration
+## Phase 4: Final Review & Integration [checkpoint: 5d947a5]
 - [x] Task: Perform a final proofread of `docs/testing.md` for clarity and technical accuracy.
 - [x] Task: Verify that all `curl` commands and shell snippets are correct and functional.
-- [~] Task: Conductor - User Manual Verification 'Final Review & Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Final Review & Integration' (Protocol in workflow.md)
