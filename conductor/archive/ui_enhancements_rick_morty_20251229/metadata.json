@@ -1,0 +1,8 @@
+{
+  "track_id": "ui_enhancements_rick_morty_20251229",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2025-12-29T19:44:00Z",
+  "updated_at": "2025-12-29T19:44:00Z",
+  "description": "UI Enhancements: Change from the pale blue to a more \"Rick and Morty\" colour screen, including green that matches portal gun aesthetic; have a better icon for \"New chat\"; Change the send button to have an animated portal gun visual."
+}

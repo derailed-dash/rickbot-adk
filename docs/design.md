@@ -186,3 +186,25 @@ Frontend user authentication is required for Rickbot.
 - **Configuration**:
     - **Local Development**: OAuth credentials (Client ID/Secret) are loaded from `.env.local`.
     - **Production**: Credentials are securely fetched from **Google Secret Manager** and injected as environment variables into the Cloud Run container.
+
+### Artifacts & Media Handling
+
+The system leverages **ADK Artifacts** for robust handling of user-uploaded files and generated content.
+
+1.  **Storage Strategy**:
+    -   **Development**: Uses `InMemoryArtifactService` for transient storage.
+    -   **Production**: Uses `GcsArtifactService` to persist files in a dedicated Google Cloud Storage bucket. This ensures history is preserved across container restarts.
+
+2.  **Upload Workflow (Next.js & API)**:
+    -   **Design Choice**: To maintain a "stateless" API design and compatibility with ADK's `new_message` structure, the system uses a **Unified Chat Request** pattern.
+    -   **Mechanism**:
+        -   The frontend sends files *directly* in the `POST /chat` request using `multipart/form-data`.
+        -   The backend endpoint (`src/main.py`) receives the file bytes.
+        -   **Backend Action 1 (Persistence)**: It immediately saves the file using `ArtifactService.save_artifact()`. This ensures the file is versioned and stored (e.g., in GCS).
+        -   **Backend Action 2 (Context)**: It constructs a `google.genai.types.Part` containing the `inline_data` (the file bytes). This `Part` is passed to the `Runner` along with the text prompt. This ensures the LLM has immediate access to the file content for the current turn.
+    -   **Benefit**: This avoids complex multi-step "upload then reference" flows for the user, while still ensuring the backend maintains a persisted record of all media via the Artifact system.
+
+3.  **Retrieval & Display**:
+    -   **Inline Display**: The frontend (Next.js) renders the user's uploaded files immediately from its local state (what the user just dropped).
+    -   **History Display**: For historical messages (reloaded sessions), the frontend relies on the message content.
+    -   **Future Enhancement**: A dedicated `GET /artifacts/{filename}` endpoint will be exposed to allow secure retrieval of historical artifacts by authorized users.

@@ -7,7 +7,7 @@ export default function AuthButton() {
   if (session) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Typography variant="body2" sx={{ color: 'white' }}>
+        <Typography variant="body1" sx={{ color: 'secondary.main', fontWeight: 'bold', textShadow: '0 0 5px rgba(176, 38, 255, 0.5)' }}>
           {session.user?.name}
         </Typography>
         <Avatar 
@@ -17,10 +17,17 @@ export default function AuthButton() {
         />
         <Button 
           variant="outlined" 
-          color="inherit" 
+          color="secondary" 
           size="small"
           onClick={() => signOut()}
-          sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)' }}
+          sx={{ 
+            fontWeight: 'bold',
+            borderWidth: 2,
+            '&:hover': {
+              borderWidth: 2,
+              boxShadow: '0 0 8px rgba(176, 38, 255, 0.6)'
+            }
+          }}
         >
           Sign out
         </Button>

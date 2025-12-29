@@ -26,16 +26,13 @@ from collections.abc import AsyncGenerator
 from os import getenv
 from typing import Annotated
 
-# from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Form, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
-from google.genai.types import Blob, Content, Part
+from google.genai.types import Content, Part
 from pydantic import BaseModel
 
-# Load environment variables from .env file
-# load_dotenv()
 from rickbot_agent.agent import get_agent
 from rickbot_agent.auth import verify_token
 from rickbot_agent.auth_models import AuthUser
@@ -60,6 +57,10 @@ class Persona(BaseModel):
     name: str
     description: str
     avatar: str
+    title: str
+    overview: str
+    welcome: str
+    prompt_question: str
 
 
 logger.debug("Initialising FastAPI app...")
@@ -84,6 +85,10 @@ def get_personas(user: AuthUser = Depends(verify_token)) -> list[Persona]:
             name=p.name,
             description=p.menu_name,
             avatar=f"/avatars/{p.name.lower()}.png",
+            title=p.title,
+            overview=p.overview,
+            welcome=p.welcome,
+            prompt_question=p.prompt_question,
         )
         for p in personalities.values()
     ]
@@ -95,13 +100,50 @@ session_service = get_session_service()
 artifact_service = get_artifact_service()
 
 
+async def _process_files(
+    files: list[UploadFile],
+    user_id: str,
+    session_id: str,
+    artifact_service,
+) -> list[Part]:
+    """Helper function to process uploaded files."""
+    parts = []
+    if files:
+        for f in files:
+            if not f.filename:
+                continue
+            logger.debug(f"Processing uploaded file: {f.filename} ({f.content_type})")
+            file_content = await f.read()
+
+            # Save as Artifact (User-scoped)
+            # Note: if user uploads a file with the same name, it will be overwritten.
+            artifact_filename = f"user:{f.filename}"
+            mime_type = f.content_type or "application/octet-stream"
+            artifact_part = Part.from_bytes(data=file_content, mime_type=mime_type)
+            await artifact_service.save_artifact(
+                app_name=APP_NAME,
+                user_id=user_id,
+                session_id=session_id,
+                filename=artifact_filename,
+                artifact=artifact_part,
+            )
+
+            # Create a Part object for the agent to process
+            parts.append(artifact_part)
+    # No warning needed for empty list, only if files is explicitly None (which shouldn't happen with default=[])
+    elif files is None:
+        logger.warning("files was None")
+
+    return parts
+
+
 @app.post("/chat")
 async def chat(
     prompt: Annotated[str, Form()],
     session_id: Annotated[str | None, Form()] = None,
     personality: Annotated[str, Form()] = "Rick",
     user: AuthUser = Depends(verify_token),
-    file: UploadFile | None = None,
+    files: list[UploadFile] = File(default=[]),
 ) -> ChatResponse:
     """Chat endpoint to interact with the Rickbot agent."""
     user_id = user.email  # Use email as user_id for ADK sessions
@@ -128,13 +170,8 @@ async def chat(
     parts = [Part.from_text(text=prompt)]
 
     # Add any files to the message
-    if file and file.filename:
-        logger.debug(f"Processing uploaded file: {file.filename} ({file.content_type})")
-        file_content = await file.read()
-        # Create a Part object for the agent to process
-        parts.append(Part(inline_data=Blob(data=file_content, mime_type=file.content_type)))
-    elif file is not None:
-        logger.warning(f"file was set to '{file}' - will not be processed")
+    file_parts = await _process_files(files, user_id, current_session_id, artifact_service)
+    parts.extend(file_parts)
 
     # Associate the role with the message
     new_message = Content(role="user", parts=parts)
@@ -156,6 +193,13 @@ async def chat(
         session_id=current_session_id,
         new_message=new_message,
     ):
+        # Log tool calls and transfers
+        if function_calls := event.get_function_calls():
+            for fc in function_calls:
+                logger.info(f"Session {current_session_id} calling tool: {fc.name}")
+        if event.actions and event.actions.transfer_to_agent:
+            logger.info(f"Session {current_session_id} transferring to agent: {event.actions.transfer_to_agent}")
+
         if event.is_final_response() and event.content and event.content.parts:
             for part in event.content.parts:
                 if part.text:
@@ -179,7 +223,7 @@ async def chat_stream(
     session_id: Annotated[str | None, Form()] = None,
     personality: Annotated[str, Form()] = "Rick",
     user: AuthUser = Depends(verify_token),
-    file: UploadFile | None = None,
+    files: list[UploadFile] = File(default=[]),
 ) -> StreamingResponse:
     """Streaming chat endpoint to interact with the Rickbot agent."""
     user_id = user.email  # Use email as user_id for ADK sessions
@@ -206,13 +250,8 @@ async def chat_stream(
     parts = [Part.from_text(text=prompt)]
 
     # Add any files to the message
-    if file and file.filename:
-        logger.debug(f"Processing uploaded file: {file.filename} ({file.content_type})")
-        file_content = await file.read()
-        # Create a Part object for the agent to process
-        parts.append(Part(inline_data=Blob(data=file_content, mime_type=file.content_type)))
-    elif file is not None:
-        logger.warning(f"file was set to '{file}' - will not be processed")
+    file_parts = await _process_files(files, user_id, current_session_id, artifact_service)
+    parts.extend(file_parts)
 
     # Associate the role with the message
     new_message = Content(role="user", parts=parts)
@@ -234,6 +273,15 @@ async def chat_stream(
             session_id=current_session_id,
             new_message=new_message,
         ):
+            # Check for tool calls
+            if function_calls := event.get_function_calls():
+                for fc in function_calls:
+                    yield f"data: {json.dumps({'tool_call': {'name': fc.name, 'args': fc.args}})}\n\n"
+
+            # Check for agent transfers
+            if event.actions and event.actions.transfer_to_agent:
+                yield f"data: {json.dumps({'agent_transfer': event.actions.transfer_to_agent})}\n\n"
+
             # For model responses, we want to stream the chunks
             # If `event` has text, we send it.
             if event.content and event.content.parts:
@@ -250,3 +298,25 @@ async def chat_stream(
 def read_root():
     """Root endpoint for the API."""
     return {"Hello": "World"}
+
+
+@app.get("/artifacts/{filename}")
+async def get_artifact(filename: str, user: AuthUser = Depends(verify_token)) -> Response:
+    """Retrieves a saved artifact for the user."""
+    user_id = user.email
+    artifact_filename = f"user:{filename}"
+
+    logger.debug(f"Retrieving artifact: {artifact_filename} for user: {user_id}")
+
+    artifact = await artifact_service.load_artifact(
+        app_name=APP_NAME,
+        user_id=user_id,
+        session_id="none",  # Ignored for user: scope
+        filename=artifact_filename,
+    )
+
+    if not artifact or not artifact.inline_data:
+        logger.warning(f"Artifact not found: {artifact_filename}")
+        raise HTTPException(status_code=404, detail="Artifact not found")
+
+    return Response(content=artifact.inline_data.data, media_type=artifact.inline_data.mime_type)

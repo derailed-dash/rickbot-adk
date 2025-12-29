@@ -1,0 +1,8 @@
+{
+  "track_id": "persona_metadata_20251229",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2025-12-29T11:00:00Z",
+  "updated_at": "2025-12-29T11:00:00Z",
+  "description": "Resolve gaps in persona metadata not being displayed in the React UI."
+}
