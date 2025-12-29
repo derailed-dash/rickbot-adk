@@ -4,7 +4,7 @@
 - [x] Task: Create `docs/testing.md` and initialize the table of contents and structure.
 - [x] Task: Migrate existing Python test guidance and configuration details from `src/tests/README.md`.
 - [x] Task: Remove `src/tests/README.md` and ensure any references to it are updated.
-- [ ] Task: Conductor - User Manual Verification 'Documentation Scaffolding & Migration' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Documentation Scaffolding & Migration' (Protocol in workflow.md)
 
 ## Phase 2: Frontend Testing & Strategy
 - [ ] Task: Document the React/Next.js testing stack (Jest, React Testing Library) and execution steps.
