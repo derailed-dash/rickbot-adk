@@ -468,14 +468,22 @@ export default function Chat() {
                             handleSendMessage();
                         }
                     }}
-                    sx={{ mr: 1, bgcolor: 'background.paper' }}
+                    sx={{ 
+                        mr: 1, 
+                        bgcolor: 'background.paper',
+                        '& .MuiOutlinedInput-root': {
+                            height: 56
+                        }
+                    }}
                 />
                 <Button 
                     variant="contained" 
-                    endIcon={<PortalGunIcon />} 
+                    endIcon={<PortalGunIcon sx={{ fontSize: 40 }} />} 
                     onClick={handleSendMessage} 
                     disabled={loading && !streamingText}
                     sx={{ 
+                        height: 56,
+                        minWidth: '100px',
                         bgcolor: '#333', 
                         color: '#fff',
                         '&:hover': {
