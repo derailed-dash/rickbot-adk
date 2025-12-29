@@ -26,5 +26,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-## [~] Track: UI Refinements: Enhanced Layout & Assets
-*Link: [./conductor/tracks/ui_refinements_layout_assets_20251229/](./conductor/tracks/ui_refinements_layout_assets_20251229/)*
+## [x] Track: UI Refinements: Enhanced Layout & Assets
+*Link: [./conductor/archive/ui_refinements_layout_assets_20251229/](./conductor/archive/ui_refinements_layout_assets_20251229/)*
