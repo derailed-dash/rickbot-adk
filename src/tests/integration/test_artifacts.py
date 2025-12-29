@@ -67,7 +67,7 @@ def test_file_upload_saves_artifact(server):
     filename = f"test_artifact_{int(time.time())}.txt"
     file_content = b"Hello ADK Artifacts!"
     
-    files = {"file": (filename, file_content, "text/plain")}
+    files = {"files": (filename, file_content, "text/plain")}
     data = {"prompt": "Describe this file.", "personality": "Rick"}
     
     print(f"Uploading file {filename}...")
