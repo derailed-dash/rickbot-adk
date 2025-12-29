@@ -291,7 +291,7 @@ export default function Chat() {
             backgroundRepeat: 'repeat',
             backgroundPosition: 'center',
             backgroundSize: 'auto',
-            backgroundColor: 'rgba(0,0,0,0.8)',
+            backgroundColor: 'rgba(0,0,0,0.85)',
             backgroundBlendMode: 'darken'
         }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -340,7 +340,7 @@ export default function Chat() {
             </Box>
 
             {/* Persona Profile Area */}
-            <Paper elevation={3} sx={{ p: 2, mb: 2, bgcolor: 'rgba(30,30,30,0.95)', borderLeft: '4px solid', borderColor: 'primary.main' }}>
+            <Paper elevation={3} sx={{ p: 2, mb: 2, bgcolor: '#000000', borderLeft: '4px solid', borderColor: '#000000' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Avatar 
                         src={selectedPersonality.avatar} 
@@ -360,7 +360,7 @@ export default function Chat() {
                 </Box>
             </Paper>
 
-            <Paper elevation={3} sx={{ flexGrow: 1, overflow: 'auto', p: 2, mb: 2, bgcolor: 'rgba(30,30,30,0.9)' }}>
+            <Paper elevation={3} sx={{ flexGrow: 1, overflow: 'auto', p: 2, mb: 2, bgcolor: 'rgba(0,0,0,0.9)' }}>
                 <List>
                     {messages.map((msg) => (
                         <ListItem key={msg.id} alignItems="flex-start">
@@ -494,10 +494,12 @@ export default function Chat() {
                         height: 56,
                         minWidth: '120px',
                         pl: 3,
-                        bgcolor: '#333', 
+                        bgcolor: '#000000', 
                         color: '#fff',
+                        border: '2px solid #000000',
                         '&:hover': {
-                            bgcolor: '#444'
+                            bgcolor: '#111',
+                            borderColor: 'secondary.main'
                         },
                         display: 'flex',
                         alignItems: 'center',
