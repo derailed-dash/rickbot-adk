@@ -6,7 +6,7 @@
 - [x] Task: Write Tests: Add a snapshot or style-based test in `src/nextjs_fe/__tests__/Chat.test.tsx` to verify the primary color application. dbebd9d
 - [x] Task: Conductor - User Manual Verification 'Theme & Portal Green Styling' (Protocol in workflow.md) dbebd9d
 
-## Phase 2: Plumbus / Meeseeks Box "New Chat" Icon
+## Phase 2: Plumbus / Meeseeks Box "New Chat" Icon [checkpoint: c3b58c6]
 - [x] Task: Source or create a stylized Plumbus SVG/Icon component. d303724
 - [x] Task: Replace `DeleteSweepIcon` in `src/nextjs_fe/components/Chat.tsx` with the new Plumbus icon. d303724
 - [x] Task: Write Tests: Update `Chat.test.tsx` to verify the presence of the Plumbus icon (via aria-label or test-id). d303724
