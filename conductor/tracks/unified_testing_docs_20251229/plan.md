@@ -2,7 +2,7 @@
 
 ## Phase 1: Documentation Scaffolding & Migration
 - [x] Task: Create `docs/testing.md` and initialize the table of contents and structure.
-- [ ] Task: Migrate existing Python test guidance and configuration details from `src/tests/README.md`.
+- [x] Task: Migrate existing Python test guidance and configuration details from `src/tests/README.md`.
 - [ ] Task: Remove `src/tests/README.md` and ensure any references to it are updated.
 - [ ] Task: Conductor - User Manual Verification 'Documentation Scaffolding & Migration' (Protocol in workflow.md)
 
