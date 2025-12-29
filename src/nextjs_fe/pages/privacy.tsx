@@ -30,8 +30,8 @@ export default function PrivacyPolicy() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Head>
-        <title>Privacy Policy - Rickbot ADK</title>
-        <meta name="description" content="Privacy Policy for Rickbot ADK" />
+        <title>Privacy Policy - Rickbot</title>
+        <meta name="description" content="Privacy Policy for Rickbot" />
       </Head>
       
       <Container maxWidth="md" sx={{ py: 8 }}>

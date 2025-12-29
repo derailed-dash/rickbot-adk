@@ -41,6 +41,7 @@ The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot).
 ## Associated Articles
 
 ### Rickbot Articles
+
 See my Medium articles which are intended to supplement this _Rickbot_ repo:
 
 1. [Creating a Rick & Morty Chatbot with Google Cloud and the Gen AI SDK](https://medium.com/google-cloud/creating-a-rick-morty-chatbot-with-google-cloud-and-the-gen-ai-sdk-e8108e83dbee)
@@ -78,7 +79,19 @@ source scripts/setup-env.sh --target-env PROD
 source scripts/setup-env.sh --noauth
 ```
 
-(Note that you can automate loading the `setup-env.sh` script by installing [direnv](https://direnv.net/), and then including the `.envrc` in the project folder.)
+### Using Direnv
+
+Note that you can automate loading the `setup-env.sh` script by installing [direnv](https://direnv.net/), and then including the `.envrc` in the project folder. E.g.
+
+```bash
+sudo apt install direnv
+
+# Add eval "$(direnv hook bash)" to your .bashrc
+echo "eval \"\$(direnv hook bash)\"" >> ~/.bashrc
+
+# Then, from this project folder:
+direnv allow
+```
 
 ### Useful Commands
 

@@ -15,8 +15,10 @@ The following table summarizes the existing tests, their category, and their pur
 | `test_auth_models.py` | Unit | Tests the `AuthUser` Pydantic model for user authentication data. |
 | `test_auth_dependency.py` | Unit | Verifies the token validation logic, including mock token support. |
 | `AuthButton.test.tsx` | Unit (Frontend) | Tests the `AuthButton` React component using Jest and React Testing Library. |
-| `Chat.test.tsx` | Unit (Frontend) | Tests the `Chat` component, including personality fetching, message sending, and Clear Chat. |
+| `Chat.test.tsx` | Unit (Frontend) | Tests the `Chat` component, including personality fetching, message sending, Clear Chat, and tool usage status. |
 | `Privacy.test.tsx` | Unit (Frontend) | Verifies the rendering of the `PrivacyPolicy` page and its accessibility. |
+| `test_artifacts.py` | Integration | Verifies that file uploads are saved as ADK Artifacts and can be retrieved via the `/artifacts` endpoint. |
+| `test_tool_status.py` | Integration | Verifies that tool call events are correctly emitted by the `/chat_stream` endpoint. |
 | `test_api.py` | Integration | Contains tests for the FastAPI `/chat` endpoint. Includes a mocked test for basic success and a true integration test for multi-turn conversation memory. |
 | `test_personalities.py` | Integration | Runs a simple query against every available agent personality to ensure each one can be loaded and can respond. |
 | `test_rickbot_agent_multiturn.py` | Integration | Verifies the agent's conversation memory by directly using the ADK `Runner` for a two-turn conversation. |

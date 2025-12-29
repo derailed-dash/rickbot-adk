@@ -28,8 +28,8 @@ export default function Home() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Head>
-        <title>Rickbot ADK</title>
-        <meta name="description" content="Rickbot ADK Chatbot" />
+        <title>Rickbot</title>
+        <meta name="description" content="Rickbot Chatbot" />
         <link rel="icon" href="/avatars/rick.png" />
       </Head>
       <Chat />

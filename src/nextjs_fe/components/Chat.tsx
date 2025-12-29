@@ -52,7 +52,8 @@ export default function Chat() {
     const [selectedPersonality, setSelectedPersonality] = useState('Rick');
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [file, setFile] = useState<File | null>(null);
+    const [botAction, setBotAction] = useState<string | null>(null);
+    const [files, setFiles] = useState<File[]>([]);
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     const [streamingText, setStreamingText] = useState('');
 
@@ -94,20 +95,21 @@ export default function Chat() {
 
 
     const handleSendMessage = async () => {
-        if (!inputValue.trim() && !file) return;
+        if (!inputValue.trim() && files.length === 0) return;
 
         const newMessage: Message = {
             id: Date.now().toString(),
             text: inputValue,
             sender: 'user',
-            attachments: file ? [file] : []
+            attachments: files.length > 0 ? [...files] : []
         };
 
         setMessages(prev => [...prev, newMessage]);
         setInputValue('');
-        setFile(null);
+        setFiles([]);
         setLoading(true);
         setStreamingText('');
+        setBotAction('Thinking...');
 
         try {
             const token = session?.idToken || session?.accessToken || "";
@@ -118,8 +120,10 @@ export default function Chat() {
             if (sessionId) {
                 formData.append('session_id', sessionId);
             }
-            if (file) {
-                formData.append('file', file);
+            if (newMessage.attachments) {
+                newMessage.attachments.forEach(f => {
+                    formData.append('files', f);
+                });
             }
 
             // Streaming implementation
@@ -159,7 +163,14 @@ export default function Chat() {
                                 currentSessionId = data.session_id;
                                 setSessionId(data.session_id);
                             }
+                            if (data.tool_call) {
+                                setBotAction(`Using tool: ${data.tool_call.name}...`);
+                            }
+                            if (data.agent_transfer) {
+                                setBotAction(`Transferring to agent: ${data.agent_transfer}...`);
+                            }
                             if (data.chunk) {
+                                setBotAction('Responding...');
                                 accumulatedText += data.chunk;
                                 setStreamingText(accumulatedText);
                             }
@@ -178,9 +189,11 @@ export default function Chat() {
             };
             setMessages(prev => [...prev, botMessage]);
             setStreamingText('');
+            setBotAction(null);
 
         } catch (error) {
             console.error('Error sending message:', error);
+            setBotAction(null);
             const errorMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 text: "Sorry, I encountered an error.",
@@ -197,11 +210,12 @@ export default function Chat() {
         setMessages([]);
         setSessionId(null);
         setStreamingText('');
+        setBotAction(null);
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files[0]) {
-            setFile(event.target.files[0]);
+        if (event.target.files) {
+            setFiles(prev => [...prev, ...Array.from(event.target.files!)]);
         }
     };
 
@@ -230,7 +244,7 @@ export default function Chat() {
                 backgroundBlendMode: 'darken',
                 color: 'white'
             }}>
-                <Typography variant="h3" color="primary" gutterBottom>Rickbot ADK</Typography>
+                <Typography variant="h3" color="primary" gutterBottom>Rickbot</Typography>
                 <Typography variant="h6" gutterBottom sx={{ mb: 4 }}>Wubba Lubba Dub Dub! Sign in to start chatting.</Typography>
                 <Button variant="contained" color="primary" size="large" onClick={() => signIn()} sx={{ mb: 4 }}>
                     Sign In
@@ -260,9 +274,9 @@ export default function Chat() {
             backgroundBlendMode: 'darken'
         }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="primary">Rickbot ADK</Typography>
+                <Typography variant="h4" color="primary">Rickbot</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <IconButton color="secondary" onClick={handleClearChat} title="Clear Chat History">
+                    <IconButton color="secondary" onClick={handleClearChat} title="Start New Chat">
                         <DeleteSweepIcon />
                     </IconButton>
                     <AuthButton />
@@ -302,6 +316,26 @@ export default function Chat() {
                                 }
                                 secondary={
                                     <Box component="span" sx={{ color: 'text.primary' }}>
+                                        {msg.attachments && msg.attachments.length > 0 && (
+                                            <Box sx={{ mb: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                {msg.attachments.map((att, i) => {
+                                                    if (!(att instanceof File)) return null;
+                                                    const url = URL.createObjectURL(att);
+                                                    if (att.type.startsWith('image/')) {
+                                                        return <Box key={i} component="img" src={url} sx={{ maxWidth: '100%', maxHeight: '300px', borderRadius: 1, display: 'block' }} />;
+                                                    } else if (att.type.startsWith('video/')) {
+                                                        return <Box key={i} component="video" src={url} controls sx={{ maxWidth: '100%', maxHeight: '300px', borderRadius: 1, display: 'block' }} />;
+                                                    } else {
+                                                        return (
+                                                            <Paper key={i} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.05)' }}>
+                                                                <AttachFileIcon fontSize="small" />
+                                                                <Typography variant="caption">{att.name}</Typography>
+                                                            </Paper>
+                                                        );
+                                                    }
+                                                })}
+                                            </Box>
+                                        )}
                                         <ReactMarkdown
                                           components={{
                                             p: ({node, ...props}) => <span {...props} />
@@ -314,7 +348,7 @@ export default function Chat() {
                             />
                         </ListItem>
                     ))}
-                    {loading && streamingText && (
+                    {loading && (
                          <ListItem alignItems="flex-start">
                             <ListItemAvatar>
                                 <Avatar src={`/avatars/${selectedPersonality.toLowerCase()}.png`} />
@@ -327,13 +361,20 @@ export default function Chat() {
                                 }
                                 secondary={
                                     <Box component="span" sx={{ color: 'text.primary' }}>
-                                        <ReactMarkdown
-                                          components={{
-                                            p: ({node, ...props}) => <span {...props} />
-                                          }}
-                                        >
-                                          {streamingText}
-                                        </ReactMarkdown>
+                                        {botAction && (
+                                            <Typography component="span" variant="caption" color="secondary" sx={{ display: 'block', mb: 1, fontStyle: 'italic' }}>
+                                                {botAction}
+                                            </Typography>
+                                        )}
+                                        {streamingText && (
+                                            <ReactMarkdown
+                                              components={{
+                                                p: ({node, ...props}) => <span {...props} />
+                                              }}
+                                            >
+                                              {streamingText}
+                                            </ReactMarkdown>
+                                        )}
                                     </Box>
                                 }
                             />
@@ -346,10 +387,11 @@ export default function Chat() {
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <input
-                    accept="image/*,application/pdf,text/plain"
+                    accept="image/*,video/*,application/pdf,text/plain"
                     style={{ display: 'none' }}
                     id="raised-button-file"
                     type="file"
+                    multiple
                     onChange={handleFileChange}
                 />
                 <label htmlFor="raised-button-file">
@@ -357,7 +399,15 @@ export default function Chat() {
                         <AttachFileIcon />
                     </IconButton>
                 </label>
-                {file && <Typography variant="caption" sx={{ mr: 1 }}>{file.name}</Typography>}
+                {files.length > 0 && (
+                    <Box sx={{ mr: 1, display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: '200px' }}>
+                        {files.map((f, i) => (
+                            <Typography key={i} variant="caption" sx={{ bgcolor: 'rgba(255,255,255,0.1)', px: 0.5, borderRadius: 1 }}>
+                                {f.name}
+                            </Typography>
+                        ))}
+                    </Box>
+                )}
                 <TextField
                     fullWidth
                     variant="outlined"

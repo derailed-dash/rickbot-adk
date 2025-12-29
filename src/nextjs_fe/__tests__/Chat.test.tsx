@@ -8,7 +8,7 @@ jest.mock('next-auth/react')
 // Mock axios
 jest.mock('axios')
 // Mock react-markdown
-jest.mock('react-markdown', () => (props: any) => <div>{props.children}</div>)
+jest.mock('react-markdown', () => (props: any) => <span>{props.children}</span>)
 // Mock fetch
 global.fetch = jest.fn()
 
@@ -18,6 +18,11 @@ window.HTMLElement.prototype.scrollIntoView = jest.fn()
 // Mock TextEncoder/TextDecoder
 global.TextEncoder = require('util').TextEncoder
 global.TextDecoder = require('util').TextDecoder
+
+// Mock URL.createObjectURL
+global.URL.createObjectURL = jest.fn(() => 'mock-url')
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 describe('Chat', () => {
   const mockSession = {
@@ -30,8 +35,9 @@ describe('Chat', () => {
 
   beforeEach(() => {
     ;(useSession as jest.Mock).mockReturnValue(mockSession)
-    ;(axios.get as jest.Mock).mockResolvedValue({ data: [] })
+    ;(axios.get as jest.Mock).mockResolvedValue({ data: [{ name: 'Rick', description: 'Rick Sanchez', avatar: '/avatars/rick.png' }] })
     ;(global.fetch as jest.Mock).mockResolvedValue({
+        status: 200,
         body: {
             getReader: () => ({
                 read: jest.fn()
@@ -88,11 +94,64 @@ describe('Chat', () => {
         expect(screen.getByText('Hi')).toBeInTheDocument()
     })
 
-    // Click Clear Chat
-    const clearButton = screen.getByTitle('Clear Chat History')
+    // Click Start New Chat
+    const clearButton = screen.getByTitle('Start New Chat')
     fireEvent.click(clearButton)
 
     // Verify messages are cleared
     expect(screen.queryByText('Hi')).not.toBeInTheDocument()
+  })
+
+  it('displays tool usage status when tool_call event is received', async () => {
+    const readMock = jest.fn()
+        .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"tool_call": {"name": "google_search"}}\n\n') })
+        .mockImplementationOnce(async () => {
+            await sleep(100);
+            return { done: false, value: new TextEncoder().encode('data: {"chunk": "Searching..."}\n\n') };
+        })
+        .mockResolvedValueOnce({ done: true })
+
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+        status: 200,
+        body: {
+            getReader: () => ({
+                read: readMock
+            })
+        }
+    })
+
+    render(<Chat />)
+    const input = screen.getByPlaceholderText('Type a message...')
+    fireEvent.change(input, { target: { value: 'Search something' } })
+    fireEvent.click(screen.getByText('Send'))
+
+    await waitFor(() => {
+        expect(screen.getByText(/Using tool: google_search/i)).toBeInTheDocument()
+    }, { timeout: 2000 })
+  })
+
+  it('handles multi-file upload and renders them inline', async () => {
+    const { container } = render(<Chat />)
+    
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement
+    const file1 = new File(['hello'], 'hello.png', { type: 'image/png' })
+    const file2 = new File(['world'], 'world.mp4', { type: 'video/mp4' })
+    
+    fireEvent.change(input, { target: { files: [file1, file2] } })
+    
+    // Check if filenames are displayed near input
+    await waitFor(() => {
+        expect(screen.getByText('hello.png')).toBeInTheDocument()
+        expect(screen.getByText('world.mp4')).toBeInTheDocument()
+    })
+
+    // Send
+    fireEvent.click(screen.getByText('Send'))
+
+    // Verify they are rendered in the message list
+    await waitFor(() => {
+        const images = screen.getAllByRole('img')
+        expect(images.some(img => img.getAttribute('src') === 'mock-url')).toBeTruthy()
+    })
   })
 })
