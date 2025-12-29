@@ -19,3 +19,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Persona Metadata Integration
 *Link: [./conductor/archive/persona_metadata_20251229/](./conductor/archive/persona_metadata_20251229/)*
+---
+
+## [~] Track: UI Enhancements: Rick and Morty Aesthetic
+*Link: [./conductor/tracks/ui_enhancements_rick_morty_20251229/](./conductor/tracks/ui_enhancements_rick_morty_20251229/)*
