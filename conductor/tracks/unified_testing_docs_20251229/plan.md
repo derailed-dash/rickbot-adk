@@ -19,6 +19,6 @@
 - [x] Task: Conductor - User Manual Verification 'Authentication & Manual Verification' (Protocol in workflow.md)
 
 ## Phase 4: Final Review & Integration
-- [ ] Task: Perform a final proofread of `docs/testing.md` for clarity and technical accuracy.
-- [ ] Task: Verify that all `curl` commands and shell snippets are correct and functional.
-- [ ] Task: Conductor - User Manual Verification 'Final Review & Integration' (Protocol in workflow.md)
+- [x] Task: Perform a final proofread of `docs/testing.md` for clarity and technical accuracy.
+- [x] Task: Verify that all `curl` commands and shell snippets are correct and functional.
+- [~] Task: Conductor - User Manual Verification 'Final Review & Integration' (Protocol in workflow.md)
