@@ -163,9 +163,9 @@ describe('Chat', () => {
     })
   })
 
-  it('renders the Plumbus icon for the New Chat button with a Badge', () => {
+  it('renders the Meeseeks Box icon for the New Chat button with a Badge', () => {
     render(<Chat />)
-    expect(screen.getByTestId('plumbus-icon')).toBeInTheDocument()
+    expect(screen.getByTestId('meeseeks-box-icon')).toBeInTheDocument()
     expect(screen.getByText('+')).toBeInTheDocument() // Check for Badge content
     expect(screen.getByTitle('Start New Chat')).toBeInTheDocument()
   })

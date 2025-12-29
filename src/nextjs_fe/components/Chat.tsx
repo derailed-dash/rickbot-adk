@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import PlumbusIcon from './PlumbusIcon';
+import MeeseeksBoxIcon from './MeeseeksBoxIcon';
 import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 import AuthButton from './AuthButton';
@@ -296,7 +296,7 @@ export default function Chat() {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <IconButton color="secondary" onClick={handleClearChat} title="Start New Chat">
                         <Badge badgeContent="+" color="primary" overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                            <PlumbusIcon sx={{ fontSize: 40 }} />
+                            <MeeseeksBoxIcon sx={{ fontSize: 40 }} />
                         </Badge>
                     </IconButton>
                     <AuthButton />
