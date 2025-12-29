@@ -100,12 +100,14 @@ def test_chat_stream_endpoint(client):
 
         # Chunk 1
         event1 = MagicMock()
+        event1.actions = None  # Prevent MagicMock serialization error in json.dumps
         # The code checks: if event.content and event.content.parts:
         event1.content.parts = [MockPart(text="Chunk 1")]
         yield event1
 
         # Chunk 2
         event2 = MagicMock()
+        event2.actions = None  # Prevent MagicMock serialization error in json.dumps
         event2.content.parts = [MockPart(text="Chunk 2")]
         yield event2
 
