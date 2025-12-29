@@ -309,7 +309,15 @@ export default function Chat() {
                     </IconButton>
                     <AuthButton />
                     <FormControl sx={{ minWidth: 120 }}>
-                        <InputLabel id="personality-select-label" sx={{ color: 'secondary.main' }}>Personality</InputLabel>
+                        <InputLabel 
+                            id="personality-select-label" 
+                            sx={{ 
+                                color: 'secondary.main',
+                                '&.Mui-focused': { color: 'secondary.main' }
+                            }}
+                        >
+                            Personality
+                        </InputLabel>
                         <Select
                             labelId="personality-select-label"
                             value={selectedPersonality.name}
@@ -320,10 +328,11 @@ export default function Chat() {
                             }}
                             sx={{ 
                                 color: 'secondary.main',
-                                '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(176, 38, 255, 0.5)' },
-                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#b026ff' },
-                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#b026ff' },
-                                '.MuiSvgIcon-root': { color: '#b026ff' }
+                                fontWeight: 'bold',
+                                '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 64, 255, 0.5)' },
+                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#FF40FF' },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#FF40FF' },
+                                '.MuiSvgIcon-root': { color: '#FF40FF' }
                             }}
                         >
                             {personalities.map((p) => (
@@ -353,7 +362,7 @@ export default function Chat() {
                         <Typography variant="body2" color="text.primary" sx={{ mb: 0.5 }}>
                             {selectedPersonality.overview}
                         </Typography>
-                        <Typography variant="caption" color="secondary.main" sx={{ fontStyle: 'italic' }}>
+                        <Typography variant="caption" color="secondary.main" sx={{ fontStyle: 'italic', fontWeight: 'bold', textShadow: '0 0 5px rgba(255, 64, 255, 0.5)' }}>
                             {selectedPersonality.welcome}
                         </Typography>
                     </Box>
@@ -369,7 +378,11 @@ export default function Chat() {
                             </ListItemAvatar>
                             <ListItemText
                                 primary={
-                                    <Box component="span" sx={{ fontWeight: 'bold', color: msg.sender === 'user' ? 'secondary.main' : 'primary.main' }}>
+                                    <Box component="span" sx={{ 
+                                        fontWeight: 'bold', 
+                                        color: msg.sender === 'user' ? 'secondary.main' : 'primary.main',
+                                        textShadow: msg.sender === 'user' ? '0 0 5px rgba(255, 64, 255, 0.5)' : 'none'
+                                    }}>
                                         {msg.sender === 'user' ? 'You' : msg.personality}
                                     </Box>
                                 }
