@@ -144,104 +144,57 @@ To use a mock token:
 
 ## Manual API Verification
 
-
-
 Once you have obtained a Bearer token, you can use `curl` to manually interact with the API. It is recommended to store your token in an environment variable.
 
-
-
 ```bash
-
 export AUTH_TOKEN="your_retrieved_token_here"
-
 # OR use a mock token
-
 export AUTH_TOKEN="mock:123:tester@example.com:TesterUser"
-
 ```
 
-
-
 ### Using Curl with Authentication
-
-
 
 #### List Available Personas
 
 ```bash
-
 curl -X GET "http://localhost:8000/personas" \
-
   -H "Authorization: Bearer $AUTH_TOKEN"
-
 ```
-
-
 
 #### Send a Message (Single-Turn)
 
 ```bash
-
 curl -X POST "http://localhost:8000/chat" \
-
   -H "Authorization: Bearer $AUTH_TOKEN" \
-
   -H "Content-Type: multipart/form-data" \
-
   -F "prompt=Hello Rick!" \
-
   -F "personality=Rick" \
-
   -F "user_id=test_user"
-
 ```
-
-
 
 #### Stream a Conversation
 
 ```bash
-
 curl -X POST "http://localhost:8000/chat_stream" \
-
   -H "Authorization: Bearer $AUTH_TOKEN" \
-
   -H "Content-Type: multipart/form-data" \
-
   -F "prompt=Tell me a joke" \
-
   -F "personality=Rick" \
-
   -F "user_id=test_user"
-
 ```
-
-
 
 ### Artifact Retrieval
 
-
-
 One of the primary uses for manual `curl` testing is verifying ADK Artifacts (files, images, videos) that the agent might have generated or received.
-
-
 
 #### Download/Retrieve an Artifact
 
 Replace `<FILENAME>` with the actual filename of the artifact (e.g., `image_123.png`).
 
-
-
 ```bash
-
 curl -X GET "http://localhost:8000/artifacts/<FILENAME>" \
-
   -H "Authorization: Bearer $AUTH_TOKEN" \
-
   --output downloaded_artifact.png
-
 ```
-
-
 
 **Note**: You can find artifact filenames in the JSON response or stream data from the `/chat` or `/chat_stream` endpoints.
