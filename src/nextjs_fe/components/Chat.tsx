@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import PlumbusIcon from './PlumbusIcon';
 import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 import AuthButton from './AuthButton';
@@ -294,7 +294,7 @@ export default function Chat() {
                 <Typography variant="h4" color="primary">Rickbot</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <IconButton color="secondary" onClick={handleClearChat} title="Start New Chat">
-                        <DeleteSweepIcon />
+                        <PlumbusIcon />
                     </IconButton>
                     <AuthButton />
                     <FormControl sx={{ minWidth: 120 }}>

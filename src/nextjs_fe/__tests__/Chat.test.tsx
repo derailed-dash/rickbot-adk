@@ -163,6 +163,12 @@ describe('Chat', () => {
     })
   })
 
+  it('renders the Plumbus icon for the New Chat button', () => {
+    render(<Chat />)
+    expect(screen.getByTestId('plumbus-icon')).toBeInTheDocument()
+    expect(screen.getByTitle('Start New Chat')).toBeInTheDocument()
+  })
+
   it('applies the Portal Green primary color to key elements', () => {
     // We need to wrap in ThemeProvider to test the actual theme application
     const { ThemeProvider } = require('@mui/material/styles')
