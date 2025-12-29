@@ -106,7 +106,142 @@ Frontend tests are located in `src/nextjs_fe/__tests__/`. We follow these conven
 ---
 
 ## Authentication & Session Management
-*(Pending implementation)*
+
+The Rickbot-ADK backend requires a valid Bearer token for most operations. This section explains how to obtain a token for manual testing and how to use mock tokens in development.
+
+### Retrieving Bearer Tokens
+
+The easiest way to obtain a valid Bearer token for an active session is using the browser's Developer Tools.
+
+#### From the Network Tab (Recommended)
+1. Open the Rickbot UI in your browser and sign in.
+2. Open **Developer Tools** (F12 or `Cmd+Opt+I` on Mac).
+3. Select the **Network** tab.
+4. Refresh the page or perform an action (like changing the personality or sending a message).
+5. Look for a request to the backend API (e.g., `personas`, `chat_stream`).
+6. Click on the request and go to the **Headers** tab.
+7. Locate the **Request Headers** section and find the `Authorization` header.
+8. Copy the value after `Bearer ` (e.g., the long string of characters).
+
+#### From the Console
+If you have access to the source code and want to quickly log the token, you can temporarily add `console.log(session.idToken)` in `Chat.tsx` and view it in the **Console** tab.
+
+### Mock Tokens
+
+For local development and testing, the backend supports a "Mock Token" format that bypasses Google/GitHub OAuth verification.
+
+- **Format**: `mock:unique_id:email:display_name`
+- **Example**: `mock:123:tester@example.com:TesterUser`
+
+To use a mock token:
+1. Ensure the backend is NOT in production mode (or `RICKBOT_TEST_MODE=true`).
+2. Use the mock string directly in your `Authorization` header:
+   ```bash
+   Authorization: Bearer mock:123:tester@example.com:TesterUser
+   ```
+
+**Note**: Mock tokens are only accepted if the backend's `verify_token` logic allows them, which is typically enabled in development environments.
 
 ## Manual API Verification
-*(Pending implementation)*
+
+
+
+Once you have obtained a Bearer token, you can use `curl` to manually interact with the API. It is recommended to store your token in an environment variable.
+
+
+
+```bash
+
+export AUTH_TOKEN="your_retrieved_token_here"
+
+# OR use a mock token
+
+export AUTH_TOKEN="mock:123:tester@example.com:TesterUser"
+
+```
+
+
+
+### Using Curl with Authentication
+
+
+
+#### List Available Personas
+
+```bash
+
+curl -X GET "http://localhost:8000/personas" \
+
+  -H "Authorization: Bearer $AUTH_TOKEN"
+
+```
+
+
+
+#### Send a Message (Single-Turn)
+
+```bash
+
+curl -X POST "http://localhost:8000/chat" \
+
+  -H "Authorization: Bearer $AUTH_TOKEN" \
+
+  -H "Content-Type: multipart/form-data" \
+
+  -F "prompt=Hello Rick!" \
+
+  -F "personality=Rick" \
+
+  -F "user_id=test_user"
+
+```
+
+
+
+#### Stream a Conversation
+
+```bash
+
+curl -X POST "http://localhost:8000/chat_stream" \
+
+  -H "Authorization: Bearer $AUTH_TOKEN" \
+
+  -H "Content-Type: multipart/form-data" \
+
+  -F "prompt=Tell me a joke" \
+
+  -F "personality=Rick" \
+
+  -F "user_id=test_user"
+
+```
+
+
+
+### Artifact Retrieval
+
+
+
+One of the primary uses for manual `curl` testing is verifying ADK Artifacts (files, images, videos) that the agent might have generated or received.
+
+
+
+#### Download/Retrieve an Artifact
+
+Replace `<FILENAME>` with the actual filename of the artifact (e.g., `image_123.png`).
+
+
+
+```bash
+
+curl -X GET "http://localhost:8000/artifacts/<FILENAME>" \
+
+  -H "Authorization: Bearer $AUTH_TOKEN" \
+
+  --output downloaded_artifact.png
+
+```
+
+
+
+**Note**: You can find artifact filenames in the JSON response or stream data from the `/chat` or `/chat_stream` endpoints.

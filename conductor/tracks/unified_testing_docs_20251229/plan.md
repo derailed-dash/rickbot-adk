@@ -13,10 +13,10 @@
 - [x] Task: Conductor - User Manual Verification 'Frontend Testing & Strategy' (Protocol in workflow.md)
 
 ## Phase 3: Authentication & Manual Verification
-- [ ] Task: Create a step-by-step guide for retrieving a Bearer token from Browser Developer Tools.
-- [ ] Task: Document the usage of Mock Tokens (`mock:id:email:name`) for local development.
-- [ ] Task: Provide authenticated `curl` examples for all endpoints, specifically highlighting Artifact retrieval using `$AUTH_TOKEN`.
-- [ ] Task: Conductor - User Manual Verification 'Authentication & Manual Verification' (Protocol in workflow.md)
+- [x] Task: Create a step-by-step guide for retrieving a Bearer token from Browser Developer Tools.
+- [x] Task: Document the usage of Mock Tokens (`mock:id:email:name`) for local development.
+- [x] Task: Provide authenticated `curl` examples for all endpoints, specifically highlighting Artifact retrieval using `$AUTH_TOKEN`.
+- [~] Task: Conductor - User Manual Verification 'Authentication & Manual Verification' (Protocol in workflow.md)
 
 ## Phase 4: Final Review & Integration
 - [ ] Task: Perform a final proofread of `docs/testing.md` for clarity and technical accuracy.
