@@ -6,13 +6,13 @@
 - [x] Task: Write Tests: Update `src/tests/unit/test_api_personas.py` to verify the `/personas` endpoint returns the new fields. 459d615
 - [x] Task: Conductor - User Manual Verification 'Backend API Enhancement' (Protocol in workflow.md) 2c1cbdc
 
-## Phase 2: Frontend Data Model & Input Placeholder
+## Phase 2: Frontend Data Model & Input Placeholder [checkpoint: 217475b]
 - [x] Task: Update the `Personality` interface in `src/nextjs_fe/components/Chat.tsx` to match the new API response structure. 4765a71
 - [x] Task: Update `handleSendMessage` and input logic to use `selectedPersonality` data directly for the placeholder. 4765a71
 - [x] Task: Modify the input `TextField` placeholder to bind to `selectedPersonality.prompt_question`. 4765a71
 - [x] Task: Conductor - User Manual Verification 'Frontend Data Model & Input Placeholder' (Protocol in workflow.md) 4765a71
 
-## Phase 3: Frontend Profile UI
+## Phase 3: Frontend Profile UI [checkpoint: 217475b]
 - [x] Task: Design and implement a `PersonaProfile` component (or integrated Box) within `Chat.tsx`. 4765a71
 - [x] Task: Integrate the `title` and `overview` fields into the profile area. 4765a71
 - [x] Task: Integrate the `welcome` message into the profile area. 4765a71
