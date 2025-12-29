@@ -7,12 +7,12 @@
 - [x] Task: Conductor - User Manual Verification 'Research and Architecture' (Protocol in workflow.md)
 
 ## Phase 2: Public Pages & Base UI
-- [ ] Task: Create the Privacy Policy page (`/pages/privacy.tsx`) and ensure it's publicly accessible.
-- [ ] Task: Link the Privacy Policy page from the Login screen and Chat Footer.
-- [ ] Task: Implement the "Clear Chat" button and backend session reset logic.
-- [ ] Task: Write Tests: Unit tests for Clear Chat functionality and Privacy page accessibility.
-- [ ] Task: Documentation: Update `@src/tests/README.md` to include new test files and categories (e.g., Privacy, Clear Chat).
-- [ ] Task: Conductor - User Manual Verification 'Public Pages & Base UI' (Protocol in workflow.md)
+- [x] Task: Create the Privacy Policy page (`/pages/privacy.tsx`) and ensure it's publicly accessible.
+- [x] Task: Link the Privacy Policy page from the Login screen and Chat Footer.
+- [x] Task: Implement the "Clear Chat" button and backend session reset logic.
+- [x] Task: Write Tests: Unit tests for Clear Chat functionality and Privacy page accessibility.
+- [x] Task: Documentation: Update `@src/tests/README.md` to include new test files and categories (e.g., Privacy, Clear Chat).
+- [x] Task: Conductor - User Manual Verification 'Public Pages & Base UI' (Protocol in workflow.md)
 
 ## Phase 3: Tool Usage & Feedback
 - [ ] Task: Update the FastAPI response to include tool execution status.

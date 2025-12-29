@@ -20,9 +20,11 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 import AuthButton from './AuthButton';
+import Link from 'next/link';
 
 interface Message {
     id: string;
@@ -191,6 +193,12 @@ export default function Chat() {
         }
     };
 
+    const handleClearChat = () => {
+        setMessages([]);
+        setSessionId(null);
+        setStreamingText('');
+    };
+
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             setFile(event.target.files[0]);
@@ -224,9 +232,14 @@ export default function Chat() {
             }}>
                 <Typography variant="h3" color="primary" gutterBottom>Rickbot ADK</Typography>
                 <Typography variant="h6" gutterBottom sx={{ mb: 4 }}>Wubba Lubba Dub Dub! Sign in to start chatting.</Typography>
-                <Button variant="contained" color="primary" size="large" onClick={() => signIn()}>
+                <Button variant="contained" color="primary" size="large" onClick={() => signIn()} sx={{ mb: 4 }}>
                     Sign In
                 </Button>
+                <Link href="/privacy" passHref legacyBehavior>
+                    <Typography component="a" variant="body2" color="primary" sx={{ cursor: 'pointer', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                        Privacy Policy
+                    </Typography>
+                </Link>
             </Box>
         )
     }
@@ -248,7 +261,10 @@ export default function Chat() {
         }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h4" color="primary">Rickbot ADK</Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <IconButton color="secondary" onClick={handleClearChat} title="Clear Chat History">
+                        <DeleteSweepIcon />
+                    </IconButton>
                     <AuthButton />
                     <FormControl sx={{ minWidth: 120 }}>
                         <InputLabel id="personality-select-label">Personality</InputLabel>
@@ -358,6 +374,13 @@ export default function Chat() {
                 <Button variant="contained" endIcon={<SendIcon />} onClick={handleSendMessage} disabled={loading && !streamingText}>
                     Send
                 </Button>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                <Link href="/privacy" passHref legacyBehavior>
+                    <Typography component="a" variant="caption" color="primary" sx={{ cursor: 'pointer', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                        Privacy Policy
+                    </Typography>
+                </Link>
             </Box>
         </Box>
     );

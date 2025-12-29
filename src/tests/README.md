@@ -15,11 +15,12 @@ The following table summarizes the existing tests, their category, and their pur
 | `test_auth_models.py` | Unit | Tests the `AuthUser` Pydantic model for user authentication data. |
 | `test_auth_dependency.py` | Unit | Verifies the token validation logic, including mock token support. |
 | `AuthButton.test.tsx` | Unit (Frontend) | Tests the `AuthButton` React component using Jest and React Testing Library. |
+| `Chat.test.tsx` | Unit (Frontend) | Tests the `Chat` component, including personality fetching, message sending, and Clear Chat. |
+| `Privacy.test.tsx` | Unit (Frontend) | Verifies the rendering of the `PrivacyPolicy` page and its accessibility. |
 | `test_api.py` | Integration | Contains tests for the FastAPI `/chat` endpoint. Includes a mocked test for basic success and a true integration test for multi-turn conversation memory. |
 | `test_personalities.py` | Integration | Runs a simple query against every available agent personality to ensure each one can be loaded and can respond. |
 | `test_rickbot_agent_multiturn.py` | Integration | Verifies the agent's conversation memory by directly using the ADK `Runner` for a two-turn conversation. |
 | `test_server_e2e.py` | Integration (E2E) | Provides an end-to-end test by starting the actual FastAPI server via `uvicorn` and testing endpoints like `/chat` and `/chat_stream`. |
-| `test_personalities.py` | Integration | Runs a simple query against every available agent personality to ensure each one can be loaded and can respond. |
 
 ## Test Configuration
 

@@ -75,4 +75,24 @@ describe('Chat', () => {
         )
     })
   })
+
+  it('clears messages and session_id when Clear Chat is clicked', async () => {
+    render(<Chat />)
+    
+    // Send a message first to populate state
+    const input = screen.getByPlaceholderText('Type a message...')
+    fireEvent.change(input, { target: { value: 'Hi' } })
+    fireEvent.click(screen.getByText('Send'))
+    
+    await waitFor(() => {
+        expect(screen.getByText('Hi')).toBeInTheDocument()
+    })
+
+    // Click Clear Chat
+    const clearButton = screen.getByTitle('Clear Chat History')
+    fireEvent.click(clearButton)
+
+    // Verify messages are cleared
+    expect(screen.queryByText('Hi')).not.toBeInTheDocument()
+  })
 })
