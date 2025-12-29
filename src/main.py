@@ -57,6 +57,10 @@ class Persona(BaseModel):
     name: str
     description: str
     avatar: str
+    title: str
+    overview: str
+    welcome: str
+    prompt_question: str
 
 
 logger.debug("Initialising FastAPI app...")
@@ -81,6 +85,10 @@ def get_personas(user: AuthUser = Depends(verify_token)) -> list[Persona]:
             name=p.name,
             description=p.menu_name,
             avatar=f"/avatars/{p.name.lower()}.png",
+            title=p.title,
+            overview=p.overview,
+            welcome=p.welcome,
+            prompt_question=p.prompt_question,
         )
         for p in personalities.values()
     ]

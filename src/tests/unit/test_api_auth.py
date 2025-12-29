@@ -24,6 +24,10 @@ def client():
     mock_p = MagicMock()
     mock_p.name = "Rick"
     mock_p.menu_name = "Rick Sanchez"
+    mock_p.title = "Rickbot"
+    mock_p.overview = "Smartest man"
+    mock_p.welcome = "Wubba Lubba"
+    mock_p.prompt_question = "What?"
     mock_personalities = {"Rick": mock_p}
 
     # Patch global session_service
