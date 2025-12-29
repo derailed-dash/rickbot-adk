@@ -27,7 +27,7 @@ from os import getenv
 from typing import Annotated
 
 # from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Form, UploadFile
+from fastapi import Depends, FastAPI, Form, UploadFile, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
@@ -131,8 +131,20 @@ async def chat(
     if file and file.filename:
         logger.debug(f"Processing uploaded file: {file.filename} ({file.content_type})")
         file_content = await file.read()
+        
+        # Save as Artifact (User-scoped)
+        artifact_filename = f"user:{file.filename}"
+        artifact_part = Part.from_bytes(data=file_content, mime_type=file.content_type)
+        await artifact_service.save_artifact(
+            app_name=APP_NAME,
+            user_id=user_id,
+            session_id=current_session_id,
+            filename=artifact_filename,
+            artifact=artifact_part,
+        )
+        
         # Create a Part object for the agent to process
-        parts.append(Part(inline_data=Blob(data=file_content, mime_type=file.content_type)))
+        parts.append(artifact_part)
     elif file is not None:
         logger.warning(f"file was set to '{file}' - will not be processed")
 
@@ -216,8 +228,20 @@ async def chat_stream(
     if file and file.filename:
         logger.debug(f"Processing uploaded file: {file.filename} ({file.content_type})")
         file_content = await file.read()
+        
+        # Save as Artifact (User-scoped)
+        artifact_filename = f"user:{file.filename}"
+        artifact_part = Part.from_bytes(data=file_content, mime_type=file.content_type)
+        await artifact_service.save_artifact(
+            app_name=APP_NAME,
+            user_id=user_id,
+            session_id=current_session_id,
+            filename=artifact_filename,
+            artifact=artifact_part,
+        )
+        
         # Create a Part object for the agent to process
-        parts.append(Part(inline_data=Blob(data=file_content, mime_type=file.content_type)))
+        parts.append(artifact_part)
     elif file is not None:
         logger.warning(f"file was set to '{file}' - will not be processed")
 
@@ -266,3 +290,25 @@ async def chat_stream(
 def read_root():
     """Root endpoint for the API."""
     return {"Hello": "World"}
+
+
+@app.get("/artifacts/{filename}")
+async def get_artifact(filename: str, user: AuthUser = Depends(verify_token)) -> Response:
+    """Retrieves a saved artifact for the user."""
+    user_id = user.email
+    artifact_filename = f"user:{filename}"
+
+    logger.debug(f"Retrieving artifact: {artifact_filename} for user: {user_id}")
+
+    artifact = await artifact_service.load_artifact(
+        app_name=APP_NAME,
+        user_id=user_id,
+        session_id="none",  # Ignored for user: scope
+        filename=artifact_filename,
+    )
+
+    if not artifact or not artifact.inline_data:
+        logger.warning(f"Artifact not found: {artifact_filename}")
+        raise HTTPException(status_code=404, detail="Artifact not found")
+
+    return Response(content=artifact.inline_data.data, media_type=artifact.inline_data.mime_type)
