@@ -116,6 +116,7 @@ async def _process_files(
             file_content = await f.read()
 
             # Save as Artifact (User-scoped)
+            # Note: if user uploads a file with the same name, it will be overwritten.
             artifact_filename = f"user:{f.filename}"
             mime_type = f.content_type or "application/octet-stream"
             artifact_part = Part.from_bytes(data=file_content, mime_type=mime_type)

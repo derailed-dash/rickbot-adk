@@ -117,18 +117,19 @@ def test_chat_stream_endpoint(client):
 
     response = c.post("/chat_stream", data={"prompt": "Hello", "personality": "Rick", "user_id": "test_user"})
     assert response.status_code == 200
-    
+
     # Check streaming content by parsing SSE
     import json
+
     content = response.content.decode("utf-8")
-    lines = content.strip().split('\n\n')
-    
-    # We expect: 
+    lines = content.strip().split("\n\n")
+
+    # We expect:
     # 1. session_id
     # 2. Chunk 1
     # 3. Chunk 2
     # 4. done
-    
+
     events = []
     for line in lines:
         if line.startswith("data: "):
@@ -140,11 +141,11 @@ def test_chat_stream_endpoint(client):
 
     assert len(events) >= 3
     assert "session_id" in events[0]
-    
+
     # Look for chunks
     chunks = [e["chunk"] for e in events if "chunk" in e]
     assert "Chunk 1" in chunks
     assert "Chunk 2" in chunks
-    
+
     # Verify done event
     assert events[-1] == {"done": True}

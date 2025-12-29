@@ -21,6 +21,7 @@ global.TextDecoder = require('util').TextDecoder
 
 // Mock URL.createObjectURL
 global.URL.createObjectURL = jest.fn(() => 'mock-url')
+global.URL.revokeObjectURL = jest.fn()
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 

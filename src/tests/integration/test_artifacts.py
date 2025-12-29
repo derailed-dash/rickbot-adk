@@ -63,7 +63,7 @@ def test_file_upload_saves_artifact(server):
     # We use a unique filename to avoid collision with other tests if any
     filename = f"test_artifact_{int(time.time())}.txt"
     file_content = b"Hello ADK Artifacts!"
-    
+
     files = {"files": (filename, file_content, "text/plain")}
     data = {"prompt": "Describe this file.", "personality": "Rick"}
 
