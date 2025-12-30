@@ -260,8 +260,8 @@ describe('Chat', () => {
         expect(screen.getByText('Message with Fallback')).toBeInTheDocument()
     })
 
-    // Check for morty.png fallback
-    const allAvatars = screen.getAllByRole('img')
-    expect(allAvatars.some(img => img.getAttribute('src') === '/avatars/morty.png')).toBeTruthy()
+    // Check for morty.png fallback in message list
+    const messageList = screen.getByRole('list');
+    expect(within(messageList).getAllByRole('img').some(img => img.getAttribute('src') === '/avatars/morty.png')).toBeTruthy();
   })
 })
