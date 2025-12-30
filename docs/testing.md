@@ -61,12 +61,16 @@ The following table summarizes the existing backend tests, their category, and t
 | `test_personality.py` | Unit | Tests the `Personality` data class and ensures personalities are loaded correctly from the YAML configuration. |
 | `test_auth_models.py` | Unit | Tests the `AuthUser` Pydantic model for user authentication data. |
 | `test_auth_dependency.py` | Unit | Verifies the token validation logic, including mock token support. |
+| `test_api_auth.py` | Unit | Tests authentication endpoints and logic within the API. |
+| `test_api_fastapi.py` | Unit | Tests core FastAPI application configuration and middleware. |
+| `test_api_personas.py` | Unit | Detailed unit tests for the `/personas` endpoint logic. |
 | `test_artifacts.py` | Integration | Verifies that file uploads are saved as ADK Artifacts and can be retrieved via the `/artifacts` endpoint. |
 | `test_tool_status.py` | Integration | Verifies that tool call events are correctly emitted by the `/chat_stream` endpoint. |
 | `test_api.py` | Integration | Contains tests for the FastAPI `/chat` endpoint. Includes a mocked test for basic success and a true integration test for multi-turn conversation memory. |
 | `test_personalities.py` | Integration | Runs a simple query against every available agent personality to ensure each one can be loaded and can respond. |
 | `test_rickbot_agent_multiturn.py` | Integration | Verifies the agent's conversation memory by directly using the ADK `Runner` for a two-turn conversation. |
 | `test_server_e2e.py` | Integration (E2E) | Provides an end-to-end test by starting the actual FastAPI server via `uvicorn` and testing endpoints like `/chat` and `/chat_stream`. |
+| `test_gcs_integration.py` | Integration | Mocks GCS environment and client to ensure `GcsArtifactService` is correctly instantiated and utilized when `ARTIFACT_BUCKET` is set. |
 
 ### Configuration & Test Mode
 

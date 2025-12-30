@@ -192,8 +192,10 @@ Frontend user authentication is required for Rickbot.
 The system leverages **ADK Artifacts** for robust handling of user-uploaded files and generated content.
 
 1.  **Storage Strategy**:
-    -   **Development**: Uses `InMemoryArtifactService` for transient storage.
-    -   **Production**: Uses `GcsArtifactService` to persist files in a dedicated Google Cloud Storage bucket. This ensures history is preserved across container restarts.
+    -   **Development**: Uses `InMemoryArtifactService` for transient storage. This is the default when the `ARTIFACT_BUCKET` environment variable is not set.
+    -   **Production**: Uses `GcsArtifactService` to persist files in a dedicated Google Cloud Storage bucket. This is enabled by setting the `ARTIFACT_BUCKET` environment variable.
+        > [!IMPORTANT]
+        > The ADK **does not enforce any data retention policy** for GCS artifacts. Retention is determined entirely by the **Lifecycle Management policies** configured on your `ARTIFACT_BUCKET`. You must configure these policies in Google Cloud (e.g., delete objects > 30 days old) to avoid indefinite storage costs.
 
 2.  **Upload Workflow (Next.js & API)**:
     -   **Design Choice**: To maintain a "stateless" API design and compatibility with ADK's `new_message` structure, the system uses a **Unified Chat Request** pattern.
