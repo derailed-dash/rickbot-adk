@@ -16,8 +16,8 @@ This plan follows the Test-Driven Development (TDD) workflow to reorganize the h
 - [x] Task: Conductor - User Manual Verification 'Desktop Header Reorganization' (Protocol in workflow.md)
 
 ## Phase 3: Mobile Responsiveness (Hamburger Menu)
-- [ ] Task: Write unit tests for `Header` component responsive behavior (Drawer visibility at mobile breakpoints)
-- [ ] Task: Implement `IconButton` (MenuIcon) and `Drawer` for mobile navigation
-- [ ] Task: Move `AuthButton` and `Persona Selector` into the `Drawer` for mobile views
-- [ ] Task: Ensure the "New conversation" (Meeseeks) icon remains visible in the top bar on mobile
-- [ ] Task: Conductor - User Manual Verification 'Mobile Responsiveness' (Protocol in workflow.md)
+- [x] Task: Write unit tests for `Header` component responsive behavior (Drawer visibility at mobile breakpoints)
+- [x] Task: Implement `IconButton` (MenuIcon) and `Drawer` for mobile navigation
+- [x] Task: Move `AuthButton` and `Persona Selector` into the `Drawer` for mobile views
+- [x] Task: Ensure the "New conversation" (Meeseeks) icon remains visible in the top bar on mobile
+- [x] Task: Conductor - User Manual Verification 'Mobile Responsiveness' (Protocol in workflow.md)
