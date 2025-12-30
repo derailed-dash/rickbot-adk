@@ -11,39 +11,17 @@ import {
     Avatar,
     Typography,
     Paper,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
     IconButton,
-    LinearProgress,
-    Badge
+    LinearProgress
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
-import AuthButton from './AuthButton';
 import Link from 'next/link';
 import PortalAnimation from './PortalAnimation';
-
-interface Message {
-    id: string;
-    text: string;
-    sender: 'user' | 'bot';
-    personality?: string;
-    attachments?: any[];
-}
-
-interface Personality {
-    name: string;
-    description: string;
-    avatar: string;
-    title: string;
-    overview: string;
-    welcome: string;
-    prompt_question: string;
-}
+import Header from './Header';
+import { Personality, Message } from '../types/chat';
 
 const initialPersonalities: Personality[] = [
     { 
@@ -328,59 +306,12 @@ export default function Chat() {
             backgroundColor: 'rgba(0,0,0,0.85)',
             backgroundBlendMode: 'darken'
         }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" color="primary" sx={{ textShadow: '0 0 10px rgba(57, 255, 20, 0.5)', fontWeight: 'bold' }}>Rickbot</Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <IconButton color="secondary" onClick={handleClearChat} title="Start New Chat">
-                        <Badge badgeContent="+" color="primary" overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
-                            <Box 
-                                component="img" 
-                                src="/meeseeks.webp" 
-                                sx={{ width: 40, height: 40 }} 
-                                data-testid="meeseeks-box-icon"
-                            />
-                        </Badge>
-                    </IconButton>
-                    <AuthButton />
-                    <FormControl sx={{ minWidth: 120 }}>
-                        <InputLabel 
-                            id="personality-select-label" 
-                            sx={{ 
-                                color: 'secondary.main',
-                                '&.Mui-focused': { color: 'secondary.main' }
-                            }}
-                        >
-                            Personality
-                        </InputLabel>
-                        <Select
-                            labelId="personality-select-label"
-                            value={selectedPersonality.name}
-                            label="Personality"
-                            onChange={(e) => {
-                                const newP = personalities.find(p => p.name === e.target.value);
-                                if (newP) setSelectedPersonality(newP);
-                            }}
-                            sx={{ 
-                                color: 'secondary.main',
-                                fontWeight: 'bold',
-                                '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 64, 255, 0.5)' },
-                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#FF40FF' },
-                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#FF40FF' },
-                                '.MuiSvgIcon-root': { color: '#FF40FF' }
-                            }}
-                        >
-                            {personalities.map((p) => (
-                                <MenuItem key={p.name} value={p.name}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Avatar src={p.avatar} sx={{ width: 24, height: 24, mr: 1 }} />
-                                        {p.name}
-                                    </Box>
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Box>
-            </Box>
+            <Header 
+                personalities={personalities}
+                selectedPersonality={selectedPersonality}
+                onPersonalityChange={(p) => setSelectedPersonality(p)}
+                onClearChat={handleClearChat}
+            />
 
             {/* Persona Profile Area */}
             <Paper elevation={3} sx={{ p: 2, mb: 2, bgcolor: '#000000', borderLeft: '4px solid', borderColor: '#000000' }}>
