@@ -137,6 +137,7 @@ export default function Header({
                     <Typography 
                         variant="caption" 
                         color="primary" 
+                        data-testid="new-chat-label"
                         sx={{ 
                             fontWeight: 'bold', 
                             fontFamily: 'Courier New, monospace',

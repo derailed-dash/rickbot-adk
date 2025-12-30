@@ -52,11 +52,9 @@ describe('Header', () => {
         expect(screen.getByText('Rickbot')).toBeInTheDocument()
         expect(screen.getByText('Sign in')).toBeInTheDocument()
         expect(screen.getByTestId('meeseeks-box-icon')).toBeInTheDocument()
-        expect(screen.getAllByText((content, element) => {
-            const hasText = (node: Element) => node.textContent === 'Newchat' || node.textContent === 'New chat' || (node.textContent?.includes('New') && node.textContent?.includes('chat'));
-            const elementHasText = element ? hasText(element) : false;
-            return elementHasText;
-        })[0]).toBeInTheDocument()
+        const newChatLabel = screen.getByTestId('new-chat-label');
+        expect(newChatLabel).toBeInTheDocument();
+        expect(newChatLabel).toHaveTextContent(/New\s*chat/i);
     })
 
     it('renders hamburger menu on mobile and toggles drawer', async () => {
