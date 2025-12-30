@@ -131,8 +131,7 @@ async def _process_files(
             # Create a Part object for the agent to process
             parts.append(artifact_part)
     # No warning needed for empty list, only if files is explicitly None (which shouldn't happen with default=[])
-    elif files is None:
-        logger.warning("files was None")
+
 
     return parts
 
