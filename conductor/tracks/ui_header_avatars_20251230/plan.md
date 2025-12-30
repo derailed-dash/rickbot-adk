@@ -2,7 +2,7 @@
 
 This plan follows the Test-Driven Development (TDD) workflow to reorganize the header and integrate user avatars into the chat interface.
 
-## Phase 1: User Avatar Integration
+## Phase 1: User Avatar Integration [checkpoint: 3c2a360]
 - [x] Task: Write unit test in `src/nextjs_fe/__tests__/Chat.test.tsx` to verify user message avatar source (Session image vs Fallback) c124739
 - [x] Task: Update `Chat.tsx` to pass the session user image to the message list avatar c124739
 - [x] Task: Verify user messages correctly display the logged-in user's avatar or fallback to `morty.png` c124739
