@@ -15,7 +15,7 @@ This plan follows the Test-Driven Development (TDD) workflow to reorganize the h
 - [x] Task: Integrate the new `Header` component back into `Chat.tsx` 5915d28
 - [x] Task: Conductor - User Manual Verification 'Desktop Header Reorganization' (Protocol in workflow.md)
 
-## Phase 3: Mobile Responsiveness (Hamburger Menu)
+## Phase 3: Mobile Responsiveness (Hamburger Menu) [checkpoint: ba80bb5]
 - [x] Task: Write unit tests for `Header` component responsive behavior (Drawer visibility at mobile breakpoints)
 - [x] Task: Implement `IconButton` (MenuIcon) and `Drawer` for mobile navigation
 - [x] Task: Move `AuthButton` and `Persona Selector` into the `Drawer` for mobile views
