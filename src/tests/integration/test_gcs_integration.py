@@ -103,7 +103,7 @@ def test_gcs_configuration_and_usage(mock_gcs_env, mock_gcs_client):
             # Verify GCS interaction
             # The ADK GcsArtifactService calls bucket.blob(blob_name).upload_from_file(...)
             # Check if any upload method was called on the blob
-            assert mock_blob.upload_from_file.called or mock_blob.upload_from_string.called
+            mock_blob.upload_from_string.assert_called_once()
 
             # --- TEST RETRIEVAL ---
             # The filename in the service is usually scoped: "user:test_upload.txt"
