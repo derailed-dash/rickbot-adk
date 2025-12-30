@@ -1,0 +1,23 @@
+# Plan: UI Enhancements - Header Layout & User Avatars
+
+This plan follows the Test-Driven Development (TDD) workflow to reorganize the header and integrate user avatars into the chat interface.
+
+## Phase 1: User Avatar Integration
+- [x] Task: Write unit test in `src/nextjs_fe/__tests__/Chat.test.tsx` to verify user message avatar source (Session image vs Fallback) c124739
+- [x] Task: Update `Chat.tsx` to pass the session user image to the message list avatar c124739
+- [x] Task: Verify user messages correctly display the logged-in user's avatar or fallback to `morty.png` c124739
+- [x] Task: Conductor - User Manual Verification 'User Avatar Integration' (Protocol in workflow.md)
+
+## Phase 2: Desktop Header Reorganization
+- [ ] Task: Extract header logic from `Chat.tsx` into a new `Header` component for better maintainability
+- [ ] Task: Write unit tests for the `Header` component layout positions (Logo Left, Auth Center, Actions Right)
+- [ ] Task: Implement the 3-column flex layout in the `Header` component
+- [ ] Task: Integrate the new `Header` component back into `Chat.tsx`
+- [ ] Task: Conductor - User Manual Verification 'Desktop Header Reorganization' (Protocol in workflow.md)
+
+## Phase 3: Mobile Responsiveness (Hamburger Menu)
+- [ ] Task: Write unit tests for `Header` component responsive behavior (Drawer visibility at mobile breakpoints)
+- [ ] Task: Implement `IconButton` (MenuIcon) and `Drawer` for mobile navigation
+- [ ] Task: Move `AuthButton` and `Persona Selector` into the `Drawer` for mobile views
+- [ ] Task: Ensure the "New conversation" (Meeseeks) icon remains visible in the top bar on mobile
+- [ ] Task: Conductor - User Manual Verification 'Mobile Responsiveness' (Protocol in workflow.md)

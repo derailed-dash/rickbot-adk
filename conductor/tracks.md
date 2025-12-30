@@ -28,3 +28,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: UI Refinements: Enhanced Layout & Assets
 *Link: [./conductor/archive/ui_refinements_layout_assets_20251229/](./conductor/archive/ui_refinements_layout_assets_20251229/)*
+
+---
+
+## [~] Track: UI Enhancements - Header Layout & User Avatars
+*Link: [./conductor/tracks/ui_header_avatars_20251230/](./conductor/tracks/ui_header_avatars_20251230/)*
