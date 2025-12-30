@@ -107,6 +107,7 @@ direnv allow
 | `make docker-clean`           | Remove any orphaned containers |
 | `make test`                   | Run unit tests |
 | `make test-all`               | Run unit and integration tests (takes a little longer) |
+| `make test-ui`                | Run frontend UI tests (equivalent to `npm test` in `src/nextjs_fe`) |
 | `make lint`                   | Run code quality checks (codespell, ruff, mypy) |
 | `make terraform`              | Plan Terraform, prompt for authorisation, then apply |
 | `uv run jupyter lab`          | Launch Jupyter notebook |

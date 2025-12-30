@@ -60,5 +60,5 @@
 - [ ] Investigate moving frontend to existing Cloud Run service, and deploying backend to a separate service.
 - [ ] Load reference material as context to Dazbo
 - [ ] Restrict access to certain personalities.
-- [ ] Ensure React UI works on mobile.
+- [x] Ensure React UI works on mobile.
 - [ ] Add voice / live.

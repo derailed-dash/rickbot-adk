@@ -261,7 +261,7 @@ describe('Chat', () => {
     })
 
     // Check for morty.png fallback in message list
-    const messageList = screen.getByRole('list');
-    expect(within(messageList).getAllByRole('img').some(img => img.getAttribute('src') === '/avatars/morty.png')).toBeTruthy();
+    const messageListFallback = screen.getByRole('list');
+    expect(within(messageListFallback).getAllByRole('img').some(img => img.getAttribute('src') === '/avatars/morty.png')).toBeTruthy();
   })
 })
