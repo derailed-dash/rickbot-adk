@@ -212,56 +212,52 @@ describe('Chat', () => {
     expect(rootBox).toHaveStyle({ backgroundImage: 'url(/galaxy_bg.png)' })
   })
 
-  it('displays user avatar from session if available, otherwise falls back to morty.png', async () => {
-    // 1. Test with avatar in session
+  it('displays user avatar from session if available', async () => {
     const mockSessionWithAvatar = {
       data: {
         user: { name: 'Test User', image: '/avatars/user-avatar.png' },
         idToken: 'mock-id-token'
       },
       status: 'authenticated'
-    }
-    ;(useSession as jest.Mock).mockReturnValue(mockSessionWithAvatar)
+    };
+    (useSession as jest.Mock).mockReturnValue(mockSessionWithAvatar);
 
-    const { unmount } = render(<Chat />)
+    render(<Chat />);
     
-    // Send a message
-    const input = screen.getByPlaceholderText('What do you want?')
-    fireEvent.change(input, { target: { value: 'Message with Avatar' } })
-    fireEvent.click(screen.getByText('Send'))
+    const input = screen.getByPlaceholderText('What do you want?');
+    fireEvent.change(input, { target: { value: 'Message with Avatar' } });
+    fireEvent.click(screen.getByText('Send'));
     
     await waitFor(() => {
-        expect(screen.getByText('Message with Avatar')).toBeInTheDocument()
-    })
+        expect(screen.getByText('Message with Avatar')).toBeInTheDocument();
+    });
 
-    // Check avatar in message list
-    const messageList = screen.getByRole('list')
-    const messageAvatars = within(messageList).getAllByRole('img')
-    expect(messageAvatars.some(img => img.getAttribute('src') === '/avatars/user-avatar.png')).toBeTruthy()
+    const messageItem = screen.getByText('Message with Avatar').closest('li');
+    const avatarInMessage = within(messageItem!).getByRole('img');
+    expect(avatarInMessage).toHaveAttribute('src', '/avatars/user-avatar.png');
+  });
 
-    unmount()
-
-    // 2. Test fallback (no image in session)
+  it('falls back to morty.png if no avatar is in session', async () => {
     const mockSessionNoAvatar = {
         data: {
           user: { name: 'Test User' },
           idToken: 'mock-id-token'
         },
         status: 'authenticated'
-      }
-    ;(useSession as jest.Mock).mockReturnValue(mockSessionNoAvatar)
+      };
+    (useSession as jest.Mock).mockReturnValue(mockSessionNoAvatar);
     
-    render(<Chat />)
-    // Send another message
-    fireEvent.change(screen.getByPlaceholderText('What do you want?'), { target: { value: 'Message with Fallback' } })
-    fireEvent.click(screen.getByText('Send'))
+    render(<Chat />);
+
+    fireEvent.change(screen.getByPlaceholderText('What do you want?'), { target: { value: 'Message with Fallback' } });
+    fireEvent.click(screen.getByText('Send'));
 
     await waitFor(() => {
-        expect(screen.getByText('Message with Fallback')).toBeInTheDocument()
-    })
+        expect(screen.getByText('Message with Fallback')).toBeInTheDocument();
+    });
 
-    // Check for morty.png fallback in message list
-    const messageListFallback = screen.getByRole('list');
-    expect(within(messageListFallback).getAllByRole('img').some(img => img.getAttribute('src') === '/avatars/morty.png')).toBeTruthy();
-  })
+    const messageItem = screen.getByText('Message with Fallback').closest('li');
+    const avatarInMessage = within(messageItem!).getByRole('img');
+    expect(avatarInMessage).toHaveAttribute('src', '/avatars/morty.png');
+  });
 })
