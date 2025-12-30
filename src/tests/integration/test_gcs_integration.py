@@ -86,32 +86,33 @@ def test_gcs_configuration_and_usage(mock_gcs_env, mock_gcs_client):
         mock_user = AuthUser(id="test_id", email="test@example.com", name="Test User", provider="mock")
         app.dependency_overrides[verify_token] = lambda: mock_user
 
-        client = TestClient(app)
+        try:
+            client = TestClient(app)
 
-        # --- TEST UPLOAD ---
-        filename = "test_upload.txt"
-        file_content = b"Content for GCS"
+            # --- TEST UPLOAD ---
+            filename = "test_upload.txt"
+            file_content = b"Content for GCS"
 
-        response = client.post(
-            "/chat",
-            data={"prompt": "Save this", "personality": "Rick"},
-            files={"files": (filename, file_content, "text/plain")}
-        )
-        assert response.status_code == 200
+            response = client.post(
+                "/chat",
+                data={"prompt": "Save this", "personality": "Rick"},
+                files={"files": (filename, file_content, "text/plain")}
+            )
+            assert response.status_code == 200
 
-        # Verify GCS interaction
-        # The ADK GcsArtifactService calls bucket.blob(blob_name).upload_from_file(...)
-        # Check if any upload method was called on the blob
-        assert mock_blob.upload_from_file.called or mock_blob.upload_from_string.called
+            # Verify GCS interaction
+            # The ADK GcsArtifactService calls bucket.blob(blob_name).upload_from_file(...)
+            # Check if any upload method was called on the blob
+            assert mock_blob.upload_from_file.called or mock_blob.upload_from_string.called
 
-        # --- TEST RETRIEVAL ---
-        # The filename in the service is usually scoped: "user:test_upload.txt"
-        get_response = client.get(f"/artifacts/{filename}")
-        assert get_response.status_code == 200
-        assert get_response.content == b"GCS Content" # Matched the mock
+            # --- TEST RETRIEVAL ---
+            # The filename in the service is usually scoped: "user:test_upload.txt"
+            get_response = client.get(f"/artifacts/{filename}")
+            assert get_response.status_code == 200
+            assert get_response.content == b"GCS Content" # Matched the mock
 
-        # Verify GCS interaction
-        assert mock_blob.download_as_bytes.called
-
-    # Clean up overrides
-    app.dependency_overrides = {}
+            # Verify GCS interaction
+            assert mock_blob.download_as_bytes.called
+        finally:
+            # Clean up overrides
+            app.dependency_overrides = {}
