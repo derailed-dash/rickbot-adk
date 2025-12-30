@@ -53,5 +53,6 @@ describe('Header', () => {
 
         // Check for Actions section (Meeseeks icon)
         expect(screen.getByTestId('meeseeks-box-icon')).toBeInTheDocument()
+        expect(screen.getByText(/New chat/i)).toBeInTheDocument()
     })
 })

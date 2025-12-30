@@ -58,6 +58,18 @@ export default function Header({
 
             {/* Column 3: Actions (Right) */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1 }}>
+                <Typography 
+                    variant="caption" 
+                    color="primary" 
+                    sx={{ 
+                        fontWeight: 'bold', 
+                        textTransform: 'uppercase',
+                        letterSpacing: 1,
+                        mr: -0.5
+                    }}
+                >
+                    New chat
+                </Typography>
                 <IconButton color="secondary" onClick={onClearChat} title="Start New Chat">
                     <Badge badgeContent="+" color="primary" overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
                         <Box 
