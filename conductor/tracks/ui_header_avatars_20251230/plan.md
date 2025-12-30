@@ -8,7 +8,7 @@ This plan follows the Test-Driven Development (TDD) workflow to reorganize the h
 - [x] Task: Verify user messages correctly display the logged-in user's avatar or fallback to `morty.png` c124739
 - [x] Task: Conductor - User Manual Verification 'User Avatar Integration' (Protocol in workflow.md)
 
-## Phase 2: Desktop Header Reorganization
+## Phase 2: Desktop Header Reorganization [checkpoint: 2950752]
 - [x] Task: Extract header logic from `Chat.tsx` into a new `Header` component for better maintainability 5915d28
 - [x] Task: Write unit tests for the `Header` component layout positions (Logo Left, Auth Center, Actions Right) 5915d28
 - [x] Task: Implement the 3-column flex layout in the `Header` component 5915d28
