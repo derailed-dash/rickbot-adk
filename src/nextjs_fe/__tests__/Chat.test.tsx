@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import Chat from '../components/Chat'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
@@ -24,6 +24,15 @@ global.URL.createObjectURL = jest.fn(() => 'mock-url')
 global.URL.revokeObjectURL = jest.fn()
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+const waitForBotResponse = async () => {
+    await waitFor(() => {
+        expect(screen.getByText('Hello')).toBeInTheDocument()
+    })
+    await waitFor(() => {
+        expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+    })
+}
 
 describe('Chat', () => {
   const mockSession = {
@@ -89,6 +98,8 @@ describe('Chat', () => {
             })
         )
     })
+
+    await waitForBotResponse()
   })
 
   it('clears messages and session_id when Clear Chat is clicked', async () => {
@@ -162,6 +173,9 @@ describe('Chat', () => {
         const images = screen.getAllByRole('img')
         expect(images.some(img => img.getAttribute('src') === 'mock-url')).toBeTruthy()
     })
+
+    // Wait for the bot response due to the send
+    await waitForBotResponse()
   })
 
   it('renders the Meeseeks Box icon for the New Chat button with a Badge', () => {
@@ -184,8 +198,9 @@ describe('Chat', () => {
     fireEvent.click(screen.getByText('Send'))
 
     // The portal should appear (we can't easily test framer motion scale but we can check existence)
-    // We didn't add a test-id to the portal div but we can find it by its style or just check if it's there
     // For now, let's just verify the Send button has the icon.
+    // And wait for the bot response to clear async state
+    await waitForBotResponse()
   })
 
   it('applies the Portal Green primary color to key elements', () => {
@@ -211,4 +226,45 @@ describe('Chat', () => {
     const rootBox = container.firstChild
     expect(rootBox).toHaveStyle({ backgroundImage: 'url(/galaxy_bg.png)' })
   })
+
+  describe('user avatar display', () => {
+    const sendMessage = async (message: string) => {
+      fireEvent.change(screen.getByPlaceholderText('What do you want?'), { target: { value: message } });
+      fireEvent.click(screen.getByText('Send'));
+      await waitFor(() => {
+          expect(screen.getByText(message)).toBeInTheDocument();
+      });
+
+      // Wait for the bot response to ensure async operations complete
+      await waitForBotResponse();
+      return screen.getByText(message).closest('li');
+    };
+  
+    test.each([
+      {
+        case: 'session with avatar',
+        session: {
+          data: { user: { name: 'Test User', image: '/avatars/user-avatar.png' }, idToken: 'mock-id-token' },
+          status: 'authenticated'
+        },
+        message: 'Message with Avatar',
+        expectedAvatar: '/avatars/user-avatar.png'
+      },
+      {
+        case: 'session without avatar',
+        session: {
+          data: { user: { name: 'Test User' }, idToken: 'mock-id-token' },
+          status: 'authenticated'
+        },
+        message: 'Message with Fallback',
+        expectedAvatar: '/avatars/morty.png'
+      }
+    ])('it should display correct avatar for $case', async ({ session, message, expectedAvatar }) => {
+      (useSession as jest.Mock).mockReturnValue(session);
+      render(<Chat />);
+      const messageItem = await sendMessage(message);
+      const avatarInMessage = within(messageItem!).getByRole('img');
+      expect(avatarInMessage).toHaveAttribute('src', expectedAvatar);
+    });
+  });
 })

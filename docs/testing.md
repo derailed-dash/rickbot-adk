@@ -40,7 +40,7 @@ All test runners should be aware of the `CI` environment variable. When `CI=true
 - Run specific test file: `uv run pytest -v -s src/tests/unit/test_config.py`
 
 #### Frontend (React/Next.js)
-- Run all tests: `cd src/nextjs_fe && npm test`
+- Run all tests: `make test-ui` (or `cd src/nextjs_fe && npm test`)
 - Run in watch mode: `cd src/nextjs_fe && npm run test:watch`
 
 ---

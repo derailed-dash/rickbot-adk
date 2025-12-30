@@ -53,12 +53,12 @@
 - [x] Implement OAuth for our API calls - Google and GitHub?
 - [x] Fix UI elements of the React UI
 - [x] Implement multimodal interactions with ArtifactService
-- [ ] Use avatar images in conversation
+- [x] Use avatar images in conversation
 - [ ] Implement rate limiting for our API calls
 - [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Ensure Gemini model references are updated
 - [ ] Investigate moving frontend to existing Cloud Run service, and deploying backend to a separate service.
 - [ ] Load reference material as context to Dazbo
 - [ ] Restrict access to certain personalities.
-- [ ] Ensure React UI works on mobile.
+- [x] Ensure React UI works on mobile.
 - [ ] Add voice / live.
