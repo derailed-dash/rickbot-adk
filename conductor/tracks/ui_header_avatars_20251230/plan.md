@@ -9,11 +9,11 @@ This plan follows the Test-Driven Development (TDD) workflow to reorganize the h
 - [x] Task: Conductor - User Manual Verification 'User Avatar Integration' (Protocol in workflow.md)
 
 ## Phase 2: Desktop Header Reorganization
-- [ ] Task: Extract header logic from `Chat.tsx` into a new `Header` component for better maintainability
-- [ ] Task: Write unit tests for the `Header` component layout positions (Logo Left, Auth Center, Actions Right)
-- [ ] Task: Implement the 3-column flex layout in the `Header` component
-- [ ] Task: Integrate the new `Header` component back into `Chat.tsx`
-- [ ] Task: Conductor - User Manual Verification 'Desktop Header Reorganization' (Protocol in workflow.md)
+- [x] Task: Extract header logic from `Chat.tsx` into a new `Header` component for better maintainability 5915d28
+- [x] Task: Write unit tests for the `Header` component layout positions (Logo Left, Auth Center, Actions Right) 5915d28
+- [x] Task: Implement the 3-column flex layout in the `Header` component 5915d28
+- [x] Task: Integrate the new `Header` component back into `Chat.tsx` 5915d28
+- [x] Task: Conductor - User Manual Verification 'Desktop Header Reorganization' (Protocol in workflow.md)
 
 ## Phase 3: Mobile Responsiveness (Hamburger Menu)
 - [ ] Task: Write unit tests for `Header` component responsive behavior (Drawer visibility at mobile breakpoints)
