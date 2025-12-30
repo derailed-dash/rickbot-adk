@@ -123,11 +123,10 @@ export default function Header({
             </Box>
 
             {/* Column 2: Auth (Center) - Hidden on Mobile */}
-            {!isMobile && (
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <AuthButton />
-                </Box>
-            )}
+            {/* Column 2: Auth (Center) - Hidden on Mobile but Box kept for layout */}
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                {!isMobile && <AuthButton />}
+            </Box>
 
             {/* Column 3: Actions (Right) */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1 }}>

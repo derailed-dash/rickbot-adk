@@ -25,6 +25,15 @@ global.URL.revokeObjectURL = jest.fn()
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
+const waitForBotResponse = async () => {
+    await waitFor(() => {
+        expect(screen.getByText('Hello')).toBeInTheDocument()
+    })
+    await waitFor(() => {
+        expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+    })
+}
+
 describe('Chat', () => {
   const mockSession = {
     data: {
@@ -90,14 +99,7 @@ describe('Chat', () => {
         )
     })
 
-    await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
-    })
-    
-    // Wait for loading to finish
-    await waitFor(() => {
-        expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
-    })
+    await waitForBotResponse()
   })
 
   it('clears messages and session_id when Clear Chat is clicked', async () => {
@@ -173,14 +175,7 @@ describe('Chat', () => {
     })
 
     // Wait for the bot response due to the send
-    await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
-    })
-    
-    // Wait for loading to finish
-    await waitFor(() => {
-        expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
-    })
+    await waitForBotResponse()
   })
 
   it('renders the Meeseeks Box icon for the New Chat button with a Badge', () => {
@@ -205,14 +200,7 @@ describe('Chat', () => {
     // The portal should appear (we can't easily test framer motion scale but we can check existence)
     // For now, let's just verify the Send button has the icon.
     // And wait for the bot response to clear async state
-    await waitFor(() => {
-        expect(screen.getByText('Hello')).toBeInTheDocument()
-    })
-    
-    // Wait for loading to finish
-    await waitFor(() => {
-        expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
-    })
+    await waitForBotResponse()
   })
 
   it('applies the Portal Green primary color to key elements', () => {
@@ -248,13 +236,7 @@ describe('Chat', () => {
       });
 
       // Wait for the bot response to ensure async operations complete
-      await waitFor(() => {
-          expect(screen.getByText('Hello')).toBeInTheDocument();
-      });
-      // Wait for loading to finish
-      await waitFor(() => {
-          expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-      });
+      await waitForBotResponse();
       return screen.getByText(message).closest('li');
     };
   
