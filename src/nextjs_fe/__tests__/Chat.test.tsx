@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import Chat from '../components/Chat'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
@@ -210,5 +210,58 @@ describe('Chat', () => {
     // The root Box is the first element in the container
     const rootBox = container.firstChild
     expect(rootBox).toHaveStyle({ backgroundImage: 'url(/galaxy_bg.png)' })
+  })
+
+  it('displays user avatar from session if available, otherwise falls back to morty.png', async () => {
+    // 1. Test with avatar in session
+    const mockSessionWithAvatar = {
+      data: {
+        user: { name: 'Test User', image: '/avatars/user-avatar.png' },
+        idToken: 'mock-id-token'
+      },
+      status: 'authenticated'
+    }
+    ;(useSession as jest.Mock).mockReturnValue(mockSessionWithAvatar)
+
+    const { unmount } = render(<Chat />)
+    
+    // Send a message
+    const input = screen.getByPlaceholderText('What do you want?')
+    fireEvent.change(input, { target: { value: 'Message with Avatar' } })
+    fireEvent.click(screen.getByText('Send'))
+    
+    await waitFor(() => {
+        expect(screen.getByText('Message with Avatar')).toBeInTheDocument()
+    })
+
+    // Check avatar in message list
+    const messageList = screen.getByRole('list')
+    const messageAvatars = within(messageList).getAllByRole('img')
+    expect(messageAvatars.some(img => img.getAttribute('src') === '/avatars/user-avatar.png')).toBeTruthy()
+
+    unmount()
+
+    // 2. Test fallback (no image in session)
+    const mockSessionNoAvatar = {
+        data: {
+          user: { name: 'Test User' },
+          idToken: 'mock-id-token'
+        },
+        status: 'authenticated'
+      }
+    ;(useSession as jest.Mock).mockReturnValue(mockSessionNoAvatar)
+    
+    render(<Chat />)
+    // Send another message
+    fireEvent.change(screen.getByPlaceholderText('What do you want?'), { target: { value: 'Message with Fallback' } })
+    fireEvent.click(screen.getByText('Send'))
+
+    await waitFor(() => {
+        expect(screen.getByText('Message with Fallback')).toBeInTheDocument()
+    })
+
+    // Check for morty.png fallback
+    const allAvatars = screen.getAllByRole('img')
+    expect(allAvatars.some(img => img.getAttribute('src') === '/avatars/morty.png')).toBeTruthy()
   })
 })

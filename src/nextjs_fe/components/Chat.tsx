@@ -408,7 +408,7 @@ export default function Chat() {
                     {messages.map((msg) => (
                         <ListItem key={msg.id} alignItems="flex-start">
                             <ListItemAvatar>
-                                <Avatar src={msg.sender === 'user' ? '/avatars/morty.png' : `/avatars/${msg.personality?.toLowerCase()}.png`} />
+                                <Avatar src={msg.sender === 'user' ? (session?.user?.image || '/avatars/morty.png') : `/avatars/${msg.personality?.toLowerCase()}.png`} />
                             </ListItemAvatar>
                             <ListItemText
                                 primary={
