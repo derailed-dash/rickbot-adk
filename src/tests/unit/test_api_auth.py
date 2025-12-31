@@ -54,7 +54,7 @@ def client():
 async def test_chat_unauthenticated(client):
     c, _ = client
     response = c.post("/chat", data={"prompt": "Hello", "personality": "Rick"})
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio

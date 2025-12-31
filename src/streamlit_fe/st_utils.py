@@ -3,6 +3,7 @@ This module contains utility functions for the Rickbot Streamlit application.
 """
 
 import streamlit as st
+from google.adk.errors.already_exists_error import AlreadyExistsError
 from google.adk.runners import Runner
 from limits import parse, storage
 from limits.strategies import MovingWindowRateLimiter
@@ -10,7 +11,7 @@ from limits.strategies import MovingWindowRateLimiter
 from rickbot_agent.agent import get_agent
 from rickbot_agent.personality import Personality
 from rickbot_agent.services import get_session_service
-from streamlit_fe.st_config import config
+from streamlit_fe.st_config import config, logger
 
 
 async def initialize_adk_runner(personality: Personality) -> Runner:
@@ -20,11 +21,15 @@ async def initialize_adk_runner(personality: Personality) -> Runner:
     rickbot_agent = get_agent(personality.name)
 
     session_service = get_session_service()
-    await session_service.create_session(
-        app_name=config.app_name,
-        user_id=st.session_state.user_id,
-        session_id=st.session_state.session_id,
-    )
+    try:
+        await session_service.create_session(
+            app_name=config.app_name,
+            user_id=st.session_state.user_id,
+            session_id=st.session_state.session_id,
+        )
+    except AlreadyExistsError:
+        logger.debug(f"Session {st.session_state.session_id} already exists. Reusing it.")
+
     return Runner(agent=rickbot_agent, app_name=config.app_name, session_service=session_service)
 
 
