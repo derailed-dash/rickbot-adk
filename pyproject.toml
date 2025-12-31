@@ -42,7 +42,8 @@ dev = [
 
 jupyter = [
     "jupyter",
-    "ipython"
+    "ipython",
+    "google-genai"
 ]
 lint = [
     "ruff",
