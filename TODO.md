@@ -54,11 +54,14 @@
 - [x] Fix UI elements of the React UI
 - [x] Implement multimodal interactions with ArtifactService
 - [x] Use avatar images in conversation
+- [x] Add File Search Store
+- [ ] Load reference material as context to Dazbo - MVP
+- [ ] Implement File Search Tool for Dazbo
 - [ ] Implement rate limiting for our API calls
 - [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Ensure Gemini model references are updated
 - [ ] Investigate moving frontend to existing Cloud Run service, and deploying backend to a separate service.
-- [ ] Load reference material as context to Dazbo
-- [ ] Restrict access to certain personalities.
+- [ ] Restrict access to certain personalities based on user identity
+- [ ] Add more reference material as context to Dazbo
 - [x] Ensure React UI works on mobile.
 - [ ] Add voice / live.
