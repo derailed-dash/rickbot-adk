@@ -30,7 +30,7 @@ graph TD
         end
         
         subgraph "Data & State"
-            AlloyDB[(AlloyDB\nSession History)]
+            FileStore[(File Search\nStore (RAG))]
             GCS[Cloud Storage\nArtifacts/Logs]
             SecretMgr[Secret Manager\nOAuth Creds / API Keys]
         end
@@ -48,7 +48,7 @@ graph TD
     React --> API
     
     API -->|ADK Framework| Vertex
-    API -->|Store/Retrieve| AlloyDB
+    API -->|Retrieve Context| FileStore
     API -->|Fetch Secrets| SecretMgr
     
     Vertex -->|Inference| Gemini
@@ -71,6 +71,8 @@ graph TD
     *   **Google Auth Platform**: Handles OAuth 2.0 authentication for users.
 *   **Data, Infrastructure & Tools**:
     *   **Google Cloud Storage (GCS)**: Stores unstructured data, logs, and generated artifacts.
+    *   **File Search Store (Gemini Developer API)**: Acts as the knowledge base for RAG (Retrieval Augmented Generation), allowing specific personas to reference uploaded documents.
+        > Note: This uses the Gemini Developer API and is managed via `notebooks/file_search_store.ipynb`.
     *   **Secret Manager**: Securely stores sensitive configuration like OAuth client IDs and API keys.
     *   **Terraform**: Manages all infrastructure provisioning.
     *   **Google Cloud Build**: Orchestrates the CI/CD pipeline for testing and deployment.

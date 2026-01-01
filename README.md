@@ -114,6 +114,17 @@ direnv allow
 
 For full command options and usage, refer to the [Makefile](Makefile).
 
+### Notebooks
+
+The `notebooks/` directory contains Jupyter notebooks used for development and management tasks that are not part of the core application deployment.
+
+#### File Search Store Management
+
+The `notebooks/file_search_store.ipynb` notebook is used to manage the **File Search Store** for the Rickbot agent. This store is used for RAG (Retrieval Augmented Generation) to provide specific personas with access to reference documents.
+
+> [!NOTE]
+> The File Search Store is a feature of the **Gemini Developer API**. It is compatible with the `google-genai` SDK (version >= 1.49.0) but does not currently work with Vertex AI. Therefore, this notebook enables specific environment configurations to interact with the Gemini Developer API directly for store management.
+
 ###  Testing
 
 - All tests are in the `src/tests` folder.
