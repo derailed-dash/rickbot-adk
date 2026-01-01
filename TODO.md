@@ -55,7 +55,7 @@
 - [x] Implement multimodal interactions with ArtifactService
 - [x] Use avatar images in conversation
 - [x] Add File Search Store
-- [ ] Load reference material as context to Dazbo - MVP
+- [x] Load reference material as context to Dazbo - MVP
 - [ ] Implement File Search Tool for Dazbo
 - [ ] Implement rate limiting for our API calls
 - [ ] Review env var changes and update Deployment / TF accordingly
