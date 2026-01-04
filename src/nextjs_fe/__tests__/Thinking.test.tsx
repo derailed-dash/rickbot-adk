@@ -13,7 +13,7 @@ describe('Thinking', () => {
   })
 
   it('renders tool name and pulse when activeTool is running', () => {
-    render(<Thinking action="Using tool..." activeTool={{ name: 'google_search', status: 'running' }} />)
+    render(<Thinking action="Using tool..." activeTool={{ name: 'SearchAgent', status: 'running' }} />)
     expect(screen.getByText(/Google Search/)).toBeInTheDocument()
   })
 
