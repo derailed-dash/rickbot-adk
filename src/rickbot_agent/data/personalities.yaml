@@ -53,5 +53,4 @@
   prompt_question: "Talk to me. I'm listening."
   temperature: 1.0
   file_search_store_id: "fileSearchStores/rickbotdazboref-akasbs0scqrs"
-  file_search_instruction: "You MUST start by searching your Dazbo reference materials for information relevant to the user's request."
 

@@ -30,6 +30,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class FileSearchTool(BaseTool):
     """
     A custom ADK tool that enables the Gemini File Search (retrieval) capability.
@@ -44,7 +45,7 @@ class FileSearchTool(BaseTool):
             file_search_store_names: The resource name of the File Search Store.
                     e.g. ["fileSearchStores/mystore-abcdef0pqrst", ...]
         """
-        super().__init__(name='file_search', description='Retrieval from file search store')
+        super().__init__(name="file_search", description="Retrieval from file search store")
         self.file_search_store_names = file_search_store_names
 
     async def process_llm_request(
@@ -63,9 +64,5 @@ class FileSearchTool(BaseTool):
 
         # Append the native tool configuration for File Search
         llm_request.config.tools.append(
-            types.Tool(
-                file_search=types.FileSearch(
-                    file_search_store_names=self.file_search_store_names
-                )
-            )
+            types.Tool(file_search=types.FileSearch(file_search_store_names=self.file_search_store_names))
         )
