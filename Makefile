@@ -55,6 +55,10 @@ test-all:
 	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "Error: GOOGLE_CLOUD_PROJECT is not set. Setup environment before running tests" && exit 1)
 	uv run pytest src/tests/unit && uv run pytest src/tests/integration
 
+# Launch Next.js React UI
+react-ui:
+	cd src/nextjs_fe && npm run dev
+
 # Run frontend UI tests
 test-ui:
 	cd src/nextjs_fe && npm test
