@@ -56,7 +56,7 @@ def create_agent(personality: Personality) -> Agent:
                 )
             )
         else:
-             logger.warning("Dazbo personality selected but FILE_SEARCH_STORE_NAME not configured.")
+            logger.warning("Dazbo personality selected but FILE_SEARCH_STORE_NAME not configured.")
 
     return Agent(
         name=f"{config.agent_name}_{personality.name}",  # Make agent name unique
