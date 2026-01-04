@@ -21,6 +21,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import PortalAnimation from './PortalAnimation';
 import Header from './Header';
+import Thinking from './Thinking';
 import { Personality, Message, ToolCall, ToolResponse } from '../types/chat';
 
 const initialPersonalities: Personality[] = [
@@ -400,11 +401,7 @@ export default function Chat() {
                                 }
                                 secondary={
                                     <Box component="span" sx={{ color: 'text.primary' }}>
-                                        {botAction && (
-                                            <Typography component="span" variant="caption" color="secondary" sx={{ display: 'block', mb: 1, fontStyle: 'italic' }}>
-                                                {botAction}
-                                            </Typography>
-                                        )}
+                                        <Thinking action={botAction} activeTool={activeTool} />
                                         {streamingText && (
                                             <ReactMarkdown
                                               components={{
