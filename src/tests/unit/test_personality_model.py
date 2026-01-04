@@ -31,7 +31,7 @@ def test_personality_model_has_optional_file_search_store_id(mock_exists):
     )
     # This should default to None (or empty string if we chose that, but spec says None or empty)
     # The dataclass field default check will be implicit if instantiation succeeds without it.
-    assert not hasattr(p1, "file_search_store_id") or p1.file_search_store_id is None
+    assert p1.file_search_store_id is None
 
     # Case 2: With file_search_store_id
     p2 = Personality(
