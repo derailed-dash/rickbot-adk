@@ -171,7 +171,7 @@ def test_chat_stream_tool_events(client):
         event2 = MagicMock()
         event2.actions = None
         fr = MagicMock()
-        fr.name = "google_search"
+        fr.name = "SearchAgent"
         event2.get_function_calls.return_value = []
         event2.get_function_responses.return_value = [fr]
         event2.content = None
@@ -203,12 +203,12 @@ def test_chat_stream_tool_events(client):
     # Verify tool call
     tool_calls = [e["tool_call"] for e in events if "tool_call" in e]
     assert len(tool_calls) == 1
-    assert tool_calls[0]["name"] == "google_search"
+    assert tool_calls[0]["name"] == "SearchAgent"
 
     # Verify tool response
     tool_responses = [e["tool_response"] for e in events if "tool_response" in e]
     assert len(tool_responses) == 1
-    assert tool_responses[0]["name"] == "google_search"
+    assert tool_responses[0]["name"] == "SearchAgent"
 
     # Verify chunk
     chunks = [e["chunk"] for e in events if "chunk" in e]
