@@ -13,8 +13,8 @@ Goal: Ensure the backend correctly emits tool execution events that the frontend
 Goal: Update the Next.js frontend to handle and store tool execution events.
 
 - [x] Task: Define TypeScript interfaces for tool execution events. df7a4e0
-- [ ] Task: Update the chat streaming logic to parse and handle tool execution events.
-- [ ] Task: Implement state management (e.g., React state) to track the "current active tool".
+- [x] Task: Update the chat streaming logic to parse and handle tool execution events. 55e2813
+- [x] Task: Implement state management (e.g., React state) to track the "current active tool". 55e2813
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Frontend State Management & Event Handling' (Protocol in workflow.md)
 
 ## Phase 3: UI Implementation (Thinking Component)
