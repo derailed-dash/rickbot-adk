@@ -46,12 +46,11 @@ def create_agent(personality: Personality) -> Agent:
     tools: list[Any] = [AgentTool(agent=search_agent)]
 
     if personality.file_search_store_id:
-        if personality.file_search_instruction:
-            instruction += f"\n        {personality.file_search_instruction}"
-        else:
-            instruction += """
-        You have access to reference materials via the 'file_search' tool. 
-        Use it to provide accurate information based on the provided context."""
+        logger.debug(f"Adding FileSearchTool for personality: {personality.name}")
+        instruction += """
+        IMPORTANT: required_action: You MUST start by searching your reference materials using the 'file_search' tool for information relevant to the user's request.
+        Always use the 'file_search' tool before answering."""
+
         tools.append(FileSearchTool(file_search_store_names=[personality.file_search_store_id]))
 
     return Agent(

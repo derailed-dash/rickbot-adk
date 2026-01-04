@@ -39,9 +39,11 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_config)
 
     agent = create_agent(personality)
 
-    # 1. Check instruction contains generic search text
-    # (Note: This will fail until we implement the generic instruction injection)
-    assert "access to reference materials via the 'file_search' tool" in agent.instruction
+    # 1. Check instruction contains stricter search text and leading newline
+    expected_instruction_part = """
+        IMPORTANT: required_action: You MUST start by searching your reference materials using the 'file_search' tool for information relevant to the user's request.
+        Always use the 'file_search' tool before answering."""
+    assert expected_instruction_part in agent.instruction
 
     # 2. Check tools include FileSearchTool with correct ID
     file_search_tools = [t for t in agent.tools if isinstance(t, FileSearchTool)]
