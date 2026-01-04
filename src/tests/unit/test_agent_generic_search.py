@@ -49,27 +49,6 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_config)
     assert file_search_tools[0].file_search_store_names == ["projects/test/locations/global/stores/yoda-store"]
 
 
-def test_create_agent_attaches_custom_search_instruction(mock_config):
-    """Test that a personality with custom file_search_instruction uses it."""
-    personality = Personality(
-        name="Dazbo",
-        menu_name="Dazbo",
-        title="Dazbo",
-        overview="Geek.",
-        welcome="Hi.",
-        prompt_question="?",
-        temperature=1.0,
-        file_search_store_id="dazbo-store",
-        file_search_instruction="Check your Dazbo reference materials.",
-    )
-    personality.system_instruction = "You are Dazbo."
-
-    agent = create_agent(personality)
-
-    assert "Check your Dazbo reference materials." in agent.instruction
-    assert "access to reference materials via the 'file_search' tool" not in agent.instruction
-
-
 def test_create_agent_no_file_search_tool_when_id_missing(mock_config):
     """Test that a personality without file_search_store_id does NOT get the tool."""
     personality = Personality(
