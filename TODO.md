@@ -56,7 +56,8 @@
 - [x] Use avatar images in conversation
 - [x] Add File Search Store
 - [x] Load reference material as context to Dazbo - MVP
-- [ ] Implement File Search Tool for Dazbo
+- [x] Implement File Search Tool for Dazbo
+- [ ] Externalise file search store name into personalities.yaml
 - [ ] Implement rate limiting for our API calls
 - [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Ensure Gemini model references are updated
