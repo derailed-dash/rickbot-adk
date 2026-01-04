@@ -12,13 +12,8 @@ interface ThinkingProps {
 }
 
 const toolMap: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  'google_search': {
-    label: 'Google Search',
-    icon: <SearchIcon fontSize="small" />,
-    color: '#4285F4',
-  },
   'SearchAgent': {
-    label: 'Search Agent',
+    label: 'Google Search',
     icon: <SearchIcon fontSize="small" />,
     color: '#4285F4',
   },
