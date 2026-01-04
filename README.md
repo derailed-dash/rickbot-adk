@@ -208,6 +208,7 @@ The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to t
 
 - **Dynamic Personas**: The UI fetches available personalities (Rick, Yoda, etc.) directly from the backend API (`/personas`).
 - **Streaming Responses**: Uses Server-Sent Events (SSE) for real-time streaming of agent responses.
+- **Interactive Tool Visibility**: Real-time visual feedback on agent actions, displaying specific tool usage (e.g., Google Search) with icons and status indicators.
 - **File Uploads**: Supports uploading images and text files for multimodal interactions.
 
 ## Application Design

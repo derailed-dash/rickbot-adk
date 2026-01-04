@@ -57,7 +57,7 @@
 - [x] Add File Search Store
 - [x] Load reference material as context to Dazbo - MVP
 - [x] Implement File Search Tool for Dazbo
-- [ ] Externalise file search store name into personalities.yaml
+- [x] Externalise file search store name into personalities.yaml
 - [ ] Implement rate limiting for our API calls
 - [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Ensure Gemini model references are updated

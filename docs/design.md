@@ -140,6 +140,7 @@ The modern, production-grade interface for Rickbot, located in `src/nextjs_fe`.
     *   **Modern UX**: Enhanced aesthetics and responsiveness using Material UI (MUI).
     *   **Dynamic Configuration**: Fetches available personalities dynamically from the backend (`/personas` endpoint), ensuring the UI is always in sync with the agent configuration.
     *   **Real-time Interaction**: Uses Server-Sent Events (SSE) via the `/chat_stream` endpoint for a responsive, streaming chat experience.
+    *   **Interactive Tool Visibility**: Real-time visual feedback on agent actions, displaying specific tool usage (e.g., Google Search, File Search) with icons and status indicators within the "Thinking" state.
     *   **Multimodal Support**: Supports file uploads (images, text) alongside chat messages.
     *   **Independent Auth**: Implements its own OAuth flow.
 

@@ -41,7 +41,10 @@ def create_agent(personality: Personality) -> Agent:
     logger.debug(f"Creating agent for personality: {personality.name}")
     # Load configuration
     instruction = f"""{personality.system_instruction}
-    If you don't know the answer to something, use the SearchAgent to perform a Google Search"""
+    If you don't know the answer to something, use the SearchAgent to perform a Google Search.
+    Additionally, if you're asked about the status of something current or recent,
+    use the SearchAgent to perform a Google Search. (Your information may be out of date.)
+    """
 
     tools: list[Any] = [AgentTool(agent=search_agent)]
 
