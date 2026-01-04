@@ -15,3 +15,16 @@ export interface Message {
     personality?: string;
     attachments?: any[];
 }
+
+export interface ToolCall {
+    name: string;
+    args: Record<string, any>;
+}
+
+export interface ToolResponse {
+    name: string;
+}
+
+export interface AgentTransfer {
+    target_agent: string;
+}
