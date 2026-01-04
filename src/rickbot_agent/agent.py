@@ -44,19 +44,18 @@ def create_agent(personality: Personality) -> Agent:
 
     tools = [AgentTool(agent=search_agent)]
 
-    if personality.name == "Dazbo":
-        if config.dazbo_file_search_store_name:
-            instruction += """
-            IMPORTANT: required_action: You MUST start by searching your Dazbo reference materials 
-            for information relevant to the user's request.
-            Always use the 'file_search' tool before answering."""
-            tools.append(
-                FileSearchTool(
-                    file_search_store_names=[config.dazbo_file_search_store_name]
-                )
-            )
+    if personality.file_search_store_id:
+        if personality.file_search_instruction:
+            instruction += f"\n        {personality.file_search_instruction}"
         else:
-            logger.warning("Dazbo personality selected but FILE_SEARCH_STORE_NAME not configured.")
+            instruction += """
+        You have access to reference materials via the 'file_search' tool. 
+        Use it to provide accurate information based on the provided context."""
+        tools.append(
+            FileSearchTool(
+                file_search_store_names=[personality.file_search_store_id]
+            )
+        )
 
     return Agent(
         name=f"{config.agent_name}_{personality.name}",  # Make agent name unique

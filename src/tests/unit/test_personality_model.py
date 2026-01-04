@@ -38,6 +38,8 @@ def test_personality_model_has_optional_file_search_store_id(mock_exists):
         welcome="Hello.",
         prompt_question="Query?",
         temperature=0.5,
-        file_search_store_id="projects/123/locations/us/stores/abc"
+        file_search_store_id="projects/123/locations/us/stores/abc",
+        file_search_instruction="Search your heart."
     )
     assert p2.file_search_store_id == "projects/123/locations/us/stores/abc"
+    assert p2.file_search_instruction == "Search your heart."
