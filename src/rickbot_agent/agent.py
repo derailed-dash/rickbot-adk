@@ -43,7 +43,7 @@ def create_agent(personality: Personality) -> Agent:
     instruction = f"""{personality.system_instruction}
     If you don't know the answer to something, use the SearchAgent to perform a Google Search"""
 
-    tools: list[Any] = [AgentTool(agent=search_agent)]
+    tools: list[BaseTool] = [AgentTool(agent=search_agent)]
 
     if personality.file_search_store_id:
         logger.debug(f"Adding FileSearchTool for personality: {personality.name}")
