@@ -1,0 +1,8 @@
+{
+  "track_id": "fix_file_search_prioritization_20260104",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-01-04T15:15:00Z",
+  "updated_at": "2026-01-04T15:15:00Z",
+  "description": "Fix File Search Prioritization and Formatting"
+}

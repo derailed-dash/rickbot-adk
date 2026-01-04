@@ -5,6 +5,7 @@ We then cache these agents for fast retrieval.
 """
 
 import functools
+from google.adk.tools import BaseTool
 
 from google.adk.agents import Agent
 from google.adk.tools import (
@@ -42,21 +43,15 @@ def create_agent(personality: Personality) -> Agent:
     instruction = f"""{personality.system_instruction}
     If you don't know the answer to something, use the SearchAgent to perform a Google Search"""
 
-    tools = [AgentTool(agent=search_agent)]
+    tools: list[BaseTool] = [AgentTool(agent=search_agent)]
 
-    if personality.name == "Dazbo":
-        if config.dazbo_file_search_store_name:
-            instruction += """
-            IMPORTANT: required_action: You MUST start by searching your Dazbo reference materials 
-            for information relevant to the user's request.
-            Always use the 'file_search' tool before answering."""
-            tools.append(
-                FileSearchTool(
-                    file_search_store_names=[config.dazbo_file_search_store_name]
-                )
-            )
-        else:
-            logger.warning("Dazbo personality selected but FILE_SEARCH_STORE_NAME not configured.")
+    if personality.file_search_store_id:
+        logger.debug(f"Adding FileSearchTool for personality: {personality.name}")
+        instruction += """
+        IMPORTANT: required_action: You MUST start by searching your reference materials using the 'file_search' tool for information relevant to the user's request.
+        Always use the 'file_search' tool before answering."""
+
+        tools.append(FileSearchTool(file_search_store_names=[personality.file_search_store_id]))
 
     return Agent(
         name=f"{config.agent_name}_{personality.name}",  # Make agent name unique

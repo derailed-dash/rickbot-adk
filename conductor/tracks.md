@@ -33,3 +33,13 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: UI Enhancements - Header Layout & User Avatars
 *Link: [./conductor/archive/ui_header_avatars_20251230/](./conductor/archive/ui_header_avatars_20251230/)*
+
+---
+
+## [x] Track: Generic File Search Store Configuration
+*Link: [./conductor/archive/generic_file_search_store_20260104/](./conductor/archive/generic_file_search_store_20260104/)*
+
+---
+
+## [x] Track: Fix File Search Prioritization and Formatting
+*Link: [./conductor/archive/fix_file_search_prioritization_20260104/](./conductor/archive/fix_file_search_prioritization_20260104/)*

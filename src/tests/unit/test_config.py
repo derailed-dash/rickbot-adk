@@ -31,6 +31,9 @@ from rickbot_utils.config import get_config
 @pytest.fixture(autouse=True)
 def clear_logger_handlers():
     """Fixture to clear logger handlers before each test to prevent duplicate logs."""
+    # Clear cache for get_config to ensure fresh config for each test
+    get_config.cache_clear()
+    
     # Clear handlers for the specific logger used in the config module
     agent_name = os.environ.get("AGENT_NAME", "rickbot_agent")
     logger = logging.getLogger(agent_name)

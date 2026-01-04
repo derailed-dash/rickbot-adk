@@ -132,7 +132,6 @@ async def _process_files(
             parts.append(artifact_part)
     # No warning needed for empty list, only if files is explicitly None (which shouldn't happen with default=[])
 
-
     return parts
 
 
@@ -274,7 +273,6 @@ async def chat_stream(
                 new_message=new_message,
             ):
                 # logger.debug(f"Event received: {event}") # Too verbose
-
 
                 if hasattr(event, "finish_reason") and event.finish_reason:
                     logger.debug(f"Event finish reason: {event.finish_reason}")

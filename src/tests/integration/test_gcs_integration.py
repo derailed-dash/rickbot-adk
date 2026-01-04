@@ -11,8 +11,9 @@ from rickbot_agent.services import get_artifact_service
 from rickbot_utils.config import get_config
 from src.main import app
 
-# Create a dummy Part class for Pydantic if needed, 
+# Create a dummy Part class for Pydantic if needed,
 # but here we rely on standard ADK types if possible, or mocks.
+
 
 @pytest.fixture
 def mock_gcs_env():
@@ -29,6 +30,7 @@ def mock_gcs_env():
         get_config.cache_clear()
         get_artifact_service.cache_clear()
 
+
 @pytest.fixture
 def mock_gcs_client():
     """Mocks the google.cloud.storage.Client to avoid real network calls."""
@@ -42,7 +44,6 @@ def mock_gcs_client():
         mock_blob = MagicMock()
         mock_bucket.blob.return_value = mock_blob
         mock_bucket.get_blob.return_value = mock_blob
-
 
         # Setup specific behaviors
         mock_blob.exists.return_value = True
@@ -60,6 +61,7 @@ def mock_gcs_client():
         mock_client.list_blobs.return_value = [mock_blob]
 
         yield mock_client, mock_bucket, mock_blob
+
 
 def test_gcs_configuration_and_usage(mock_gcs_env, mock_gcs_client):
     """
@@ -79,9 +81,7 @@ def test_gcs_configuration_and_usage(mock_gcs_env, mock_gcs_client):
 
     # 2. Patch the app's artifact_service
     # main.py might have already initialized a service. We override it.
-    with patch("src.main.artifact_service", service), \
-         patch("src.main.Runner"): # Mock Runner to skip Agent logic
-
+    with patch("src.main.artifact_service", service), patch("src.main.Runner"):  # Mock Runner to skip Agent logic
         # Mock Auth
         mock_user = AuthUser(id="test_id", email="test@example.com", name="Test User", provider="mock")
         app.dependency_overrides[verify_token] = lambda: mock_user
@@ -96,7 +96,7 @@ def test_gcs_configuration_and_usage(mock_gcs_env, mock_gcs_client):
             response = client.post(
                 "/chat",
                 data={"prompt": "Save this", "personality": "Rick"},
-                files={"files": (filename, file_content, "text/plain")}
+                files={"files": (filename, file_content, "text/plain")},
             )
             assert response.status_code == 200
 
@@ -109,7 +109,7 @@ def test_gcs_configuration_and_usage(mock_gcs_env, mock_gcs_client):
             # The filename in the service is usually scoped: "user:test_upload.txt"
             get_response = client.get(f"/artifacts/{filename}")
             assert get_response.status_code == 200
-            assert get_response.content == b"GCS Content" # Matched the mock
+            assert get_response.content == b"GCS Content"  # Matched the mock
 
             # Verify GCS interaction
             assert mock_blob.download_as_bytes.called
