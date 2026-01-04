@@ -124,7 +124,7 @@ describe('Chat', () => {
 
   it('displays tool usage status when tool_call event is received', async () => {
     const readMock = jest.fn()
-        .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"tool_call": {"name": "google_search"}}\n\n') })
+        .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"tool_call": {"name": "SearchAgent"}}\n\n') })
         .mockImplementationOnce(async () => {
             await sleep(50);
             return { done: false, value: new TextEncoder().encode('data: {"tool_response": {"name": "google_search"}}\n\n') };
