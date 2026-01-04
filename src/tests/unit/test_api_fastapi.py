@@ -160,7 +160,7 @@ def test_chat_stream_tool_events(client):
         event1 = MagicMock()
         event1.actions = None
         fc = MagicMock()
-        fc.name = "google_search"
+        fc.name = "SearchAgent"
         fc.args = {"query": "rick and morty"}
         event1.get_function_calls.return_value = [fc]
         event1.get_function_responses.return_value = []
