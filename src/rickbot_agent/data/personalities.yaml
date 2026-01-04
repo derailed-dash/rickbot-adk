@@ -52,4 +52,5 @@
   welcome: "I'm ready to talk about anything!"
   prompt_question: "Talk to me. I'm listening."
   temperature: 1.0
+  file_search_store_id: "fileSearchStores/rickbotdazboref-akasbs0scqrs"
 
