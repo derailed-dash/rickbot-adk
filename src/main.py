@@ -283,6 +283,12 @@ async def chat_stream(
                         logger.info(f"Tool Call: {fc.name}")
                         yield f"data: {json.dumps({'tool_call': {'name': fc.name, 'args': fc.args}})}\n\n"
 
+                # Check for tool responses
+                if function_responses := event.get_function_responses():
+                    for fr in function_responses:
+                        logger.info(f"Tool Response: {fr.name}")
+                        yield f"data: {json.dumps({'tool_response': {'name': fr.name}})}\n\n"
+
                 # Check for agent transfers
                 if event.actions and event.actions.transfer_to_agent:
                     logger.info(f"Agent Transfer: {event.actions.transfer_to_agent}")

@@ -149,3 +149,67 @@ def test_chat_stream_endpoint(client):
 
     # Verify done event
     assert events[-1] == {"done": True}
+
+
+def test_chat_stream_tool_events(client):
+    c, mock_runner = client
+
+    # Mock runner.run_async to yield tool events
+    async def mock_run_async(*args, **kwargs):
+        # Tool Call Event
+        event1 = MagicMock()
+        event1.actions = None
+        fc = MagicMock()
+        fc.name = "SearchAgent"
+        fc.args = {"query": "rick and morty"}
+        event1.get_function_calls.return_value = [fc]
+        event1.get_function_responses.return_value = []
+        event1.content = None
+        yield event1
+
+        # Tool Response Event
+        event2 = MagicMock()
+        event2.actions = None
+        fr = MagicMock()
+        fr.name = "SearchAgent"
+        event2.get_function_calls.return_value = []
+        event2.get_function_responses.return_value = [fr]
+        event2.content = None
+        yield event2
+
+        # Content Event
+        event3 = MagicMock()
+        event3.actions = None
+        event3.get_function_calls.return_value = []
+        event3.get_function_responses.return_value = []
+        event3.content.parts = [MockPart(text="I found something.")]
+        yield event3
+
+    mock_runner.run_async = mock_run_async
+
+    response = c.post("/chat_stream", data={"prompt": "Search for something", "personality": "Rick"})
+    assert response.status_code == 200
+
+    import json
+    content = response.content.decode("utf-8")
+    lines = content.strip().split("\n\n")
+
+    events = []
+    for line in lines:
+        if line.startswith("data: "):
+            payload = line[6:]
+            events.append(json.loads(payload))
+
+    # Verify tool call
+    tool_calls = [e["tool_call"] for e in events if "tool_call" in e]
+    assert len(tool_calls) == 1
+    assert tool_calls[0]["name"] == "SearchAgent"
+
+    # Verify tool response
+    tool_responses = [e["tool_response"] for e in events if "tool_response" in e]
+    assert len(tool_responses) == 1
+    assert tool_responses[0]["name"] == "SearchAgent"
+
+    # Verify chunk
+    chunks = [e["chunk"] for e in events if "chunk" in e]
+    assert "I found something." in chunks

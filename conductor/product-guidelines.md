@@ -10,7 +10,7 @@
 
 ## Visual Identity & UI Design
 - **Thematic Consistency:** The UI should incorporate visual elements that reflect the diverse personas. This includes using distinct avatars (e.g., Rick, Yoda, Jack Burton) and thematic icons that ground the experience in their respective worlds.
-- **Dynamic Feedback:** Use streaming text effects and loading states that keep the user informed and engaged during complex AI operations.
+- **Dynamic Feedback:** Use streaming text effects, tool-specific icons, and pulse animations to provide granular, real-time visibility into the agent's reasoning and tool usage processes.
 
 ## User Interaction Guidelines
 - **Persona-Centric Errors:** When something goes wrong, the application should handle it "in-character" where possible. For example, Rick might deliver a cynical error message, while Yoda might offer a cryptic but helpful observation about the mistake.

@@ -124,9 +124,13 @@ describe('Chat', () => {
 
   it('displays tool usage status when tool_call event is received', async () => {
     const readMock = jest.fn()
-        .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"tool_call": {"name": "google_search"}}\n\n') })
+        .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"tool_call": {"name": "SearchAgent"}}\n\n') })
         .mockImplementationOnce(async () => {
-            await sleep(100);
+            await sleep(50);
+            return { done: false, value: new TextEncoder().encode('data: {"tool_response": {"name": "google_search"}}\n\n') };
+        })
+        .mockImplementationOnce(async () => {
+            await sleep(50);
             return { done: false, value: new TextEncoder().encode('data: {"chunk": "Searching..."}\n\n') };
         })
         .mockResolvedValueOnce({ done: true })
@@ -145,9 +149,17 @@ describe('Chat', () => {
     fireEvent.change(input, { target: { value: 'Search something' } })
     fireEvent.click(screen.getByText('Send'))
 
+    // Initially shows using tool
     await waitFor(() => {
-        expect(screen.getByText(/Using tool: google_search/i)).toBeInTheDocument()
+        expect(screen.getByText(/Google Search/i)).toBeInTheDocument()
     }, { timeout: 2000 })
+    
+    // Then it should clear when chunk comes (or stay if we decided to keep it, but Chat.tsx clears on chunk)
+    // The test mock sends chunk after tool response, so by the time "Searching..." is displayed, tool status might be gone.
+    // Let's just verify the text "Searching..." eventually appears.
+     await waitFor(() => {
+        expect(screen.getByText("Searching...")).toBeInTheDocument()
+    })
   })
 
   it('handles multi-file upload and renders them inline', async () => {

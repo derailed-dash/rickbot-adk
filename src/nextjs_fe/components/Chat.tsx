@@ -21,7 +21,8 @@ import axios from 'axios';
 import Link from 'next/link';
 import PortalAnimation from './PortalAnimation';
 import Header from './Header';
-import { Personality, Message } from '../types/chat';
+import Thinking from './Thinking';
+import { Personality, Message, ToolCall, ToolResponse } from '../types/chat';
 
 const initialPersonalities: Personality[] = [
     { 
@@ -78,6 +79,7 @@ export default function Chat() {
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [botAction, setBotAction] = useState<string | null>(null);
+    const [activeTool, setActiveTool] = useState<{name: string, status: 'running' | 'completed'} | null>(null);
     const [files, setFiles] = useState<File[]>([]);
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     const [streamingText, setStreamingText] = useState('');
@@ -89,7 +91,7 @@ export default function Chat() {
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages, streamingText]);
+    }, [messages, streamingText, botAction]);
 
     useEffect(() => {
         const fetchPersonalities = async () => {
@@ -141,6 +143,7 @@ export default function Chat() {
         setLoading(true);
         setStreamingText('');
         setBotAction('Thinking...');
+        setActiveTool(null);
         setShowPortal(true);
         setTimeout(() => setShowPortal(false), 1000);
 
@@ -197,15 +200,25 @@ export default function Chat() {
                                 setSessionId(data.session_id);
                             }
                             if (data.tool_call) {
-                                setBotAction(`Using tool: ${data.tool_call.name}...`);
+                                const toolCall = data.tool_call as ToolCall;
+                                setBotAction(`Using tool: ${toolCall.name}...`);
+                                setActiveTool({ name: toolCall.name, status: 'running' });
+                            }
+                            if (data.tool_response) {
+                                const toolResponse = data.tool_response as ToolResponse;
+                                // Ideally we show "Tool X finished" briefly, but maybe just clear active tool
+                                // or update status. For now, keep showing "Using tool X..." until next tool or response starts
+                                setActiveTool(prev => prev ? { ...prev, status: 'completed' } : null);
                             }
                             if (data.agent_transfer) {
                                 setBotAction(`Transferring to agent: ${data.agent_transfer}...`);
+                                setActiveTool(null);
                             }
                             if (data.chunk) {
                                 setBotAction('Responding...');
                                 accumulatedText += data.chunk;
                                 setStreamingText(accumulatedText);
+                                setActiveTool(null); // Clear tool when response starts
                             }
                         } catch (e) {
                             console.error("Error parsing JSON chunk", e);
@@ -223,10 +236,12 @@ export default function Chat() {
             setMessages(prev => [...prev, botMessage]);
             setStreamingText('');
             setBotAction(null);
+            setActiveTool(null);
 
         } catch (error) {
             console.error('Error sending message:', error);
             setBotAction(null);
+            setActiveTool(null);
             const errorMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 text: "Sorry, I encountered an error.",
@@ -386,11 +401,7 @@ export default function Chat() {
                                 }
                                 secondary={
                                     <Box component="span" sx={{ color: 'text.primary' }}>
-                                        {botAction && (
-                                            <Typography component="span" variant="caption" color="secondary" sx={{ display: 'block', mb: 1, fontStyle: 'italic' }}>
-                                                {botAction}
-                                            </Typography>
-                                        )}
+                                        <Thinking action={botAction} activeTool={activeTool} />
                                         {streamingText && (
                                             <ReactMarkdown
                                               components={{
