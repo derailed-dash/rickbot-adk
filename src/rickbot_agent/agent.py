@@ -5,7 +5,7 @@ We then cache these agents for fast retrieval.
 """
 
 import functools
-from typing import Any
+from google.adk.tools import BaseTool
 
 from google.adk.agents import Agent
 from google.adk.tools import (
