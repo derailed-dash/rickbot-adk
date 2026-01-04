@@ -18,7 +18,7 @@ describe('Thinking', () => {
   })
 
   it('renders tool name and Done when activeTool is completed', () => {
-    render(<Thinking action="Using tool..." activeTool={{ name: 'google_search', status: 'completed' }} />)
+    render(<Thinking action="Using tool..." activeTool={{ name: 'SearchAgent', status: 'completed' }} />)
     expect(screen.getByText(/Google Search \(Done\)/)).toBeInTheDocument()
   })
 
