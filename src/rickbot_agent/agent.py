@@ -17,6 +17,7 @@ from google.genai.types import GenerateContentConfig
 from rickbot_utils.config import config, logger
 
 from .personality import Personality, get_personalities
+from .tools_custom import FileSearchTool
 
 # ADK Built-in Tool Limitation:
 # A single root agent or a standalone agent can only support ONE built-in tool.
@@ -41,12 +42,28 @@ def create_agent(personality: Personality) -> Agent:
     instruction = f"""{personality.system_instruction}
     If you don't know the answer to something, use the SearchAgent to perform a Google Search"""
 
+    tools = [AgentTool(agent=search_agent)]
+
+    if personality.name == "Dazbo":
+        if config.dazbo_file_search_store_name:
+            instruction += """
+            IMPORTANT: required_action: You MUST start by searching your Dazbo reference materials 
+            for information relevant to the user's request.
+            Always use the 'file_search' tool before answering."""
+            tools.append(
+                FileSearchTool(
+                    file_search_store_names=[config.dazbo_file_search_store_name]
+                )
+            )
+        else:
+             logger.warning("Dazbo personality selected but FILE_SEARCH_STORE_NAME not configured.")
+
     return Agent(
         name=f"{config.agent_name}_{personality.name}",  # Make agent name unique
         description=f"A chatbot with the personality of {personality.menu_name}",
         model=config.model,
         instruction=instruction,
-        tools=[AgentTool(agent=search_agent)],
+        tools=tools,
         generate_content_config=GenerateContentConfig(temperature=personality.temperature, top_p=1, max_output_tokens=8192),
         output_key="last_turn_response",
     )
