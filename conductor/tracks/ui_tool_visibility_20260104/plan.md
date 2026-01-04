@@ -2,12 +2,12 @@
 
 This plan outlines the steps to implement real-time tool execution visibility in the Rickbot-ADK Next.js frontend.
 
-## Phase 1: Backend Event Propagation (FastAPI & ADK)
+## Phase 1: Backend Event Propagation (FastAPI & ADK) [checkpoint: 6a0fe65]
 Goal: Ensure the backend correctly emits tool execution events that the frontend can consume.
 
 - [x] Task: Review ADK event system for tool calls. 7c7b242
 - [x] Task: Update FastAPI endpoint to stream tool execution events alongside response chunks. 455e3c5
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Backend Event Propagation (FastAPI & ADK)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Backend Event Propagation (FastAPI & ADK)' (Protocol in workflow.md)
 
 ## Phase 2: Frontend State Management & Event Handling
 Goal: Update the Next.js frontend to handle and store tool execution events.
