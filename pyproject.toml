@@ -112,6 +112,10 @@ build-backend = "hatchling.build"
 pythonpath = "."
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["src/tests"] # This helps pytest to find tests, making collection faster
+filterwarnings = [
+    "ignore::DeprecationWarning:google.adk.*",
+    "ignore::DeprecationWarning:google.genai.*",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/rickbot_agent", "src/rickbot_utils", "src/streamlit_fe"]
