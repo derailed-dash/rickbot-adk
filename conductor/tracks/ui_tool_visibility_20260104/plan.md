@@ -22,8 +22,8 @@ Goal: Update the UI to display the tool information.
 
 - [x] Task: Create or update the `Thinking` component to display tool name, action, and icon. 7db3c4e
 - [x] Task: Map ADK tool names to specific icons and descriptive verbs. 7db3c4e
-- [ ] Task: Ensure smooth transitions between different tools and the final response.
-- [ ] Task: Style the tool status to match the "Portal Green" theme.
+- [x] Task: Ensure smooth transitions between different tools and the final response. 507947f
+- [x] Task: Style the tool status to match the "Portal Green" theme. 507947f
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: UI Implementation (Thinking Component)' (Protocol in workflow.md)
 
 ## Phase 4: Final Verification & Cleanup
