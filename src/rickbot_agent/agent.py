@@ -5,6 +5,7 @@ We then cache these agents for fast retrieval.
 """
 
 import functools
+from typing import Any
 
 from google.adk.agents import Agent
 from google.adk.tools import (
@@ -42,7 +43,7 @@ def create_agent(personality: Personality) -> Agent:
     instruction = f"""{personality.system_instruction}
     If you don't know the answer to something, use the SearchAgent to perform a Google Search"""
 
-    tools = [AgentTool(agent=search_agent)]
+    tools: list[Any] = [AgentTool(agent=search_agent)]
 
     if personality.file_search_store_id:
         if personality.file_search_instruction:
@@ -51,11 +52,7 @@ def create_agent(personality: Personality) -> Agent:
             instruction += """
         You have access to reference materials via the 'file_search' tool. 
         Use it to provide accurate information based on the provided context."""
-        tools.append(
-            FileSearchTool(
-                file_search_store_names=[personality.file_search_store_id]
-            )
-        )
+        tools.append(FileSearchTool(file_search_store_names=[personality.file_search_store_id]))
 
     return Agent(
         name=f"{config.agent_name}_{personality.name}",  # Make agent name unique
