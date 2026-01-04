@@ -32,15 +32,25 @@ const toolMap: Record<string, { label: string; icon: React.ReactNode; color: str
     icon: <MoveToInboxIcon fontSize="small" />,
     color: '#34A853',
   },
+  'Responding': {
+    label: 'Responding',
+    icon: <PsychologyIcon fontSize="small" />,
+    color: '#39FF14', // Portal Green
+  }
 };
 
 const Thinking: React.FC<ThinkingProps> = ({ action, activeTool }) => {
   if (!action && !activeTool) return null;
 
-  const toolInfo = activeTool ? toolMap[activeTool.name] : null;
+  const isResponding = action === 'Responding...';
+  const toolName = activeTool?.name || (isResponding ? 'Responding' : null);
+  const toolInfo = toolName ? toolMap[toolName] : null;
+  
   const displayName = toolInfo ? toolInfo.label : (activeTool?.name || action || 'Thinking...');
   const icon = toolInfo ? toolInfo.icon : <PsychologyIcon fontSize="small" />;
-  const color = toolInfo ? toolInfo.color : 'secondary.main';
+  const color = toolInfo ? toolInfo.color : '#39FF14'; // Default to Portal Green
+
+  const isRunning = activeTool?.status === 'running' || action === 'Thinking...' || isResponding;
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 0.5 }}>
@@ -49,10 +59,11 @@ const Thinking: React.FC<ThinkingProps> = ({ action, activeTool }) => {
         alignItems: 'center', 
         justifyContent: 'center',
         color: color,
-        animation: activeTool?.status === 'running' ? 'pulse 1.5s infinite ease-in-out' : 'none',
+        filter: `drop-shadow(0 0 2px ${color})`,
+        animation: isRunning ? 'pulse 1.5s infinite ease-in-out' : 'none',
         '@keyframes pulse': {
           '0%': { opacity: 0.6, transform: 'scale(0.95)' },
-          '50%': { opacity: 1, transform: 'scale(1.05)' },
+          '50%': { opacity: 1, transform: 'scale(1.1)' },
           '100%': { opacity: 0.6, transform: 'scale(0.95)' },
         }
       }}>
@@ -62,16 +73,19 @@ const Thinking: React.FC<ThinkingProps> = ({ action, activeTool }) => {
         variant="caption" 
         sx={{ 
           fontStyle: 'italic', 
-          color: 'text.secondary',
-          fontWeight: 'medium',
+          color: color,
+          opacity: 0.8,
+          fontWeight: 'bold',
           display: 'flex',
           alignItems: 'center',
-          gap: 0.5
+          gap: 0.5,
+          textShadow: `0 0 5px ${color}44`
         }}
       >
         {displayName}
         {activeTool?.status === 'running' && '...'}
         {activeTool?.status === 'completed' && ' (Done)'}
+        {(!activeTool && action === 'Thinking...') && '...'}
       </Typography>
     </Box>
   );
