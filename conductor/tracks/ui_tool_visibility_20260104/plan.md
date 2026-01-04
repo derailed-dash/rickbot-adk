@@ -6,7 +6,7 @@ This plan outlines the steps to implement real-time tool execution visibility in
 Goal: Ensure the backend correctly emits tool execution events that the frontend can consume.
 
 - [x] Task: Review ADK event system for tool calls. 7c7b242
-- [ ] Task: Update FastAPI endpoint to stream tool execution events alongside response chunks.
+- [x] Task: Update FastAPI endpoint to stream tool execution events alongside response chunks. 455e3c5
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Backend Event Propagation (FastAPI & ADK)' (Protocol in workflow.md)
 
 ## Phase 2: Frontend State Management & Event Handling
