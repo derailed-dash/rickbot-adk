@@ -43,3 +43,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Fix File Search Prioritization and Formatting
 *Link: [./conductor/archive/fix_file_search_prioritization_20260104/](./conductor/archive/fix_file_search_prioritization_20260104/)*
+---
+
+## [~] Track: Update the React UI so that it shows when tools are used and which tools.
+*Link: [./conductor/tracks/ui_tool_visibility_20260104/](./conductor/tracks/ui_tool_visibility_20260104/)*

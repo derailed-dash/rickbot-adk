@@ -41,7 +41,8 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_config)
 
     # 1. Check instruction contains stricter search text and leading newline
     expected_instruction_part = """
-        IMPORTANT: required_action: You MUST start by searching your reference materials using the 'file_search' tool for information relevant to the user's request.
+        IMPORTANT: required_action: You MUST start by searching your reference materials
+        using the 'file_search' tool for information relevant to the user's request.
         Always use the 'file_search' tool before answering."""
     assert expected_instruction_part in agent.instruction
 

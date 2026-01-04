@@ -29,7 +29,7 @@ Goal: Update the UI to display the tool information.
 ## Phase 4: Final Verification & Cleanup
 Goal: Ensure everything works as expected and meets quality standards.
 
-- [ ] Task: Verify end-to-end flow with various tool-using agents (e.g., Rick with search).
+- [~] Task: Verify end-to-end flow with various tool-using agents (e.g., Rick with search).
 - [ ] Task: Ensure mobile responsiveness of the updated "Thinking" state.
 - [ ] Task: Run full linting, type checks, and tests.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification & Cleanup' (Protocol in workflow.md)
