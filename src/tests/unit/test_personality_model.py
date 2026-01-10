@@ -31,9 +31,11 @@ def test_personality_model_has_optional_file_search_store_id(mock_exists):
     )
     # This should default to None (or empty string if we chose that, but spec says None or empty)
     # The dataclass field default check will be implicit if instantiation succeeds without it.
-    assert p1.file_search_store_id is None
+    # This should default to None (or empty string if we chose that, but spec says None or empty)
+    # The dataclass field default check will be implicit if instantiation succeeds without it.
+    assert p1.file_search_store_name is None
 
-    # Case 2: With file_search_store_id
+    # Case 2: With file_search_store_name
     p2 = Personality(
         name="Dazbo",
         menu_name="Dazbo",
@@ -42,7 +44,7 @@ def test_personality_model_has_optional_file_search_store_id(mock_exists):
         welcome="Hello.",
         prompt_question="Query?",
         temperature=0.5,
-        file_search_store_id="projects/123/locations/us/stores/abc",
+        file_search_store_name="projects/123/locations/us/stores/abc",
     )
-    assert p2.file_search_store_id == "projects/123/locations/us/stores/abc"
+    assert p2.file_search_store_name == "projects/123/locations/us/stores/abc"
 

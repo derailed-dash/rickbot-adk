@@ -185,6 +185,7 @@ tmp*
 /coverage
 /libpeerconnection.log
 /typings
+scratch/
 
 # System files
 .DS_Store
