@@ -7,6 +7,7 @@ import pytest
 from rickbot_agent.agent import create_agent
 from rickbot_agent.personality import Personality
 from rickbot_agent.tools_custom import FileSearchTool
+from google.adk.tools import AgentTool
 
 
 @pytest.fixture
@@ -17,8 +18,10 @@ def mock_config():
         yield m
 
 
-def test_create_agent_attaches_file_search_tool_for_any_personality(mock_config):
+@patch("rickbot_agent.agent.get_store")
+def test_create_agent_attaches_file_search_tool_for_any_personality(mock_get_store, mock_config):
     """Test that any personality with file_search_store_id gets the tool and instruction."""
+    mock_get_store.return_value = "projects/test/locations/global/stores/yoda-store"
 
     # Define a personality that is NOT Dazbo but has a search store
     personality = Personality(
@@ -29,7 +32,7 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_config)
         welcome="Welcome.",
         prompt_question="Query?",
         temperature=0.7,
-        file_search_store_id="projects/test/locations/global/stores/yoda-store",
+        file_search_store_name="projects/test/locations/global/stores/yoda-store",
     )
     # We also need to mock personality.system_instruction because it's set in __post_init__
     # which might call secret manager. But our previous change to personality.py
@@ -40,14 +43,16 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_config)
     agent = create_agent(personality)
 
     # 1. Check instruction contains stricter search text and leading newline
-    expected_instruction_part = """
-        IMPORTANT: required_action: You MUST start by searching your reference materials
-        using the 'file_search' tool for information relevant to the user's request.
-        Always use the 'file_search' tool before answering."""
+    expected_instruction_part = "IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent."
     assert expected_instruction_part in agent.instruction
 
-    # 2. Check tools include FileSearchTool with correct ID
-    file_search_tools = [t for t in agent.tools if isinstance(t, FileSearchTool)]
+    # 2. Check tools include AgentTool for RagAgent
+    rag_agent_tool = next((t for t in agent.tools if isinstance(t, AgentTool) and t.agent.name == "RagAgent"), None)
+    assert rag_agent_tool is not None
+    
+    # Check that the RagAgent has the FileSearchTool
+    rag_agent = rag_agent_tool.agent
+    file_search_tools = [t for t in rag_agent.tools if isinstance(t, FileSearchTool)]
     assert len(file_search_tools) == 1
     assert file_search_tools[0].file_search_store_names == ["projects/test/locations/global/stores/yoda-store"]
 
@@ -62,14 +67,14 @@ def test_create_agent_no_file_search_tool_when_id_missing(mock_config):
         welcome="Hey.",
         prompt_question="What?",
         temperature=1.0,
-        file_search_store_id=None,
+        file_search_store_name=None,
     )
     personality.system_instruction = "You are Rick."
 
     agent = create_agent(personality)
 
     # 1. Check instruction does NOT contain generic search text
-    assert "access to reference materials via the 'file_search' tool" not in agent.instruction
+    assert "IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent." not in agent.instruction
 
     # 2. Check tools do NOT include FileSearchTool
     file_search_tools = [t for t in agent.tools if isinstance(t, FileSearchTool)]

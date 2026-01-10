@@ -299,7 +299,7 @@ async def chat_stream(
                     for part in event.content.parts:
                         if part.text:
                             yield f"data: {json.dumps({'chunk': part.text})}\n\n"
-                        else:
+                        elif not (part.function_call or part.function_response):
                             logger.debug("Received part with no text data.")
                 else:
                     logger.debug("Event contained no content parts.")

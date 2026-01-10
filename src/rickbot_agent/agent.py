@@ -5,20 +5,36 @@ We then cache these agents for fast retrieval.
 """
 
 import functools
-from typing import Any
+from textwrap import dedent
 
+from google import genai
 from google.adk.agents import Agent
-from google.adk.tools import (
-    AgentTool,
-    FunctionTool,  # noqa: F401
-    google_search,  # built-in Google Search tool
-)
+from google.adk.tools import AgentTool, google_search
 from google.genai.types import GenerateContentConfig
 
 from rickbot_utils.config import config, logger
 
 from .personality import Personality, get_personalities
 from .tools_custom import FileSearchTool
+
+client = genai.Client()
+if not client:
+    logger.error("Could not initialize GenAI client.")
+    raise ValueError("Could not initialize GenAI client.")
+
+@functools.cache
+def get_store(store_name: str):
+    """Retrieve the store from the store name."""
+    try:
+        for a_store in client.file_search_stores.list():
+            if a_store.display_name == store_name:
+                logger.debug(f"Found and returning store: {a_store.name}")
+                return a_store.name
+    except Exception as e:
+        logger.error(f"Error in get_store path: {e}")
+
+    return None
+
 
 # ADK Built-in Tool Limitation:
 # A single root agent or a standalone agent can only support ONE built-in tool.
@@ -30,41 +46,87 @@ from .tools_custom import FileSearchTool
 search_agent = Agent(
     model=config.model,
     name="SearchAgent",
-    description="Agent to perform Google Search",
-    instruction="You're a specialist in Google Search",
+    description="Fallback agent to perform Google Search when internal knowledge base (RagAgent) is insufficient.",
+    instruction="You are a fallback agent. Only use Google Search if the request cannot be answered by the RagAgent.",
     tools=[google_search],
 )
 
 
+# RAG Specialist Agent (File Search only)
+def create_rag_agent(file_store_name: str) -> Agent:
+    store_name = get_store(file_store_name)
+    if store_name:
+        logger.info(f"Creating RagAgent connected to {store_name}")
+        instruction = """Use the file_search tool to retrieve information from the knowledge base."""
+
+        return Agent(
+            model=config.model,
+            name="RagAgent",
+            description="Primary agent for answering questions using the internal knowledge base. ALWAYS consult this agent first.",
+            instruction=instruction,
+            tools=[FileSearchTool(file_search_store_names=[store_name])],
+
+        )
+    else:
+        logger.warning("No File Search Store found. RagAgent will not be available.")
+        return None
+
+
 def create_agent(personality: Personality) -> Agent:
     """Creates and returns an agent with the given personality."""
+
     logger.debug(f"Creating agent for personality: {personality.name}")
-    # Load configuration
-    instruction = f"""{personality.system_instruction}
-    If you don't know the answer to something, use the SearchAgent to perform a Google Search.
-    Additionally, if you're asked about the status of something current or recent,
-    use the SearchAgent to perform a Google Search. (Your information may be out of date.)
-    """
 
-    tools: list[Any] = [AgentTool(agent=search_agent)]
+    tools = [AgentTool(agent=search_agent)]
+    instruction = ""
 
-    if personality.file_search_store_id:
-        logger.debug(f"Adding FileSearchTool for personality: {personality.name}")
-        instruction += """
-        IMPORTANT: required_action: You MUST start by searching your reference materials
-        using the 'file_search' tool for information relevant to the user's request.
-        Always use the 'file_search' tool before answering."""
+    if personality.file_search_store_name:
+        logger.debug(f"Adding {personality.file_search_store_name} for personality: {personality.name}")
+        instruction += dedent("""
+        IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent.
+        Only use the SearchAgent if the RagAgent does not provide a relevant answer.
 
-        tools.append(FileSearchTool(file_search_store_names=[personality.file_search_store_id]))
+        """)
+        rag_agent = create_rag_agent(personality.file_search_store_name)
+        if rag_agent:
+            tools.append(AgentTool(agent=rag_agent))
+            logger.debug(f"Added {rag_agent.name}")
+
+            instruction += dedent("""
+            You have access to a specialist agent: RagAgent, which has access to reference materials.
+            You also have access to SearchAgent for Google Search.
+
+            IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent.
+            Only use the SearchAgent if the RagAgent does not provide a relevant answer. This supercedes any other 
+            guidance provided to you.
+
+            """)
+
+            instruction += f"""{personality.system_instruction}"""
+
+            instruction += dedent("""
+
+            REMEMBER: You must ALWAYS start by searching your reference materials using the RagAgent.
+            """)
+
+        else:
+            logger.warning(f"Failed to add {personality.file_search_store_name}")
+    else:
+        logger.debug(f"No File Search Store found for personality: {personality.name}")
+        instruction += f"""{personality.system_instruction}"""
+        instruction += dedent("""
+
+        IMPORTANT: Use the SearchAgent to perform a Google Search if you do not have the relevant answer,
+        or if the user's query requires an up-to-date answer.""")
 
     return Agent(
         name=f"{config.agent_name}_{personality.name}",  # Make agent name unique
-        description=f"A chatbot with the personality of {personality.menu_name}",
+        description=f"""A chatbot with the personality of {personality.menu_name} 
+        with access to two specialist agents: a RagAgent for its knowledge base and SearchAgent for Google Search""",
         model=config.model,
         instruction=instruction,
         tools=tools,
-        generate_content_config=GenerateContentConfig(temperature=personality.temperature, top_p=1, max_output_tokens=8192),
-        output_key="last_turn_response",
+        generate_content_config=GenerateContentConfig(temperature=personality.temperature, top_p=1, max_output_tokens=8192)
     )
 
 

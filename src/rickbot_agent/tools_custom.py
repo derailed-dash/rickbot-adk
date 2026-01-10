@@ -1,8 +1,6 @@
 """
-Custom Tools for Rickbot Agent.
-
-This module defines custom tools compatible with the Google Agent Development Kit (ADK).
-Specifically, it implements the `FileSearchTool`.
+Defines a custom tool for running Gemini File Search (RAG) queries inside 
+the Google Agent Development Kit (ADK).
 
 What it does:
     It acts as a middleware tool that intercepts the LLM request before it is sent
@@ -10,11 +8,14 @@ What it does:
     File Search Store ID) directly into the `tools` parameter of the Gemini API request.
 
 Why we need it:
-    The standard ADK library provides easy access to Python functions and Google Search,
-    but we need a way to attach a persistent Gemini File Search Store (created in AI Studio)
-    to our agent. This custom tool allows us to pass that specific store ID to the model,
-    enabling RAG (Retrieval-Augmented Generation) capabilities using the native Gemini
-    File Search feature.
+    The google.adk.tools library currently includes helpers for GoogleSearch,
+    CodeExecution, and VertexAISearch, but it does not yet have a native FileSearch wrapper.
+    We need a way to attach a persistent Gemini File Search Store (created in AI Studio)
+    to our agent. 
+
+    File Search is a server-side tool (executed by the model/Gemini API, not the client code).
+    To use it, the specific tools configuration must be present in the 
+    GenerateContentConfig of the request.
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ from typing import TYPE_CHECKING
 from google.adk.tools import BaseTool, ToolContext
 from google.genai import types
 
+# We only use LlmRequest for type hints, so we can hide it from runtime
 if TYPE_CHECKING:
     from google.adk.models import LlmRequest
 
