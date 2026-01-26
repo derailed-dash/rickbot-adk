@@ -41,10 +41,6 @@ docker-clean:
 	@echo "================================================================================="
 	docker compose down --remove-orphans
 
-# Launch local development server with hot-reload
-local-backend:
-	uv run uvicorn adk_sample_app.server:app --app-dir src --host 0.0.0.0 --port 8000 --reload
-
 # Run unit tests
 test:
 	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "Error: GOOGLE_CLOUD_PROJECT is not set. Setup environment before running tests" && exit 1)
