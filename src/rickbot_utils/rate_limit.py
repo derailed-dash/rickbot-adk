@@ -21,7 +21,16 @@ def get_rate_limit_key(request: Request) -> str:
 # Initialize the Limiter with our custom key function and global default limits
 # We keep headers_enabled=False (default) to avoid crashes with Pydantic model returns.
 # We will handle custom headers (like Retry-After) in the exception handler.
-limiter = Limiter(
-    key_func=get_rate_limit_key,
-    default_limits=["60 per minute"]
-)
+try:
+    limiter = Limiter(
+        key_func=get_rate_limit_key,
+        default_limits=["60 per minute"]
+    )
+except UnicodeDecodeError:
+    # This can happen in CI/CD where .env is encrypted (git-crypt) and thus invalid utf-8.
+    # In this case, we initialize without reading the config file.
+    limiter = Limiter(
+        key_func=get_rate_limit_key,
+        default_limits=["60 per minute"],
+        config_filename=""
+    )
