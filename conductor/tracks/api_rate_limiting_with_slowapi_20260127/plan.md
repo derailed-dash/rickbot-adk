@@ -20,7 +20,7 @@ Goal: Apply the defined rate limit policies to the API endpoints.
 - [x] Task: Ensure the `429` error response is correctly handled and formatted. 1bbc070
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Global & Specific Limits' (Protocol in workflow.md)
 
-## Phase 3: Verification & Documentation
+## Phase 3: Verification & Documentation [checkpoint: df50882]
 Goal: Verify the implementation with tests and ensure it meets project standards.
 
 - [x] Task: Write unit tests to verify the identifier extraction (IP vs User ID). 2c0f07d
