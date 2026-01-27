@@ -32,6 +32,9 @@ from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
 from google.genai.types import Content, Part
 from pydantic import BaseModel
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from rickbot_agent.agent import get_agent
 from rickbot_agent.auth import verify_token
@@ -39,6 +42,7 @@ from rickbot_agent.auth_models import AuthUser
 from rickbot_agent.personality import get_personalities
 from rickbot_agent.services import get_artifact_service, get_session_service
 from rickbot_utils.config import logger
+from rickbot_utils.rate_limit import limiter
 
 APP_NAME = "rickbot_api"
 
@@ -65,6 +69,11 @@ class Persona(BaseModel):
 
 logger.debug("Initialising FastAPI app...")
 app = FastAPI()
+
+# Add Rate Limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 # Add CORS middleware
 app.add_middleware(
