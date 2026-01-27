@@ -1,0 +1,8 @@
+{
+  "track_id": "api_rate_limiting_with_slowapi_20260127",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-27T12:00:00Z",
+  "updated_at": "2026-01-27T12:00:00Z",
+  "description": "Add API rate limiting using slowapi"
+}

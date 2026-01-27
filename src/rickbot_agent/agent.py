@@ -6,6 +6,7 @@ We then cache these agents for fast retrieval.
 
 import functools
 from textwrap import dedent
+from typing import Any
 
 from google import genai
 from google.adk.agents import Agent
@@ -53,7 +54,7 @@ search_agent = Agent(
 
 
 # RAG Specialist Agent (File Search only)
-def create_rag_agent(file_store_name: str) -> Agent:
+def create_rag_agent(file_store_name: str) -> Agent | None:
     store_name = get_store(file_store_name)
     if store_name:
         logger.info(f"Creating RagAgent connected to {store_name}")
@@ -62,7 +63,10 @@ def create_rag_agent(file_store_name: str) -> Agent:
         return Agent(
             model=config.model,
             name="RagAgent",
-            description="Primary agent for answering questions using the internal knowledge base. ALWAYS consult this agent first.",
+            description=(
+                "Primary agent for answering questions using the internal knowledge base. "
+                "ALWAYS consult this agent first."
+            ),
             instruction=instruction,
             tools=[FileSearchTool(file_search_store_names=[store_name])],
 
@@ -77,7 +81,7 @@ def create_agent(personality: Personality) -> Agent:
 
     logger.debug(f"Creating agent for personality: {personality.name}")
 
-    tools = [AgentTool(agent=search_agent)]
+    tools: list[Any] = [AgentTool(agent=search_agent)]
     instruction = ""
 
     if personality.file_search_store_name:
@@ -97,7 +101,7 @@ def create_agent(personality: Personality) -> Agent:
             You also have access to SearchAgent for Google Search.
 
             IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent.
-            Only use the SearchAgent if the RagAgent does not provide a relevant answer. This supercedes any other 
+            Only use the SearchAgent if the RagAgent does not provide a relevant answer. This supersedes any other 
             guidance provided to you.
 
             """)

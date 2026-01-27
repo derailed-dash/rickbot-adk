@@ -1,13 +1,15 @@
 """Unit tests for generic file search store support in the agent."""
 
+from typing import cast
 from unittest.mock import patch
 
 import pytest
+from google.adk.agents import Agent
+from google.adk.tools import AgentTool
 
 from rickbot_agent.agent import create_agent
 from rickbot_agent.personality import Personality
 from rickbot_agent.tools_custom import FileSearchTool
-from google.adk.tools import AgentTool
 
 
 @pytest.fixture
@@ -49,9 +51,9 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_get_sto
     # 2. Check tools include AgentTool for RagAgent
     rag_agent_tool = next((t for t in agent.tools if isinstance(t, AgentTool) and t.agent.name == "RagAgent"), None)
     assert rag_agent_tool is not None
-    
+
     # Check that the RagAgent has the FileSearchTool
-    rag_agent = rag_agent_tool.agent
+    rag_agent = cast(Agent, rag_agent_tool.agent)
     file_search_tools = [t for t in rag_agent.tools if isinstance(t, FileSearchTool)]
     assert len(file_search_tools) == 1
     assert file_search_tools[0].file_search_store_names == ["projects/test/locations/global/stores/yoda-store"]

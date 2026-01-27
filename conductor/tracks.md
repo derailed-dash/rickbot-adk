@@ -46,4 +46,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 ---
 
 ## [x] Track: Update the React UI so that it shows when tools are used and which tools.
-*Link: [./conductor/tracks/ui_tool_visibility_20260104/](./conductor/tracks/ui_tool_visibility_20260104/)*
+*Link: [./conductor/archive/ui_tool_visibility_20260104/](./conductor/archive/ui_tool_visibility_20260104/)*
