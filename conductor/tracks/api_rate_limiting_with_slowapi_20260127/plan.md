@@ -2,7 +2,7 @@
 
 This plan outlines the steps to implement API rate limiting in the Rickbot-ADK backend using `slowapi`.
 
-## Phase 1: Foundation & Configuration
+## Phase 1: Foundation & Configuration [checkpoint: 25225bb]
 Goal: Add `slowapi` dependency and set up the basic rate limiting infrastructure.
 
 - [x] Task: Add slowapi to pyproject.toml dependencies. 188d542
