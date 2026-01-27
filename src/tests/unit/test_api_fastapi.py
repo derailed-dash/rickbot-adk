@@ -65,7 +65,7 @@ def client():
 
         with TestClient(app) as c:
             yield c, mock_runner
-        
+
         # Re-enable for other tests
         app.state.limiter.enabled = True
 

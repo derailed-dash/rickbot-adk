@@ -6,6 +6,7 @@ We then cache these agents for fast retrieval.
 
 import functools
 from textwrap import dedent
+from typing import Any
 
 from google import genai
 from google.adk.agents import Agent
@@ -53,7 +54,7 @@ search_agent = Agent(
 
 
 # RAG Specialist Agent (File Search only)
-def create_rag_agent(file_store_name: str) -> Agent:
+def create_rag_agent(file_store_name: str) -> Agent | None:
     store_name = get_store(file_store_name)
     if store_name:
         logger.info(f"Creating RagAgent connected to {store_name}")
@@ -80,7 +81,7 @@ def create_agent(personality: Personality) -> Agent:
 
     logger.debug(f"Creating agent for personality: {personality.name}")
 
-    tools = [AgentTool(agent=search_agent)]
+    tools: list[Any] = [AgentTool(agent=search_agent)]
     instruction = ""
 
     if personality.file_search_store_name:

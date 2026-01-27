@@ -1,6 +1,7 @@
+from fastapi import Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from fastapi import Request
+
 
 def get_rate_limit_key(request: Request) -> str:
     """
@@ -13,7 +14,7 @@ def get_rate_limit_key(request: Request) -> str:
              return str(request.state.user.id)
     except AttributeError:
         pass
-    
+
     # Fallback to IP
     return get_remote_address(request)
 

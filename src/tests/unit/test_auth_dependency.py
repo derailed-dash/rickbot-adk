@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 from fastapi import HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials
 
@@ -17,11 +18,11 @@ async def test_verify_mock_token_valid():
     token = "mock:123:test@example.com:Test User"
 
     creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
-    
+
     # Create mock request
     request = MagicMock(spec=Request)
     request.state = MagicMock()
-    
+
     user = await verify_token(request, creds)
 
     assert isinstance(user, AuthUser)
@@ -29,7 +30,7 @@ async def test_verify_mock_token_valid():
     assert user.email == "test@example.com"
     assert user.name == "Test User"
     assert user.provider == "mock"
-    
+
     # Verify user was attached to request state
     assert request.state.user == user
 
@@ -43,7 +44,7 @@ async def test_verify_mock_token_invalid_prefix():
 
     token = "invalid:123:test@example.com:Test User"
     creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
-    
+
     request = MagicMock(spec=Request)
     request.state = MagicMock()
 
