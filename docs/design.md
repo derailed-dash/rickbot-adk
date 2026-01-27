@@ -190,6 +190,23 @@ Frontend user authentication is required for Rickbot.
     - **Local Development**: OAuth credentials (Client ID/Secret) are loaded from `.env.local`.
     - **Production**: Credentials are securely fetched from **Google Secret Manager** and injected as environment variables into the Cloud Run container.
 
+### Rate Limiting
+
+To ensure the stability and availability of the Rickbot-ADK platform, rate limiting is implemented at the API level.
+
+*   **Framework**: **slowapi** (a FastAPI port of `limits`).
+*   **Storage**: **In-memory storage** (default). Note that rate limits are currently local to each instance of the API server.
+*   **Key Identification**:
+    *   **Authenticated Users**: Requests are tracked using the unique **User ID** extracted from the verified JWT (Google or GitHub). This ensures fair usage across different devices for the same account.
+    *   **Unauthenticated Users**: Requests are tracked by the **Client IP address** as a fallback.
+*   **Policies**:
+    *   **Global Default**: 60 requests per minute.
+    *   **LLM Generation**: 5 requests per minute for `/chat` and `/chat_stream`. This stricter limit is necessary to manage the high computational cost and external API quotas associated with Gemini model inference.
+*   **Error Handling**:
+    *   Exceeding a limit triggers a `429 Too Many Requests` response.
+    *   The response includes a `Retry-After: 60` header to inform clients when they can resume requests.
+    *   A custom exception handler ensures the response body is formatted as standard JSON: `{"detail": "Rate limit exceeded: ..."}`.
+
 ### Artifacts & Media Handling
 
 The system leverages **ADK Artifacts** for robust handling of user-uploaded files and generated content.

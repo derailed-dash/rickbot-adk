@@ -22,6 +22,7 @@ Author: Darren Lester
   - [API Backend](#api-backend)
   - [Streamlit UI](#streamlit-ui)
   - [OAuth](#oauth)
+  - [Rate Limiting](#rate-limiting)
   - [DNS](#dns)
 - [Deploying Infrastructure](#deploying-infrastructure)
 - [Historical Notes About This Repo](#historical-notes-about-this-repo)
@@ -292,6 +293,17 @@ For production deployment, avoid embedding secrets in the container image or env
     *   `GITHUB_CLIENT_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-github-client-secret/versions/latest`
 
 Non-sensitive values (Client IDs, URLs) can be set as standard environment variables in the Cloud Run configuration.
+
+### Rate Limiting
+
+The FastAPI backend implements rate limiting using `slowapi` to ensure stability and fair resource usage.
+
+- **Global Limit:** 60 requests per minute per user/IP across all endpoints.
+- **LLM Generation Limit:** 5 requests per minute per user/IP for `/chat` and `/chat_stream`.
+- **Identification:**
+    - **Authenticated users** are tracked by their unique User ID (extracted from JWT).
+    - **Unauthenticated users** are tracked by their IP address.
+- **Error Response:** Exceeding limits returns a `429 Too Many Requests` status code with a `Retry-After: 60` header and a descriptive JSON body.
 
 ### DNS
 
