@@ -46,8 +46,11 @@ from rickbot_utils.rate_limit import limiter
 APP_NAME = "rickbot_api"
 
 
-async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
+async def rate_limit_exceeded_handler(request: Request, exc: Exception) -> JSONResponse:
     """Custom handler for rate limit exceeded errors."""
+    if not isinstance(exc, RateLimitExceeded):
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
+
     response = JSONResponse(
         status_code=429,
         content={"detail": f"Rate limit exceeded: {exc.detail}"}

@@ -101,7 +101,7 @@ exclude = [".venv", "node_modules", "src/nextjs_fe"]
 
 [tool.codespell]
 ignore-words-list = "rouge"
-skip = "./locust_env/*,uv.lock,.venv,./src/frontend,**/*.ipynb,**/node_modules,**/.next,./src/nextjs_fe/out,**/*.excalidraw,**/package-lock.json"
+skip = "./locust_env/*,uv.lock,.venv,./src/frontend,**/*.ipynb,**/node_modules,**/.next,./src/nextjs_fe/out,**/*.excalidraw,**/package-lock.json,./scratch/*"
 
 
 [build-system]

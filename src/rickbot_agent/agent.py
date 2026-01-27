@@ -62,7 +62,10 @@ def create_rag_agent(file_store_name: str) -> Agent:
         return Agent(
             model=config.model,
             name="RagAgent",
-            description="Primary agent for answering questions using the internal knowledge base. ALWAYS consult this agent first.",
+            description=(
+                "Primary agent for answering questions using the internal knowledge base. "
+                "ALWAYS consult this agent first."
+            ),
             instruction=instruction,
             tools=[FileSearchTool(file_search_store_names=[store_name])],
 
@@ -97,7 +100,7 @@ def create_agent(personality: Personality) -> Agent:
             You also have access to SearchAgent for Google Search.
 
             IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent.
-            Only use the SearchAgent if the RagAgent does not provide a relevant answer. This supercedes any other 
+            Only use the SearchAgent if the RagAgent does not provide a relevant answer. This supersedes any other 
             guidance provided to you.
 
             """)
