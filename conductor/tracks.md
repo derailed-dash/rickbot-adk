@@ -47,8 +47,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Update the React UI so that it shows when tools are used and which tools.
 *Link: [./conductor/archive/ui_tool_visibility_20260104/](./conductor/archive/ui_tool_visibility_20260104/)*
-
----
-
-## [x] Track: Add API Rate Limiting with slowapi
-*Link: [./conductor/tracks/api_rate_limiting_with_slowapi_20260127/](./conductor/tracks/api_rate_limiting_with_slowapi_20260127/)*
