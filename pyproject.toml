@@ -26,6 +26,7 @@ dependencies = [
     "langchain-core",
     "streamlit-feedback",
     "langchain-google-vertexai",
+    "slowapi>=0.1.9",
 ]
 
 requires-python = ">=3.12"
