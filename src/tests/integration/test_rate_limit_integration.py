@@ -2,8 +2,13 @@ from fastapi.testclient import TestClient
 from main import app
 from slowapi.errors import RateLimitExceeded
 import pytest
+import os
+from unittest.mock import patch, AsyncMock, MagicMock
 
 client = TestClient(app)
+
+# Ensure mock auth is enabled for testing
+os.environ["NEXT_PUBLIC_ALLOW_MOCK_AUTH"] = "true"
 
 def test_limiter_integration():
     # Verify limiter state is attached
@@ -12,15 +17,6 @@ def test_limiter_integration():
 
 def test_global_rate_limit_applied():
     limiter = app.state.limiter
-    # Check if any default limit matches our expectation
-    found = False
-    for limit_group in limiter._default_limits:
-        if any("60 per 1 minute" in str(limit) or "60/1 minute" in str(limit) for limit in limit_group):
-            found = True
-            break
-    # Note: str(limit) might vary by version, but functional test is better
-    # Let's just trust the functional test if this is too brittle, but I'll try to be broad.
-    # Actually, I'll just check if it's not empty.
     assert len(limiter._default_limits) > 0
 
 def test_root_endpoint_rate_limited():
@@ -31,3 +27,36 @@ def test_root_endpoint_rate_limited():
             return # Success, it's limited
     
     pytest.fail("Root endpoint was not rate limited after 65 requests")
+
+@patch("main.Runner")
+@patch("main.get_agent")
+def test_chat_endpoint_stricter_limit(mock_get_agent, mock_runner_class):
+    # Setup mock runner to return a dummy final response
+    mock_runner = MagicMock()
+    mock_runner_class.return_value = mock_runner
+    
+    async def mock_run_async(*args, **kwargs):
+        event = MagicMock()
+        event.get_function_calls.return_value = []
+        event.actions = None
+        event.is_final_response.return_value = True
+        
+        part = MagicMock()
+        part.text = "Mocked response"
+        event.content.parts = [part]
+        
+        yield event
+
+    mock_runner.run_async = mock_run_async
+    
+    # The limit for /chat should be 5/minute
+    headers = {"Authorization": "Bearer mock:user1:user1@example.com:User1"}
+    data = {"prompt": "Hello", "personality": "Rick"}
+    
+    for i in range(10):
+        response = client.post("/chat", data=data, headers=headers)
+        if response.status_code == 429:
+            assert i < 6 # Should fail at 6th request
+            return
+            
+    pytest.fail("Chat endpoint was not rate limited after 10 requests")

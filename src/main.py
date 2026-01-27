@@ -26,7 +26,7 @@ from collections.abc import AsyncGenerator
 from os import getenv
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, File, Form, HTTPException, Response, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
@@ -145,7 +145,9 @@ async def _process_files(
 
 
 @app.post("/chat")
+@limiter.limit("5 per minute")
 async def chat(
+    request: Request,
     prompt: Annotated[str, Form()],
     session_id: Annotated[str | None, Form()] = None,
     personality: Annotated[str, Form()] = "Rick",
@@ -225,7 +227,9 @@ async def chat(
 
 
 @app.post("/chat_stream")
+@limiter.limit("5 per minute")
 async def chat_stream(
+    request: Request,
     prompt: Annotated[str, Form()],
     session_id: Annotated[str | None, Form()] = None,
     personality: Annotated[str, Form()] = "Rick",
