@@ -28,11 +28,10 @@ from typing import Annotated
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from google.adk.runners import Runner
 from google.genai.types import Content, Part
 from pydantic import BaseModel
-from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
@@ -45,6 +44,17 @@ from rickbot_utils.config import logger
 from rickbot_utils.rate_limit import limiter
 
 APP_NAME = "rickbot_api"
+
+
+async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
+    """Custom handler for rate limit exceeded errors."""
+    response = JSONResponse(
+        status_code=429,
+        content={"detail": f"Rate limit exceeded: {exc.detail}"}
+    )
+    # Add Retry-After header (defaulting to 60s)
+    response.headers["Retry-After"] = "60"
+    return response
 
 
 class ChatResponse(BaseModel):
@@ -72,7 +82,7 @@ app = FastAPI()
 
 # Add Rate Limiting
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 # Add CORS middleware
@@ -86,7 +96,8 @@ app.add_middleware(
 
 
 @app.get("/personas")
-def get_personas(user: AuthUser = Depends(verify_token)) -> list[Persona]:
+@limiter.limit("60 per minute")
+def get_personas(request: Request, user: AuthUser = Depends(verify_token)) -> list[Persona]:
     """Returns a list of available chatbot personalities."""
     personalities = get_personalities()
     return [
@@ -327,13 +338,15 @@ async def chat_stream(
 
 
 @app.get("/")
-def read_root():
+@limiter.limit("60 per minute")
+def read_root(request: Request):
     """Root endpoint for the API."""
     return {"Hello": "World"}
 
 
 @app.get("/artifacts/{filename}")
-async def get_artifact(filename: str, user: AuthUser = Depends(verify_token)) -> Response:
+@limiter.limit("60 per minute")
+async def get_artifact(filename: str, request: Request, user: AuthUser = Depends(verify_token)) -> Response:
     """Retrieves a saved artifact for the user."""
     user_id = user.email
     artifact_filename = f"user:{filename}"

@@ -3,7 +3,7 @@ from main import app
 from slowapi.errors import RateLimitExceeded
 import pytest
 import os
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import patch, MagicMock
 
 client = TestClient(app)
 
@@ -24,6 +24,10 @@ def test_root_endpoint_rate_limited():
     for _ in range(65):
         response = client.get("/")
         if response.status_code == 429:
+            # Check for Retry-After header
+            print(f"DEBUG: 429 response headers: {response.headers}")
+            print(f"DEBUG: 429 response body: {response.json()}")
+            assert "Retry-After" in response.headers
             return # Success, it's limited
     
     pytest.fail("Root endpoint was not rate limited after 65 requests")
@@ -57,6 +61,8 @@ def test_chat_endpoint_stricter_limit(mock_get_agent, mock_runner_class):
         response = client.post("/chat", data=data, headers=headers)
         if response.status_code == 429:
             assert i < 6 # Should fail at 6th request
+            assert "Retry-After" in response.headers
+            assert "detail" in response.json()
             return
             
     pytest.fail("Chat endpoint was not rate limited after 10 requests")

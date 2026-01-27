@@ -60,8 +60,14 @@ def client():
         # Override the dependency
         app.dependency_overrides[verify_token] = lambda: mock_user
 
+        # Disable rate limiting for these tests to prevent interference
+        app.state.limiter.enabled = False
+
         with TestClient(app) as c:
             yield c, mock_runner
+        
+        # Re-enable for other tests
+        app.state.limiter.enabled = True
 
 
 def test_read_root(client):

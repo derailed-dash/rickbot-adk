@@ -18,6 +18,8 @@ def get_rate_limit_key(request: Request) -> str:
     return get_remote_address(request)
 
 # Initialize the Limiter with our custom key function and global default limits
+# We keep headers_enabled=False (default) to avoid crashes with Pydantic model returns.
+# We will handle custom headers (like Retry-After) in the exception handler.
 limiter = Limiter(
     key_func=get_rate_limit_key,
     default_limits=["60 per minute"]
