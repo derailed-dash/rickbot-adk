@@ -17,5 +17,8 @@ def get_rate_limit_key(request: Request) -> str:
     # Fallback to IP
     return get_remote_address(request)
 
-# Initialize the Limiter with our custom key function
-limiter = Limiter(key_func=get_rate_limit_key)
+# Initialize the Limiter with our custom key function and global default limits
+limiter = Limiter(
+    key_func=get_rate_limit_key,
+    default_limits=["60 per minute"]
+)
