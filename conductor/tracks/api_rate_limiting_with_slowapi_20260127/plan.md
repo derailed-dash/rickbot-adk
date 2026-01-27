@@ -27,5 +27,5 @@ Goal: Verify the implementation with tests and ensure it meets project standards
 - [x] Task: Write integration tests to simulate rate limit exhaustion and verify `429` responses. c6ebc19
 - [x] Task: Verify that `Retry-After` headers are present in `429` responses. 1bbc070
 - [x] Task: Update `README.md` and `docs/design.md` with rate limiting details. fecdded
-- [ ] Task: Run full linting, type checks, and spelling checks.
+- [x] Task: Run full linting, type checks, and spelling checks. ff98eef
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Verification & Documentation' (Protocol in workflow.md)
