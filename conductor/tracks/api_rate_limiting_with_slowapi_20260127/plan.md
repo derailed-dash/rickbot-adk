@@ -14,7 +14,7 @@ Goal: Add `slowapi` dependency and set up the basic rate limiting infrastructure
 ## Phase 2: Global & Specific Limits
 Goal: Apply the defined rate limit policies to the API endpoints.
 
-- [ ] Task: Apply the global default rate limit (60/minute) to the FastAPI app.
+- [x] Task: Apply the global default rate limit (60/minute) to the FastAPI app. c6ebc19
 - [ ] Task: Identify all LLM-related endpoints in the codebase.
 - [ ] Task: Apply specific stricter limits (5/minute) to LLM endpoints using decorators.
 - [ ] Task: Ensure the `429` error response is correctly handled and formatted.
