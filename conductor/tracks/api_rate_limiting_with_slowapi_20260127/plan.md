@@ -8,7 +8,7 @@ Goal: Add `slowapi` dependency and set up the basic rate limiting infrastructure
 - [x] Task: Add slowapi to pyproject.toml dependencies. 188d542
 - [x] Task: Create a central limiter instance in `src/rickbot_utils/` or a new utils module. 785d220
 - [x] Task: Implement a custom key function to identify users (User ID from JWT or IP). 2c0f07d
-- [ ] Task: Integrate the `Limiter` middleware into the FastAPI application in `src/main.py`.
+- [x] Task: Integrate the `Limiter` middleware into the FastAPI application in `src/main.py`. d571855
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Configuration' (Protocol in workflow.md)
 
 ## Phase 2: Global & Specific Limits
