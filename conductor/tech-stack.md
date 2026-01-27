@@ -4,8 +4,9 @@
 - **Language:** Python 3.12+ (managed with `uv`).
 - **Frameworks:** 
     - **Google Agent Development Kit (ADK):** Core framework for building and managing the multi-personality agents.
-    - **FastAPI:** High-performance web framework for the backend API, decoupling agent logic from the frontends.
-    - **Authlib:** For handling OAuth flows and JWT token verification.
+    - **FastAPI**: High-performance web framework for the backend API, decoupling agent logic from the frontends.
+    - **Authlib**: For handling OAuth flows and JWT token verification.
+    - **SlowAPI**: For implementing robust API rate limiting and ensuring system stability.
 - **SDKs:** 
     - **Google Gen AI SDK (`google-genai`):** For direct interaction with Gemini models.
     - **Google Cloud SDKs:** Including Vertex AI, Secret Manager, and Logging/Tracing.
