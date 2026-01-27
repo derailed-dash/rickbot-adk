@@ -23,9 +23,9 @@ Goal: Apply the defined rate limit policies to the API endpoints.
 ## Phase 3: Verification & Documentation
 Goal: Verify the implementation with tests and ensure it meets project standards.
 
-- [ ] Task: Write unit tests to verify the identifier extraction (IP vs User ID).
-- [ ] Task: Write integration tests to simulate rate limit exhaustion and verify `429` responses.
-- [ ] Task: Verify that `Retry-After` headers are present in `429` responses.
-- [ ] Task: Update `README.md` and `docs/design.md` with rate limiting details.
+- [x] Task: Write unit tests to verify the identifier extraction (IP vs User ID). 2c0f07d
+- [x] Task: Write integration tests to simulate rate limit exhaustion and verify `429` responses. c6ebc19
+- [x] Task: Verify that `Retry-After` headers are present in `429` responses. 1bbc070
+- [x] Task: Update `README.md` and `docs/design.md` with rate limiting details. fecdded
 - [ ] Task: Run full linting, type checks, and spelling checks.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Verification & Documentation' (Protocol in workflow.md)
