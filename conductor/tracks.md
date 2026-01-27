@@ -50,5 +50,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-## [~] Track: Add API Rate Limiting with slowapi
+## [x] Track: Add API Rate Limiting with slowapi
 *Link: [./conductor/tracks/api_rate_limiting_with_slowapi_20260127/](./conductor/tracks/api_rate_limiting_with_slowapi_20260127/)*
