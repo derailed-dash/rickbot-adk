@@ -1,8 +1,21 @@
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from fastapi import Request
 
-# Initialize the Limiter
-# We use get_remote_address as a default fallback, but we will likely override this
-# with a custom key function in the main app or via dependency injection to handle
-# authenticated users correctly.
-limiter = Limiter(key_func=get_remote_address)
+def get_rate_limit_key(request: Request) -> str:
+    """
+    Returns the key for rate limiting.
+    - If user is authenticated (request.state.user exists), returns user ID.
+    - Otherwise, returns the IP address.
+    """
+    try:
+        if hasattr(request.state, "user") and request.state.user:
+             return str(request.state.user.id)
+    except AttributeError:
+        pass
+    
+    # Fallback to IP
+    return get_remote_address(request)
+
+# Initialize the Limiter with our custom key function
+limiter = Limiter(key_func=get_rate_limit_key)
