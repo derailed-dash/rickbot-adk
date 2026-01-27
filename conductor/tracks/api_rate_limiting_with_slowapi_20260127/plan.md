@@ -11,7 +11,7 @@ Goal: Add `slowapi` dependency and set up the basic rate limiting infrastructure
 - [x] Task: Integrate the `Limiter` middleware into the FastAPI application in `src/main.py`. d571855
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Configuration' (Protocol in workflow.md)
 
-## Phase 2: Global & Specific Limits
+## Phase 2: Global & Specific Limits [checkpoint: 264f122]
 Goal: Apply the defined rate limit policies to the API endpoints.
 
 - [x] Task: Apply the global default rate limit (60/minute) to the FastAPI app. c6ebc19
