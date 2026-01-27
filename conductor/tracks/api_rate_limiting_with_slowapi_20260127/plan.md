@@ -6,7 +6,7 @@ This plan outlines the steps to implement API rate limiting in the Rickbot-ADK b
 Goal: Add `slowapi` dependency and set up the basic rate limiting infrastructure.
 
 - [x] Task: Add slowapi to pyproject.toml dependencies. 188d542
-- [ ] Task: Create a central `limiter` instance in `src/rickbot_utils/` or a new utils module.
+- [x] Task: Create a central limiter instance in `src/rickbot_utils/` or a new utils module. 785d220
 - [ ] Task: Implement a custom key function to identify users (User ID from JWT or IP).
 - [ ] Task: Integrate the `Limiter` middleware into the FastAPI application in `src/main.py`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Configuration' (Protocol in workflow.md)
