@@ -8,9 +8,9 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
     - [x] Task: Create `Dockerfile.react_fe` for the Next.js frontend
     - [x] Task: Create `Dockerfile.api_sidecar` for the FastAPI backend
     - [x] Task: Update existing `Dockerfile` (Streamlit) to ensure consistency and slimness
-- [ ] Task: Update Makefile for local container testing
-    - [ ] Task: Add `make docker-react` to build and run the sidecar setup locally using `docker-compose` or similar
-    - [ ] Task: Update `make docker-streamlit` to use the updated Dockerfile
+- [x] Task: Update Makefile for local container testing [1f83a40]
+    - [x] Task: Add `make docker-react` to build and run the sidecar setup locally using `docker-compose` or similar
+    - [x] Task: Update `make docker-streamlit` to use the updated Dockerfile
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Containerization' (Protocol in workflow.md)
 
 ## Phase 2: Infrastructure as Code (Terraform)
