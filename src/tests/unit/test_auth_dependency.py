@@ -2,28 +2,16 @@ from unittest.mock import MagicMock
 
 import pytest
 from fastapi import HTTPException, Request
-from fastapi.security import HTTPAuthorizationCredentials
 
+from rickbot_agent.auth import verify_credentials, verify_token
 from rickbot_agent.auth_models import AuthUser
 
 
-@pytest.mark.asyncio
-async def test_verify_mock_token_valid():
-    try:
-        from rickbot_agent.auth import verify_token
-    except ImportError:
-        pytest.fail("Could not import verify_token from rickbot_agent.auth")
-
+def test_verify_credentials_valid_mock():
     # Mock token format: "mock:user_id:email:name"
     token = "mock:123:test@example.com:Test User"
 
-    creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
-
-    # Create mock request
-    request = MagicMock(spec=Request)
-    request.state = MagicMock()
-
-    user = await verify_token(request, creds)
+    user = verify_credentials(token)
 
     assert isinstance(user, AuthUser)
     assert user.id == "123"
@@ -31,41 +19,49 @@ async def test_verify_mock_token_valid():
     assert user.name == "Test User"
     assert user.provider == "mock"
 
-    # Verify user was attached to request state
-    assert request.state.user == user
 
-
-@pytest.mark.asyncio
-async def test_verify_mock_token_invalid_prefix():
-    try:
-        from rickbot_agent.auth import verify_token
-    except ImportError:
-        pytest.fail("Could not import verify_token")
-
+def test_verify_credentials_invalid_prefix():
     token = "invalid:123:test@example.com:Test User"
-    creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
+    user = verify_credentials(token)
+    assert user is None
 
-    request = MagicMock(spec=Request)
-    request.state = MagicMock()
 
-    with pytest.raises(HTTPException) as excinfo:
-        await verify_token(request, creds)
-    assert excinfo.value.status_code == 401
+def test_verify_credentials_malformed():
+    token = "mock:broken"
+    user = verify_credentials(token)
+    assert user is None
 
 
 @pytest.mark.asyncio
-async def test_verify_mock_token_malformed():
-    try:
-        from rickbot_agent.auth import verify_token
-    except ImportError:
-        pytest.fail("Could not import verify_token")
-
-    token = "mock:broken"
-    creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
-
+async def test_verify_token_dependency_success():
+    # Create mock request with user in state
     request = MagicMock(spec=Request)
     request.state = MagicMock()
+    user = AuthUser(id="123", email="test@example.com", name="Test", provider="mock")
+    request.state.user = user
 
+    # We need to mock hasattr behavior for request.state
+    # Actually, MagicMock allows setting attributes.
+    # verify_token checks: hasattr(request.state, "user") and request.state.user
+
+    result = await verify_token(request)
+    assert result == user
+
+
+@pytest.mark.asyncio
+async def test_verify_token_dependency_failure():
+    # Create mock request WITHOUT user in state
+    request = MagicMock(spec=Request)
+    # Ensure 'user' attr is missing or None.
+    # MagicMock behaves weirdly with hasattr if not carefully managed.
+    # Easiest way is to set it to None or ensure it raises AttributeError?
+    # verify_token uses: hasattr(..., "user")
+    # If we use a plain object or a configured mock
+    class State:
+        pass
+    request.state = State()
+    # No user attr
     with pytest.raises(HTTPException) as excinfo:
-        await verify_token(request, creds)
+        await verify_token(request)
     assert excinfo.value.status_code == 401
+

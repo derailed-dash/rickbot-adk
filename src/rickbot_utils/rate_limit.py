@@ -9,11 +9,8 @@ def get_rate_limit_key(request: Request) -> str:
     - If user is authenticated (request.state.user exists), returns user ID.
     - Otherwise, returns the IP address.
     """
-    try:
-        if hasattr(request.state, "user") and request.state.user:
-             return str(request.state.user.id)
-    except AttributeError:
-        pass
+    if hasattr(request.state, "user") and request.state.user:
+         return str(request.state.user.id)
 
     # Fallback to IP
     return get_remote_address(request)
