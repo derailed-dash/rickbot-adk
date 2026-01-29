@@ -1,5 +1,5 @@
 import os
-import pytest
+
 
 def test_dockerfiles_exist():
     """Verify that the required Dockerfiles for the sidecar architecture exist."""
@@ -15,7 +15,7 @@ def test_dockerfiles_exist():
 def test_docker_compose_has_sidecar_services():
     """Verify that docker-compose.yml has the react_fe and api_sidecar services."""
     import yaml
-    with open("docker-compose.yml", "r") as f:
+    with open("docker-compose.yml") as f:
         compose = yaml.safe_load(f)
     services = compose.get("services", {})
     assert "react_fe" in services, "react_fe service is missing from docker-compose.yml"
@@ -23,6 +23,6 @@ def test_docker_compose_has_sidecar_services():
 
 def test_makefile_has_docker_react():
     """Verify that the Makefile has the docker-react target."""
-    with open("Makefile", "r") as f:
+    with open("Makefile") as f:
         content = f.read()
     assert "docker-react:" in content, "docker-react target is missing from Makefile"
