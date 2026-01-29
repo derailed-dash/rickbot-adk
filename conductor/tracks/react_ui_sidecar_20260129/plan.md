@@ -34,13 +34,13 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
     - [x] Task: Ensure `pr_checks.yaml` runs relevant tests for both the backend and the React frontend
 - [x] Task: Conductor - User Manual Verification 'Phase 3: CI/CD' (Protocol in workflow.md)
 
-## Phase 4: Documentation & Final Verification
+## Phase 4: Documentation & Final Verification [checkpoint: bee714d]
 
 - [x] Task: Update Project Documentation [1cdb44c]
     - [x] Task: Update `README.md` with Local Development guide for Sidecar setup
     - [x] Task: Update `deployment/README.md` with instructions for the `ui_type` toggle
     - [x] Task: Update `docs/design.md` with architecture diagrams for both UI modes
-- [~] Task: Final System Integration Test
-    - [ ] Task: Deploy to Staging with `ui_type="react"` and verify end-to-end functionality
-    - [ ] Task: Deploy to Staging with `ui_type="streamlit"` and verify fallback functionality
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Documentation & Final Verification' (Protocol in workflow.md)
+- [x] Task: Final System Integration Test [3ea2639]
+    - [x] Task: Deploy to Staging with `ui_type="react"` and verify end-to-end functionality
+    - [x] Task: Deploy to Staging with `ui_type="streamlit"` and verify fallback functionality
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Documentation & Final Verification' (Protocol in workflow.md)
