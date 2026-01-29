@@ -106,9 +106,6 @@ async def verify_token(request: Request, creds: HTTPAuthorizationCredentials = D
     if hasattr(request.state, "user") and request.state.user:
         return request.state.user
 
-    # Fallback/Safety: If for some reason middleware didn't run or failed silently but a token is present, 
-    # we could try to verify it here. But per plan, we just check state.
-    # However, to be robust, if middleware was skipped (e.g. testing?), we might want to check.
-    # But wait, middleware sets state.user. If it failed, it didn't set it.
-    # So if it's not set, it's 401.
+    # If the middleware has not populated the user state (e.g., invalid token or no token),
+    # we raise a 401 error.
     raise HTTPException(status_code=401, detail="Invalid authentication credentials")
