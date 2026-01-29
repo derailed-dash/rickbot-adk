@@ -50,5 +50,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Add the React UI to the container using a sidecar architecture. Make it configurable so we can select whether to run Streamlit or React UI.**
+- [x] **Track: Add the React UI to the container using a sidecar architecture. Make it configurable so we can select whether to run Streamlit or React UI.**
 *Link: [./conductor/tracks/react_ui_sidecar_20260129/](./conductor/tracks/react_ui_sidecar_20260129/)*
