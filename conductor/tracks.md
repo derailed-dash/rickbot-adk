@@ -47,3 +47,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Update the React UI so that it shows when tools are used and which tools.
 *Link: [./conductor/archive/ui_tool_visibility_20260104/](./conductor/archive/ui_tool_visibility_20260104/)*
+
+---
+
+- [~] **Track: Add the React UI to the container using a sidecar architecture. Make it configurable so we can select whether to run Streamlit or React UI.**
+*Link: [./conductor/tracks/react_ui_sidecar_20260129/](./conductor/tracks/react_ui_sidecar_20260129/)*

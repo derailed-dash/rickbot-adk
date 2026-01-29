@@ -1,0 +1,8 @@
+{
+  "track_id": "react_ui_sidecar_20260129",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-29T00:00:00Z",
+  "updated_at": "2026-01-29T00:00:00Z",
+  "description": "Add the React UI to the container using a sidecar architecture. Make it configurable so we can select whether to run Streamlit or React UI."
+}
