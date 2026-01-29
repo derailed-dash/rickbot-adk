@@ -1,43 +1,61 @@
 steps:
   # 1. Build Streamlit (Legacy)
-  - name: "gcr.io/kaniko-project/executor:latest"
-    id: build-streamlit
-    args:
-      - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-streamlit:$SHORT_SHA"
-      - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-streamlit:latest"
-      - "--context=."
-      - "--dockerfile=./Dockerfile"
-      - "--cache=true"
-      - "--cache-ttl=48h"
-      - "--build-arg=COMMIT_SHA=$COMMIT_SHA"
     # Only run if UI_TYPE is streamlit
-    # We use a trick: check environment variable in a previous step or just let it fail/skip?
-    # Better: Use a shell script to conditionally invoke Kaniko if possible, or just let all build but only deploy one.
-    # To save time/cost, let's use a shell script to check _UI_TYPE.
+    script: |
+      #!/usr/bin/env bash
+      if [ "$_UI_TYPE" == "streamlit" ]; then
+        /kaniko/executor \
+        --destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-streamlit:$SHORT_SHA \
+        --destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-streamlit:latest \
+        --context=. \
+        --dockerfile=./Dockerfile \
+        --cache=true \
+        --cache-ttl=48h \
+        --build-arg=COMMIT_SHA=$COMMIT_SHA
+      else
+        echo "Skipping Streamlit build as _UI_TYPE is $_UI_TYPE"
+      fi
+    automapSubstitutions: true
 
   # 2. Build React FE (Sidecar Ingress)
   - name: "gcr.io/kaniko-project/executor:latest"
     id: build-react-fe
+    entrypoint: 'bash'
     args:
-      - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-react-fe:$SHORT_SHA"
-      - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-react-fe:latest"
-      - "--context=."
-      - "--dockerfile=./Dockerfile.react_fe"
-      - "--cache=true"
-      - "--cache-ttl=48h"
-      - "--build-arg=COMMIT_SHA=$COMMIT_SHA"
+      - '-c'
+      - |
+        if [ "$_UI_TYPE" = "react" ]; then
+          /kaniko/executor \
+          --destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-react-fe:$SHORT_SHA \
+          --destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-react-fe:latest \
+          --context=. \
+          --dockerfile=./Dockerfile.react_fe \
+          --cache=true \
+          --cache-ttl=48h \
+          --build-arg=COMMIT_SHA=$COMMIT_SHA
+        else
+          echo "Skipping React FE build as _UI_TYPE is $_UI_TYPE"
+        fi
 
   # 3. Build API Sidecar
   - name: "gcr.io/kaniko-project/executor:latest"
     id: build-api-sidecar
+    entrypoint: 'bash'
     args:
-      - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-api-sidecar:$SHORT_SHA"
-      - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-api-sidecar:latest"
-      - "--context=."
-      - "--dockerfile=./Dockerfile.api_sidecar"
-      - "--cache=true"
-      - "--cache-ttl=48h"
-      - "--build-arg=COMMIT_SHA=$COMMIT_SHA"
+      - '-c'
+      - |
+        if [ "$_UI_TYPE" = "react" ]; then
+          /kaniko/executor \
+          --destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-api-sidecar:$SHORT_SHA \
+          --destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-api-sidecar:latest \
+          --context=. \
+          --dockerfile=./Dockerfile.api_sidecar \
+          --cache=true \
+          --cache-ttl=48h \
+          --build-arg=COMMIT_SHA=$COMMIT_SHA
+        else
+          echo "Skipping API Sidecar build as _UI_TYPE is $_UI_TYPE"
+        fi
 
   # 4. Deploy to Staging (Conditional)
   - name: "gcr.io/cloud-builders/gcloud"
