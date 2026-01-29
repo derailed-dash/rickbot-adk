@@ -20,9 +20,10 @@
 ## Infrastructure & DevOps
 - **Cloud Provider:** **Google Cloud Platform (GCP).**
 - **Hosting:** **Cloud Run / Vertex AI Agent Engine.**
+- **Architecture:** **Cloud Run Sidecar Pattern.** For multi-container deployment of React FE and FastAPI Backend.
 - **Infrastructure as Code (IaC):** **Terraform.** For reproducible environment setup.
 - **CI/CD:** **Google Cloud Build.** Automating tests and deployments.
-- **Containerization:** **Docker.** For consistent environments across development and production.
+- **Containerization:** **Docker.** Multi-stage, optimized builds for Node.js and Python runtimes.
 - **Dependency Management:** **`uv`.** Used for fast and reliable Python package management.
 
 ## Monitoring & Observability
