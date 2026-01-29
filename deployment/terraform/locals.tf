@@ -47,9 +47,7 @@ locals {
     "docker-compose.yml"
   ]
 
-  # Configuration for containers based on UI type
-  # Note: These are placeholders used for initial service creation.
-  # CI/CD handles the actual image deployment.
+
   # Configuration for containers based on UI type
   # Note: These are placeholders used for initial service creation.
   # CI/CD handles the actual image deployment.
