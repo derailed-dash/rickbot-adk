@@ -81,7 +81,7 @@ locals {
           }
         }
         env = [
-          { name = "NEXT_PUBLIC_API_URL", value = "https://${config.domain_name}" }, # Dynamically set to the environment URL
+          { name = "NEXT_PUBLIC_API_URL", value = "http://localhost:8000" }, # Sidecar Architecture uses localhost
           { name = "NEXTAUTH_URL", value = "https://${config.domain_name}" }
         ]
       },
