@@ -1,0 +1,49 @@
+# ---- Base Stage ----
+FROM node:20-slim AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+WORKDIR /app
+
+# Copy package files for dependency installation
+COPY src/nextjs_fe/package.json src/nextjs_fe/package-lock.json ./
+RUN npm ci
+
+# ---- Builder Stage ----
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY src/nextjs_fe .
+
+# Build the Next.js application
+RUN npm run build
+
+# ---- Production Stage ----
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+ENV APP_USER nextjs
+
+# Create non-root user
+RUN adduser --system --group ${APP_USER}
+
+# Copy the built application from the builder stage
+# We only need the public folder, the static assets, and the .next/standalone output
+# Note: To use standalone output, we need to enable it in next.config.js
+# For now, we'll copy the standard output.
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
+RUN chown -R ${APP_USER}:${APP_USER} /app
+
+USER ${APP_USER}
+
+EXPOSE 3000
+
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["npm", "start"]
