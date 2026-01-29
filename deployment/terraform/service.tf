@@ -38,8 +38,7 @@ resource "google_cloud_run_v2_service" "app_staging" {
         }
 
         resources {
-
-
+          limits = containers.value.resources.limits
           startup_cpu_boost = true
         }
       }
