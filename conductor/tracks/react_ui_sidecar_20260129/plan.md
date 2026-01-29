@@ -2,7 +2,7 @@
 
 This plan outlines the steps to integrate the Next.js React UI using a Cloud Run Sidecar architecture, providing a configurable deployment toggle between React and Streamlit.
 
-## Phase 1: Containerization & Local Optimization
+## Phase 1: Containerization & Local Optimization [checkpoint: b4a4846]
 
 - [x] Task: Create optimized Dockerfiles for the Sidecar architecture [f1694d9]
     - [x] Task: Create `Dockerfile.react_fe` for the Next.js frontend
@@ -11,7 +11,7 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
 - [x] Task: Update Makefile for local container testing [1f83a40]
     - [x] Task: Add `make docker-react` to build and run the sidecar setup locally using `docker-compose` or similar
     - [x] Task: Update `make docker-streamlit` to use the updated Dockerfile
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Containerization' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Containerization' (Protocol in workflow.md)
 
 ## Phase 2: Infrastructure as Code (Terraform)
 
