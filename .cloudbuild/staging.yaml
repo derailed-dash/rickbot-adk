@@ -110,6 +110,13 @@ steps:
                   value: "$_GOOGLE_CLOUD_LOCATION"
         EOF
           gcloud beta run services replace service.yaml --project=$_STAGING_PROJECT_ID --region=$_REGION
+          
+          # Explicitly allow unauthenticated access (public) as 'replace' might reset/ignore it
+          gcloud run services add-iam-policy-binding $_SERVICE_NAME \
+            --member="allUsers" \
+            --role="roles/run.invoker" \
+            --region=$_REGION \
+            --project=$_STAGING_PROJECT_ID
         else
           echo "Deploying Streamlit (Legacy) architecture..."
           gcloud run deploy "$_SERVICE_NAME" \
