@@ -261,6 +261,7 @@ This file configures the FastAPI server. Use `source scripts/setup-env.sh` to lo
 | :--- | :--- |
 | `GOOGLE_CLIENT_ID` | Required to verify Google ID Tokens sent by the frontend. |
 | `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to accept mock tokens. |
+| `BACKEND_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to *verify* mock tokens. Must be kept out of prod. |
 | `GOOGLE_CLOUD_PROJECT` | Used for ADK and Secret Manager access. |
 
 ##### `src/nextjs_fe/.env.local` (Next.js Frontend)
@@ -273,7 +274,7 @@ This file is used exclusively by the Next.js application.
 | `NEXTAUTH_SECRET` | Used by NextAuth to encrypt session cookies. |
 | `GOOGLE_CLIENT_ID` / `SECRET` | Credentials for Google OAuth. |
 | `GITHUB_CLIENT_ID` / `SECRET` | Credentials for GitHub OAuth. |
-| `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Enables the "Mock Login" provider in the UI. |
+| `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Enables the "Mock Login" provider in the UI (Frontend only). |
 | `MOCK_AUTH_USER` | (Optional) The email address assigned to the mock user identity. |
 | `NEXT_PUBLIC_API_URL` | URL of the backend API (e.g., `http://localhost:8000`). |
 

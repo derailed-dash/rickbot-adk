@@ -11,6 +11,7 @@ client = TestClient(app)
 
 # Ensure mock auth is enabled for testing
 os.environ["NEXT_PUBLIC_ALLOW_MOCK_AUTH"] = "true"
+os.environ["BACKEND_ALLOW_MOCK_AUTH"] = "true"
 
 def test_limiter_integration():
     # Verify limiter state is attached

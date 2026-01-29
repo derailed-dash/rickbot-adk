@@ -29,7 +29,7 @@ async def verify_token(request: Request, creds: HTTPAuthorizationCredentials = D
     # 1. Check for Mock Token (Development Only)
     if token.startswith("mock:"):
         # In a real app, you'd check an environment variable to ensure this is only enabled in dev
-        allow_mock = os.getenv("NEXT_PUBLIC_ALLOW_MOCK_AUTH")
+        allow_mock = os.getenv("BACKEND_ALLOW_MOCK_AUTH")
 
         if allow_mock != "true":
             logger.warning(f"Mock auth failed. ALLOW_MOCK={allow_mock}")

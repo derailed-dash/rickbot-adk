@@ -116,14 +116,14 @@ def test_chat_endpoint(server_fixture: subprocess.Popen[str]) -> None:
     # For now we use the mock usage pattern:
     # The server in production (and here) uses verify_token.
     # We need to rely on the MOCK AUTH environment variable if we want to bypass real auth,
-    # OR we need to supply a valid mock token if NEXT_PUBLIC_ALLOW_MOCK_AUTH is enabled.
+    # OR we need to supply a valid mock token if NEXT_PUBLIC_ALLOW_MOCK_AUTH and BACKEND_ALLOW_MOCK_AUTH are enabled.
 
-    # Note: We didn't set NEXT_PUBLIC_ALLOW_MOCK_AUTH in the subprocess env above.
+    # Note: We didn't set BACKEND_ALLOW_MOCK_AUTH in the subprocess env above.
     # Let's rely on the fact we can't easily mock auth in a subprocess without that var.
     # However, 'make test-all' usually runs in an env where we can access GCP secrets.
     # But wait, user doesn't want Dazbo secrets.
 
-    # We'll use the Mock Auth credentials format, assuming NEXT_PUBLIC_ALLOW_MOCK_AUTH is set in .env
+    # We'll use the Mock Auth credentials format, assuming BACKEND_ALLOW_MOCK_AUTH is set in .env
     # or passed in. Let's assume .env is loaded by the app.
 
     headers = {"Authorization": "Bearer mock:123:test@example.com:Tester"}
