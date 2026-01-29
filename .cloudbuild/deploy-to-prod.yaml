@@ -37,7 +37,7 @@ steps:
                 - name: NEXT_PUBLIC_API_URL
                   value: http://localhost:8000
                 - name: NEXTAUTH_URL
-                  value: https://rickbot.just2good.co.uk
+                  value: $_APP_URL
               - name: api-sidecar
                 image: $_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-api-sidecar:$SHORT_SHA
                 resources:
@@ -97,6 +97,7 @@ substitutions:
   _GOOGLE_CLOUD_LOCATION: "global"
   _MAX_INSTANCES: "1"
   _UI_TYPE: "react"
+  _APP_URL: "https://rickbot.co.uk"
 
 logsBucket: gs://${PROJECT_ID}-logs-data/build-logs
 options:
