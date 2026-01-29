@@ -40,9 +40,8 @@ async def test_verify_token_dependency_success():
     user = AuthUser(id="123", email="test@example.com", name="Test", provider="mock")
     request.state.user = user
 
-    # We need to mock hasattr behavior for request.state
-    # Actually, MagicMock allows setting attributes.
-    # verify_token checks: hasattr(request.state, "user") and request.state.user
+    # Mock the request state to include an authenticated user
+    # This simulates the state after AuthMiddleware has run
 
     result = await verify_token(request)
     assert result == user
@@ -52,15 +51,11 @@ async def test_verify_token_dependency_success():
 async def test_verify_token_dependency_failure():
     # Create mock request WITHOUT user in state
     request = MagicMock(spec=Request)
-    # Ensure 'user' attr is missing or None.
-    # MagicMock behaves weirdly with hasattr if not carefully managed.
-    # Easiest way is to set it to None or ensure it raises AttributeError?
-    # verify_token uses: hasattr(..., "user")
-    # If we use a plain object or a configured mock
+    # Ensure the request state does not have a user attribute
+    # This simulates a request where AuthMiddleware failed or wasn't run
     class State:
         pass
     request.state = State()
-    # No user attr
     with pytest.raises(HTTPException) as excinfo:
         await verify_token(request)
     assert excinfo.value.status_code == 401

@@ -20,8 +20,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 if user:
                     request.state.user = user
             except Exception:
-                # Log? Maybe too verbose if bad tokens are common spam
+                # Swallow exceptions to allow non-authenticated requests to proceed.
+                # Invalid tokens will result in request.state.user being None.
                 pass
-        
         response = await call_next(request)
         return response
