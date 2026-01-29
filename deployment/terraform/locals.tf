@@ -57,8 +57,8 @@ locals {
       ports = [3000]
       resources = {
         limits = {
-          cpu    = "1"
-          memory = "1Gi"
+          cpu    = "0.2"
+          memory = "512Mi"
         }
       }
       env = [
@@ -72,8 +72,8 @@ locals {
       ports = [8000]
       resources = {
         limits = {
-          cpu    = "1"
-          memory = "2Gi"
+          cpu    = "0.8"
+          memory = "1536Mi"
         }
       }
       env = [

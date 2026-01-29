@@ -186,7 +186,7 @@ The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to t
 - Node.js (v18 or later)
 - Python backend running (`make api`)
 
-#### Running locally
+#### Running locally (Native)
 
 1.  **Start the Backend**:
     In one terminal, launch the FastAPI server:
@@ -204,6 +204,16 @@ The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to t
 
 3.  **Access the UI**:
     Open your browser to `http://localhost:3000`.
+
+#### Running locally (Docker Sidecars)
+
+To simulate the production environment (Cloud Run sidecars) locally, use the Docker Compose setup:
+
+```bash
+make docker-react
+```
+
+This will spin up both the FastAPI backend (`api_sidecar`) and the Next.js frontend (`react_fe`) in linked containers. You can then access the UI at `http://localhost:3000`.
 
 #### Key Features
 

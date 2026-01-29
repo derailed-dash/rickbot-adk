@@ -31,8 +31,8 @@ steps:
                 - containerPort: 3000
                 resources:
                   limits:
-                    cpu: '1'
-                    memory: 2Gi
+                    cpu: '0.2'
+                    memory: 512Mi
                 env:
                 - name: NEXT_PUBLIC_API_URL
                   value: http://localhost:8000
@@ -42,8 +42,8 @@ steps:
                 image: $_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME-api-sidecar:$SHORT_SHA
                 resources:
                   limits:
-                    cpu: '2'
-                    memory: 4Gi
+                    cpu: '0.8'
+                    memory: 1536Mi
                 env:
                 - name: GOOGLE_CLOUD_PROJECT
                   value: $_PROD_PROJECT_ID

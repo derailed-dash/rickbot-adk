@@ -36,10 +36,10 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
 
 ## Phase 4: Documentation & Final Verification
 
-- [ ] Task: Update Project Documentation
-    - [ ] Task: Update `README.md` with Local Development guide for Sidecar setup
-    - [ ] Task: Update `deployment/README.md` with instructions for the `ui_type` toggle
-    - [ ] Task: Update `docs/design.md` with architecture diagrams for both UI modes
+- [~] Task: Update Project Documentation
+    - [~] Task: Update `README.md` with Local Development guide for Sidecar setup
+    - [~] Task: Update `deployment/README.md` with instructions for the `ui_type` toggle
+    - [~] Task: Update `docs/design.md` with architecture diagrams for both UI modes
 - [ ] Task: Final System Integration Test
     - [ ] Task: Deploy to Staging with `ui_type="react"` and verify end-to-end functionality
     - [ ] Task: Deploy to Staging with `ui_type="streamlit"` and verify fallback functionality

@@ -107,10 +107,7 @@ resource "google_cloud_run_v2_service" "app_prod" {
         }
 
         resources {
-          # Use prod-specific limits if needed, otherwise use local defaults
-          limits = var.ui_type == "react" ? (
-            containers.value.name == "ingress" ? { cpu = "1", memory = "2Gi" } : { cpu = "2", memory = "4Gi" }
-          ) : { cpu = "2", memory = "4Gi" }
+          limits = containers.value.resources.limits
           startup_cpu_boost = true
         }
       }
