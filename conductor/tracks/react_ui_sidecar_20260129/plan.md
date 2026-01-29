@@ -13,16 +13,16 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
     - [x] Task: Update `make docker-streamlit` to use the updated Dockerfile
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Containerization' (Protocol in workflow.md)
 
-## Phase 2: Infrastructure as Code (Terraform)
+## Phase 2: Infrastructure as Code (Terraform) [checkpoint: 83c1e1b]
 
-- [ ] Task: Update Terraform variables and locals
-    - [ ] Task: Add `ui_type` variable to `variables.tf` (default: "react")
-    - [ ] Task: Update `locals.tf` to handle conditional logic for container configurations
-- [ ] Task: Update Cloud Run service definition for Sidecars
-    - [ ] Task: Modify `service.tf` to support multi-container deployments when `ui_type` is "react"
-    - [ ] Task: Configure `ingress` container (Next.js) and `sidecar` container (FastAPI)
-    - [ ] Task: Ensure environment variables and secrets are correctly mapped to both containers
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Infrastructure' (Protocol in workflow.md)
+- [x] Task: Update Terraform variables and locals [83c1e1b]
+    - [x] Task: Add `ui_type` variable to `variables.tf` (default: "react")
+    - [x] Task: Update `locals.tf` to handle conditional logic for container configurations
+- [x] Task: Update Cloud Run service definition for Sidecars [83c1e1b]
+    - [x] Task: Modify `service.tf` to support multi-container deployments when `ui_type` is "react"
+    - [x] Task: Configure `ingress` container (Next.js) and `sidecar` container (FastAPI)
+    - [x] Task: Ensure environment variables and secrets are correctly mapped to both containers
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Infrastructure' (Protocol in workflow.md)
 
 ## Phase 3: CI/CD Pipeline Integration
 
