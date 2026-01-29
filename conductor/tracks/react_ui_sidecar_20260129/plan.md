@@ -11,7 +11,7 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
 - [x] Task: Update Makefile for local container testing [1f83a40]
     - [x] Task: Add `make docker-react` to build and run the sidecar setup locally using `docker-compose` or similar
     - [x] Task: Update `make docker-streamlit` to use the updated Dockerfile
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Containerization' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Containerization' (Protocol in workflow.md)
 
 ## Phase 2: Infrastructure as Code (Terraform)
 
