@@ -24,15 +24,15 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
     - [x] Task: Ensure environment variables and secrets are correctly mapped to both containers
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Infrastructure' (Protocol in workflow.md)
 
-## Phase 3: CI/CD Pipeline Integration
+## Phase 3: CI/CD Pipeline Integration [checkpoint: 721bec9]
 
 - [x] Task: Update Cloud Build configurations [721bec9]
     - [x] Task: Modify `staging.yaml` and `deploy-to-prod.yaml` to conditionally build images based on `ui_type`
     - [x] Task: Implement tagging with Git short SHA for all built images
     - [x] Task: Update deployment step to handle the multi-container service configuration
-- [x] Task: Update Pull Request checks [27918fc]
+- [x] Task: Update Pull Request checks [e68dacd]
     - [x] Task: Ensure `pr_checks.yaml` runs relevant tests for both the backend and the React frontend
-- [~] Task: Conductor - User Manual Verification 'Phase 3: CI/CD' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: CI/CD' (Protocol in workflow.md)
 
 ## Phase 4: Documentation & Final Verification
 
