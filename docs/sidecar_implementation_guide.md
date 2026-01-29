@@ -100,6 +100,7 @@ In `deployment/terraform/locals.tf`, we defined two configurations:
 In `service.tf`, we use a `dynamic "containers"` block to render the correct configuration based on the `ui_type` variable.
 
 ### Resource Optimization
+
 To manage costs, we tuned the resource limits for the Sidecar deployment to match the legacy cost profile (Total: ~1 CPU, ~2GB RAM):
 - **Next.js:** 0.2 CPU, 512 MiB RAM.
 - **FastAPI:** 0.8 CPU, 1.5 GiB RAM.
