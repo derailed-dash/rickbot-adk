@@ -11,6 +11,7 @@ client = TestClient(app)
 
 # Ensure mock auth is enabled for testing
 os.environ["NEXT_PUBLIC_ALLOW_MOCK_AUTH"] = "true"
+os.environ["BACKEND_ALLOW_MOCK_AUTH"] = "true"
 
 def test_limiter_integration():
     # Verify limiter state is attached
@@ -27,8 +28,7 @@ def test_root_endpoint_rate_limited():
         response = client.get("/")
         if response.status_code == 429:
             # Check for Retry-After header
-            print(f"DEBUG: 429 response headers: {response.headers}")
-            print(f"DEBUG: 429 response body: {response.json()}")
+
             assert "Retry-After" in response.headers
             return # Success, it's limited
 

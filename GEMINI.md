@@ -3,7 +3,7 @@
 ---
 ***IMPORTANT: Run this check at the start of EVERY session!***
 
-Google Cloud configuration is achieved through a combination of `.env` and the `scripts/setup-env.sh` script. 
+Google Cloud configuration is achieved through a combination of `.env` and the `scripts/setup-env.sh` script. Note that `.env` is encrypted in the repo using `git-encrypt`. 
 
 Before providing your FIRST response in any conversation, you MUST perform the following steps:
 1.  Run `printenv GOOGLE_CLOUD_PROJECT` to check the environment variable.

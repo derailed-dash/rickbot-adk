@@ -12,40 +12,39 @@ from rickbot_utils.config import logger
 security = HTTPBearer()
 
 
-async def verify_token(request: Request, creds: HTTPAuthorizationCredentials = Depends(security)) -> AuthUser:
+def verify_credentials(token: str) -> AuthUser | None:
     """
-    Verifies the authentication token and returns an AuthUser object.
+    Verifies the authentication token and returns an AuthUser object or None if invalid.
     Supports:
-    - Mock tokens (format: \"mock:id:email:name\") - Development only
+    - Mock tokens (format: "mock:id:email:name") - Development only
     - Google ID Tokens
     - GitHub Access Tokens
     """
-    token = creds.credentials
     if not token or token == "undefined":
-        raise HTTPException(status_code=403, detail="Not authenticated")
+        return None
 
     user = None
 
     # 1. Check for Mock Token (Development Only)
     if token.startswith("mock:"):
         # In a real app, you'd check an environment variable to ensure this is only enabled in dev
-        allow_mock = os.getenv("NEXT_PUBLIC_ALLOW_MOCK_AUTH")
+        allow_mock = os.getenv("BACKEND_ALLOW_MOCK_AUTH")
 
         if allow_mock != "true":
             logger.warning(f"Mock auth failed. ALLOW_MOCK={allow_mock}")
-            raise HTTPException(status_code=401, detail="Mock authentication is disabled")
+            return None
 
         try:
             # Format: mock:id:email:name
             parts = token.split(":")
             if len(parts) < 4:
                 logger.warning(f"Mock token malformed: {token}")
-                raise HTTPException(status_code=401, detail="Malformed mock token")
+                return None
 
             user = AuthUser(id=parts[1], email=parts[2], name=parts[3], provider="mock")
         except Exception as e:
             logger.error(f"Mock auth exception: {e}")
-            raise HTTPException(status_code=401, detail="Invalid mock token") from e
+            return None
 
     # 2. Try Google ID Token Verification
     if not user:
@@ -96,9 +95,17 @@ async def verify_token(request: Request, creds: HTTPAuthorizationCredentials = D
         except Exception as e:
             logger.error(f"Error verifying GitHub token: {e}")
 
-    if user:
-        request.state.user = user
-        return user
+    return user
 
-    # Default reject
+
+async def verify_token(request: Request, creds: HTTPAuthorizationCredentials = Depends(security)) -> AuthUser:
+    """
+    Dependency that enforces authentication.
+    It expects the user to have been authenticated by the AuthMiddleware.
+    """
+    if hasattr(request.state, "user") and request.state.user:
+        return request.state.user
+
+    # If the middleware has not populated the user state (e.g., invalid token or no token),
+    # we raise a 401 error.
     raise HTTPException(status_code=401, detail="Invalid authentication credentials")

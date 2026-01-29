@@ -26,6 +26,7 @@ def server():
     env = os.environ.copy()
     env["RICKBOT_TEST_MODE"] = "true"
     env["NEXT_PUBLIC_ALLOW_MOCK_AUTH"] = "true"
+    env["BACKEND_ALLOW_MOCK_AUTH"] = "true"
 
     process = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, env=env, cwd=os.getcwd()

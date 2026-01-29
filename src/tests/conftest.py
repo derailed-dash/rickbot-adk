@@ -11,5 +11,12 @@ if "GOOGLE_CLOUD_PROJECT" not in os.environ:
 @pytest.fixture(scope="session", autouse=True)
 def set_test_env():
     """Sets environment variables for the entire test session."""
-    with patch.dict(os.environ, {"RICKBOT_TEST_MODE": "true", "NEXT_PUBLIC_ALLOW_MOCK_AUTH": "true"}):
+    with patch.dict(
+        os.environ,
+        {
+            "RICKBOT_TEST_MODE": "true",
+            "NEXT_PUBLIC_ALLOW_MOCK_AUTH": "true",
+            "BACKEND_ALLOW_MOCK_AUTH": "true",
+        },
+    ):
         yield

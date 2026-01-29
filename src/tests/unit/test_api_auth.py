@@ -75,7 +75,7 @@ async def test_chat_authenticated_mock(client):
     # Enable mock auth - verify_token reads from environment, so we patch os.getenv specifically for that check
     # But note: verify_token is imported in src.main. If we patch it there, we need to locate it.
     # Actually, verify_token uses os.getenv internally.
-    # Conftest sets NEXT_PUBLIC_ALLOW_MOCK_AUTH="true" in env, so we might not need to patch it here
+    # Conftest sets BACKEND_ALLOW_MOCK_AUTH="true" in env, so we might not need to patch it here
     # if we trust set_test_env. But ensuring it explicit is fine.
 
     response = c.post("/chat", data={"prompt": "Hello", "personality": "Rick"}, headers=headers)

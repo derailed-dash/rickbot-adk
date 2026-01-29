@@ -37,6 +37,7 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from rickbot_agent.agent import get_agent
 from rickbot_agent.auth import verify_token
+from rickbot_agent.auth_middleware import AuthMiddleware
 from rickbot_agent.auth_models import AuthUser
 from rickbot_agent.personality import get_personalities
 from rickbot_agent.services import get_artifact_service, get_session_service
@@ -46,11 +47,8 @@ from rickbot_utils.rate_limit import limiter
 APP_NAME = "rickbot_api"
 
 
-async def rate_limit_exceeded_handler(request: Request, exc: Exception) -> JSONResponse:
+def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
     """Custom handler for rate limit exceeded errors."""
-    if not isinstance(exc, RateLimitExceeded):
-        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
-
     response = JSONResponse(
         status_code=429,
         content={"detail": f"Rate limit exceeded: {exc.detail}"}
@@ -58,6 +56,9 @@ async def rate_limit_exceeded_handler(request: Request, exc: Exception) -> JSONR
     # Add Retry-After header (defaulting to 60s)
     response.headers["Retry-After"] = "60"
     return response
+
+# Override the default slowapi exception handler so that the middleware uses our custom response
+limiter._exception_handler = rate_limit_exceeded_handler
 
 
 class ChatResponse(BaseModel):
@@ -85,8 +86,13 @@ app = FastAPI()
 
 # Add Rate Limiting
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)  # type: ignore
 app.add_middleware(SlowAPIMiddleware)
+# Note on Middleware Order:
+# FastAPI/Starlette middlewares are executed LIFO (Last Added = First Executed).
+# We add AuthMiddleware LAST so that it executes FIRST on the request path.
+# Request -> AuthMiddleware -> SlowAPIMiddleware -> ...
+app.add_middleware(AuthMiddleware)
 
 # Add CORS middleware
 app.add_middleware(
@@ -99,7 +105,6 @@ app.add_middleware(
 
 
 @app.get("/personas")
-@limiter.limit("60 per minute")
 def get_personas(request: Request, user: AuthUser = Depends(verify_token)) -> list[Persona]:
     """Returns a list of available chatbot personalities."""
     personalities = get_personalities()
@@ -341,14 +346,12 @@ async def chat_stream(
 
 
 @app.get("/")
-@limiter.limit("60 per minute")
 def read_root(request: Request):
     """Root endpoint for the API."""
     return {"Hello": "World"}
 
 
 @app.get("/artifacts/{filename}")
-@limiter.limit("60 per minute")
 async def get_artifact(filename: str, request: Request, user: AuthUser = Depends(verify_token)) -> Response:
     """Retrieves a saved artifact for the user."""
     user_id = user.email

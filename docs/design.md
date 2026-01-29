@@ -185,7 +185,11 @@ Frontend user authentication is required for Rickbot.
         - It validates the tokens passed by the frontend:
             - **Google Tokens**: Verified using `google-auth` library against the Google ID Token issuer.
             - **GitHub Tokens**: Verified by calling the GitHub User API.
-            - **Mock Tokens**: Verified by parsing a custom mock token format (enabled only in dev environments).
+            - **Mock Tokens**: Verified by parsing a custom mock token format.
+                - **Security**: Mock auth is controlled by two distinct environment variables:
+                    - `NEXT_PUBLIC_ALLOW_MOCK_AUTH`: Controls UI visibility of the mock login provider.
+                    - `BACKEND_ALLOW_MOCK_AUTH`: Controls whether the backend accepts mock tokens.
+                - **Usage**: STRICTLY for local development. `BACKEND_ALLOW_MOCK_AUTH` should be falsy in production.
 - **Configuration**:
     - **Local Development**: OAuth credentials (Client ID/Secret) are loaded from `.env.local`.
     - **Production**: Credentials are securely fetched from **Google Secret Manager** and injected as environment variables into the Cloud Run container.
@@ -197,7 +201,8 @@ To ensure the stability and availability of the Rickbot-ADK platform, rate limit
 *   **Framework**: **slowapi** (a FastAPI port of `limits`).
 *   **Storage**: **In-memory storage** (default). Note that rate limits are currently local to each instance of the API server.
 *   **Key Identification**:
-    *   **Authenticated Users**: Requests are tracked using the unique **User ID** extracted from the verified JWT (Google or GitHub). This ensures fair usage across different devices for the same account.
+    *   **Authenticated Users**: Requests are tracked using the unique **User ID** extracted from the verified JWT.
+        > **Technical Detail**: This is achieved via a custom `AuthMiddleware` that runs *before* the rate limiting middleware (`SlowAPIMiddleware`). It passively attempts to verify the token and populate `request.state.user` so `slowapi` can use it for the key function.
     *   **Unauthenticated Users**: Requests are tracked by the **Client IP address** as a fallback.
 *   **Policies**:
     *   **Global Default**: 60 requests per minute.
