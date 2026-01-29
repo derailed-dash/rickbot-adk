@@ -4,7 +4,6 @@ steps:
     entrypoint: /bin/bash
     args:
       - "-c"
-      - "-c"
       - "./scripts/deploy-prod.sh"
 
 # Note: The values defined here act as defaults.
