@@ -17,7 +17,7 @@ resource "google_cloud_run_v2_service" "app_staging" {
 
   template {
     dynamic "containers" {
-      for_each = local.containers
+      for_each = local.staging_containers
       content {
         name  = containers.value.name
         image = containers.value.image
@@ -94,7 +94,7 @@ resource "google_cloud_run_v2_service" "app_prod" {
 
   template {
     dynamic "containers" {
-      for_each = local.containers
+      for_each = local.prod_containers
       content {
         name  = containers.value.name
         image = containers.value.image
