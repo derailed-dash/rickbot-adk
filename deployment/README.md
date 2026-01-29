@@ -22,6 +22,10 @@ This project utilizes distinct Google Cloud Projects to manage **staging** and *
 
 *   **Definition (`deployment/terraform/variables.tf`):** This file declares all input variables for the Terraform configuration.
 *   **Assignment (`deployment/terraform/vars/env.tfvars`):** This file is used to assign concrete values to the variables declared in `variables.tf`. This allows for environment-specific configurations.
+    *   **GitHub Variables**: The variables `github_app_installation_id` and `github_pat_secret_id` are crucial for the Cloud Build repository connection.
+        *   `github_app_installation_id`: Obtained from the GitHub App installation URL settings on your repository.
+        *   `github_pat_secret_id`: The ID of a secret in Google Secret Manager that holds your GitHub Personal Access Token (PAT). This PAT is required for Terraform to authenticate with GitHub.
+        *   `host_connection_name`: The name required for the Cloud Build host connection resource.
 
 ### CI/CD Pipeline Creation
 
@@ -60,6 +64,7 @@ This project leverages Google Cloud Build for its CI/CD workflows. The build con
     *   **Steps:**
         *   Deploys the pre-built and tested image to a Cloud Run service in the production project.
     *   **Substitutions:** Similar to staging, it uses substitutions (e.g., `_PROD_PROJECT_ID`, `_SERVICE_NAME`) to ensure the correct production environment is targeted.
+    *   **Precedence Note**: The variables defined in the `substitutions` block of the YAML files act as **defaults**. They are overridden by substitutions defined in the Cloud Build Trigger itself (which are configured via Terraform). This allows the same YAML file to be reused across different environments or configurations by simply changing the trigger definitions.
 
 ### Iteration and Environment Specifics in CI/CD
 

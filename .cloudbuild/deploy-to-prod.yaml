@@ -16,6 +16,8 @@ steps:
       - '--service-account=$_SERVICE_NAME-app-sa@$_PROD_PROJECT_ID.iam.gserviceaccount.com'
       - '--allow-unauthenticated' # Allow unauthenticated invocations - end user will perform OAuth
 
+# Note: The values defined here act as defaults.
+# They are overridden by substitutions defined in the Cloud Build Trigger (Highest Priority).
 substitutions:
   _PROD_PROJECT_ID: YOUR_PROD_PROJECT_ID
   _REGION: europe-west4
