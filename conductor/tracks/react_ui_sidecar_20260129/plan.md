@@ -26,7 +26,7 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
 
 ## Phase 3: CI/CD Pipeline Integration
 
-- [x] Task: Update Cloud Build configurations [27918fc]
+- [x] Task: Update Cloud Build configurations [721bec9]
     - [x] Task: Modify `staging.yaml` and `deploy-to-prod.yaml` to conditionally build images based on `ui_type`
     - [x] Task: Implement tagging with Git short SHA for all built images
     - [x] Task: Update deployment step to handle the multi-container service configuration
