@@ -111,12 +111,8 @@ steps:
         EOF
           gcloud beta run services replace service.yaml --project=$_STAGING_PROJECT_ID --region=$_REGION
           
-          # Explicitly allow unauthenticated access (public) as 'replace' might reset/ignore it
-          gcloud run services add-iam-policy-binding $_SERVICE_NAME \
-            --member="allUsers" \
-            --role="roles/run.invoker" \
-            --region=$_REGION \
-            --project=$_STAGING_PROJECT_ID
+          # Enable IAP for Staging
+          gcloud run services update "$_SERVICE_NAME" --project=$_STAGING_PROJECT_ID --region=$_REGION --iap
         else
           echo "Deploying Streamlit (Legacy) architecture..."
           gcloud run deploy "$_SERVICE_NAME" \
@@ -127,7 +123,7 @@ steps:
             --cpu-boost \
             --set-env-vars="GOOGLE_CLOUD_PROJECT=$_STAGING_PROJECT_ID,GOOGLE_CLOUD_REGION=$_REGION,LOG_LEVEL=$_LOG_LEVEL,APP_NAME=$_APP_NAME,AGENT_NAME=$_AGENT_NAME,GOOGLE_GENAI_USE_VERTEXAI=$_GOOGLE_GENAI_USE_VERTEXAI,MODEL=$_MODEL,AUTH_REQUIRED=$_AUTH_REQUIRED,RATE_LIMIT=$_RATE_LIMIT,GOOGLE_CLOUD_LOCATION=$_GOOGLE_CLOUD_LOCATION" \
             --service-account="$_SERVICE_NAME-app-sa@$_STAGING_PROJECT_ID.iam.gserviceaccount.com" \
-            --allow-unauthenticated
+            --iap
         fi
 
   # Fetch Staging Service URL
