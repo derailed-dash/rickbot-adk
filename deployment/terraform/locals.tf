@@ -55,103 +55,69 @@ locals {
   # CI/CD handles the actual image deployment.
   # We define a map of containers keyed by environment (prod, staging) to handle dynamic values.
   
-  staging_containers = var.ui_type == "react" ? [
-    {
-      name  = "ingress"
-      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
-      ports = [3000]
-      resources = {
-        limits = {
-          cpu    = "0.2"
-          memory = "512Mi"
-        }
-      }
-      env = [
-        { name = "NEXT_PUBLIC_API_URL", value = "http://localhost:8000" },
-        { name = "NEXTAUTH_URL", value = "https://${var.staging_app_domain_name[0]}" }
-      ]
-    },
-    {
-      name  = "api-sidecar"
-      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
-      ports = [8000]
-      resources = {
-        limits = {
-          cpu    = "0.8"
-          memory = "1536Mi"
-        }
-      }
-      env = [
-        { name = "GOOGLE_CLOUD_PROJECT", value = var.staging_project_id },
-        { name = "AGENT_NAME", value = var.agent_name }
-      ]
+  # Environments configuration map
+  environments = {
+    staging = {
+      project_id  = var.staging_project_id
+      domain_name = var.staging_app_domain_name[0]
     }
-  ] : [
-    {
-      name  = "streamlit"
-      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
-      ports = [8080]
-      resources = {
-        limits = {
-          cpu    = "1"
-          memory = "2Gi"
-        }
-      }
-      env = [
-        { name = "GOOGLE_CLOUD_PROJECT", value = var.staging_project_id },
-        { name = "AGENT_NAME", value = var.agent_name }
-      ]
+    prod = {
+      project_id  = var.prod_project_id
+      domain_name = var.prod_app_domain_name[0]
     }
-  ]
+  }
 
-  prod_containers = var.ui_type == "react" ? [
-    {
-      name  = "ingress"
-      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
-      ports = [3000]
-      resources = {
-        limits = {
-          cpu    = "0.2"
-          memory = "512Mi"
+  # Dynamic container configuration
+  container_config = {
+    for env, config in local.environments : env => var.ui_type == "react" ? [
+      {
+        name  = "ingress"
+        image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
+        ports = [3000]
+        resources = {
+          limits = {
+            cpu    = "0.2"
+            memory = "512Mi"
+          }
         }
-      }
-      env = [
-        { name = "NEXT_PUBLIC_API_URL", value = "http://localhost:8000" },
-        { name = "NEXTAUTH_URL", value = "https://${var.prod_app_domain_name[0]}" }
-      ]
-    },
-    {
-      name  = "api-sidecar"
-      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
-      ports = [8000]
-      resources = {
-        limits = {
-          cpu    = "0.8"
-          memory = "1536Mi"
+        env = [
+          { name = "NEXT_PUBLIC_API_URL", value = "https://${config.domain_name}" }, # Dynamically set to the environment URL
+          { name = "NEXTAUTH_URL", value = "https://${config.domain_name}" }
+        ]
+      },
+      {
+        name  = "api-sidecar"
+        image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
+        ports = [8000]
+        resources = {
+          limits = {
+            cpu    = "0.8"
+            memory = "1536Mi"
+          }
         }
+        env = [
+          { name = "GOOGLE_CLOUD_PROJECT", value = config.project_id },
+          { name = "AGENT_NAME", value = var.agent_name }
+        ]
       }
-      env = [
-        { name = "GOOGLE_CLOUD_PROJECT", value = var.prod_project_id },
-        { name = "AGENT_NAME", value = var.agent_name }
-      ]
-    }
-  ] : [
-    {
-      name  = "streamlit"
-      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
-      ports = [8080]
-      resources = {
-        limits = {
-          cpu    = "1"
-          memory = "2Gi"
+    ] : [
+      {
+        name  = "streamlit"
+        image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
+        ports = [8080]
+        resources = {
+          limits = {
+            cpu    = "1"
+            memory = "2Gi"
+          }
         }
+        env = [
+          { name = "GOOGLE_CLOUD_PROJECT", value = config.project_id },
+          { name = "AGENT_NAME", value = var.agent_name }
+        ]
       }
-      env = [
-        { name = "GOOGLE_CLOUD_PROJECT", value = var.prod_project_id },
-        { name = "AGENT_NAME", value = var.agent_name }
-      ]
-    }
-  ]
+    ]
+  }
 
 }
 
