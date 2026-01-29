@@ -24,9 +24,9 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
     - [x] Task: Ensure environment variables and secrets are correctly mapped to both containers
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Infrastructure' (Protocol in workflow.md)
 
-## Phase 3: CI/CD Pipeline Integration [checkpoint: 721bec9]
+## Phase 3: CI/CD Pipeline Integration [checkpoint: 1cdb44c]
 
-- [x] Task: Update Cloud Build configurations [721bec9]
+- [x] Task: Update Cloud Build configurations [1cdb44c]
     - [x] Task: Modify `staging.yaml` and `deploy-to-prod.yaml` to conditionally build images based on `ui_type`
     - [x] Task: Implement tagging with Git short SHA for all built images
     - [x] Task: Update deployment step to handle the multi-container service configuration
@@ -36,11 +36,11 @@ This plan outlines the steps to integrate the Next.js React UI using a Cloud Run
 
 ## Phase 4: Documentation & Final Verification
 
-- [~] Task: Update Project Documentation
-    - [~] Task: Update `README.md` with Local Development guide for Sidecar setup
-    - [~] Task: Update `deployment/README.md` with instructions for the `ui_type` toggle
-    - [~] Task: Update `docs/design.md` with architecture diagrams for both UI modes
-- [ ] Task: Final System Integration Test
+- [x] Task: Update Project Documentation [1cdb44c]
+    - [x] Task: Update `README.md` with Local Development guide for Sidecar setup
+    - [x] Task: Update `deployment/README.md` with instructions for the `ui_type` toggle
+    - [x] Task: Update `docs/design.md` with architecture diagrams for both UI modes
+- [~] Task: Final System Integration Test
     - [ ] Task: Deploy to Staging with `ui_type="react"` and verify end-to-end functionality
     - [ ] Task: Deploy to Staging with `ui_type="streamlit"` and verify fallback functionality
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Documentation & Final Verification' (Protocol in workflow.md)

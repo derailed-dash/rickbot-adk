@@ -68,8 +68,12 @@ This project leverages Google Cloud Build for its CI/CD workflows. The build con
 
 ### Iteration and Environment Specifics in CI/CD
 
-The CI/CD pipelines are designed to handle multiple environments through:
+The CI/CD pipelines are designed to handle multiple environments and UI architectures through:
 
+*   **UI Type Configuration (`_UI_TYPE`):** The project supports two different user interface architectures:
+    *   `react`: (Default) Deploys a modern Next.js frontend as an ingress container with a FastAPI sidecar backend.
+    *   `streamlit`: Deploys the legacy single-container Streamlit application.
+    *   This is controlled by the `ui_type` Terraform variable, which defaults to `react`. To change this, update `deployment/terraform/vars/env.tfvars` or pass it as a flag: `-var="ui_type=streamlit"`.
 *   **Project ID Variables:** Cloud Build substitutions like `_STAGING_PROJECT_ID` and `_PROD_PROJECT_ID` are used in the `.cloudbuild` YAML files to ensure that deployments target the correct Google Cloud Project based on the environment.
 *   **Shared Image:** The same Docker image built and tested in the staging pipeline is promoted to production, ensuring consistency and reducing the risk of environment-specific issues.
 *   **Environment Variables:** Application configurations (e.g., `LOG_LEVEL`, `MODEL`, `AUTH_REQUIRED`) are passed as environment variables during deployment, allowing for environment-specific tuning.

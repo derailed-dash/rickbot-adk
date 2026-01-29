@@ -213,7 +213,10 @@ To simulate the production environment (Cloud Run sidecars) locally, use the Doc
 make docker-react
 ```
 
-This will spin up both the FastAPI backend (`api_sidecar`) and the Next.js frontend (`react_fe`) in linked containers. You can then access the UI at `http://localhost:3000`.
+This will spin up both the FastAPI backend (`api_sidecar`) and the Next.js frontend (`react_fe`) in linked containers. 
+- The Frontend is accessible at `http://localhost:3000`.
+- The Backend is accessible at `http://localhost:8000`.
+- They communicate via `localhost` within the container network.
 
 #### Key Features
 

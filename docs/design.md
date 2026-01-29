@@ -9,48 +9,60 @@
 
 ## Solution Design
 
-The solution is architected as a cloud-native application running on Google Cloud, leveraging Vertex AI / Gemini for intelligence. It is containerised and can be deployed onto Google Cloud Run for compute.
+The solution is architected as a cloud-native application running on Google Cloud, leveraging Vertex AI / Gemini for intelligence. It supports two distinct deployment architectures, configurable via the `ui_type` Terraform variable.
 
-### High-Level Architecture
+### 1. React Sidecar Architecture (Primary)
+
+This is the modern, production-grade architecture. A single Cloud Run service hosts two containers that communicate via `localhost`.
 
 ```mermaid
 graph TD
     User([User])
     
-    subgraph "Interfaces"
-        Streamlit[Streamlit UI\n(Prototype)]
-        React[React/Next.js UI\n(Primary)]
-    end
-    
-    subgraph "Google Cloud Platform"
-        LB[Load Balancer / Ingress]
+    subgraph "Cloud Run Service (Rickbot-ADK)"
+        direction LR
+        Ingress[Next.js Container\n(Port 3000)]
+        Sidecar[FastAPI Container\n(Port 8000)]
         
-        subgraph "Cloud Run Services"
-            API[FastAPI Backend\n(Rickbot Agent)]
-        end
-        
-        subgraph "Data & State"
-            FileStore[(File Search\nStore (RAG))]
-            GCS[Cloud Storage\nArtifacts/Logs]
-            SecretMgr[Secret Manager\nOAuth Creds / API Keys]
-        end
-        
-        subgraph "AI Services"
-            Vertex[Vertex AI Agent Engine]
-            Gemini[Gemini 1.5 Pro/Flash]
-        end
+        Ingress <-->|localhost| Sidecar
     end
 
-    User --> Streamlit
-    User --> React
+    subgraph "Google Cloud Platform"
+        direction TB
+        FileStore[(File Search\nStore (RAG))]
+        GCS[Cloud Storage\nArtifacts/Logs]
+        SecretMgr[Secret Manager\nOAuth Creds / API Keys]
+        Vertex[Vertex AI Agent Engine]
+        Gemini[Gemini 1.5/2.5]
+    end
+
+    User -->|Public Traffic| Ingress
+    Sidecar -->|ADK Framework| Vertex
+    Sidecar -->|Retrieve Context| FileStore
+    Sidecar -->|Fetch Secrets| SecretMgr
+    Vertex -->|Inference| Gemini
+```
+
+### 2. Streamlit Architecture (Legacy/Prototype)
+
+A simpler, single-container architecture used for rapid prototyping and internal testing.
+
+```mermaid
+graph TD
+    User([User])
     
-    Streamlit --> API
-    React --> API
-    
-    API -->|ADK Framework| Vertex
-    API -->|Retrieve Context| FileStore
-    API -->|Fetch Secrets| SecretMgr
-    
+    subgraph "Cloud Run Service (Rickbot-ADK)"
+        Streamlit[Streamlit Container\n(Port 8080)]
+    end
+
+    subgraph "Google Cloud Platform"
+        direction TB
+        Vertex[Vertex AI Agent Engine]
+        Gemini[Gemini 1.5/2.5]
+    end
+
+    User -->|Public Traffic| Streamlit
+    Streamlit -->|ADK Framework| Vertex
     Vertex -->|Inference| Gemini
 ```
 
