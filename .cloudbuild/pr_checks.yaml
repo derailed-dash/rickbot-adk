@@ -32,6 +32,15 @@ steps:
   #   env:
   #     - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
 
+  # Run frontend tests (React/Next.js)
+  - name: "node:20-slim"
+    id: frontend-tests
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        cd src/nextjs_fe && npm ci && npm test
+
 logsBucket: gs://${PROJECT_ID}-logs-data/build-logs
 options:
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
