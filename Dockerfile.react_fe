@@ -18,6 +18,9 @@ COPY src/nextjs_fe .
 # Build the Next.js application
 RUN npm run build
 
+# Prune development dependencies to optimize image size
+RUN npm prune --production
+
 # ---- Production Stage ----
 FROM base AS runner
 WORKDIR /app
