@@ -23,13 +23,18 @@ ENV WORKDIR=/app \
 
 WORKDIR ${WORKDIR}
 
-COPY --from=builder ${WORKDIR}/.venv ./.venv
-COPY --from=builder ${WORKDIR}/src ./src
+# Create non-root user for the application with required permissions
+# We do this BEFORE copying files so we can assign ownership during copy
+RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER}
+
+# Copy the virtual environment from the builder stage with correct ownership
+# This avoids the expensive `chown -R` command later
+COPY --from=builder --chown=${APP_USER}:${APP_USER} ${WORKDIR}/.venv ./.venv
+
+# Copy the application source code from the builder stage with correct ownership
+COPY --from=builder --chown=${APP_USER}:${APP_USER} ${WORKDIR}/src ./src
 
 ENV PATH="${WORKDIR}/.venv/bin:$PATH"
-
-RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER} && \
-    chown -R ${APP_USER} ${WORKDIR}
 
 USER ${APP_USER}
 

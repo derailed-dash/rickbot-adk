@@ -7,6 +7,8 @@ GREP_FILTER = 2>&1 | grep -v -e '^$$' -e 'WSL' -e 'xdg-open'
 install:
 	@command -v uv >/dev/null 2>&1 || { echo "uv is not installed. Installing uv..."; curl -LsSf https://astral.sh/uv/0.6.12/install.sh | sh; source $HOME/.local/bin/env; }
 	uv sync --dev --extra jupyter
+	@echo "Installing frontend dependencies..."
+	cd src/nextjs_fe && npm install
 
 # Launch local dev playground
 adk-playground:
@@ -23,12 +25,15 @@ streamlit:
 	@echo "================================================================================="
 	MOCK_AUTH_USER="mock.user@example.com" uv run -- streamlit run src/streamlit_fe/app.py ${GREP_FILTER}
 
+# Launch Streamlit frontend in a Docker container using docker-compose
 docker-streamlit: docker-clean
 	@echo "================================================================================="
 	@echo "| 🚀 Launching Streamlit FE in Docker                                           |"
 	@echo "================================================================================="
 	MOCK_AUTH_USER="mock.user@example.com" docker compose up streamlit_fe
 
+# Launch the full React UI stack (Next.js frontend + FastAPI sidecar) in Docker
+# This simulates the Cloud Run sidecar deployment using docker-compose service networking
 docker-react: docker-clean
 	@echo "================================================================================="
 	@echo "| 🚀 Launching React FE (Sidecar) in Docker                                     |"

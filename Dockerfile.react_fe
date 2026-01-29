@@ -28,16 +28,12 @@ ENV APP_USER nextjs
 # Create non-root user
 RUN adduser --system --group ${APP_USER}
 
-# Copy the built application from the builder stage
+# Copy the built application from the builder stage with correct ownership
 # We only need the public folder, the static assets, and the .next/standalone output
-# Note: To use standalone output, we need to enable it in next.config.js
-# For now, we'll copy the standard output.
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-
-RUN chown -R ${APP_USER}:${APP_USER} /app
+COPY --from=builder --chown=${APP_USER}:${APP_USER} /app/public ./public
+COPY --from=builder --chown=${APP_USER}:${APP_USER} /app/.next ./.next
+COPY --from=builder --chown=${APP_USER}:${APP_USER} /app/node_modules ./node_modules
+COPY --from=builder --chown=${APP_USER}:${APP_USER} /app/package.json ./package.json
 
 USER ${APP_USER}
 
