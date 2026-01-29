@@ -70,8 +70,9 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     _MODEL                         = var.model
     _LOG_LEVEL                     = "DEBUG"
     _MAX_INSTANCES                 = "1"
-    _AUTH_REQUIRED                 = "True"
-    _RATE_LIMIT                    = "120"    
+    _AUTH_REQUIRED                 = var.auth_required
+    _RATE_LIMIT                    = var.rate_limit
+    _GOOGLE_CLOUD_LOCATION         = var.google_cloud_location
   }
 
   depends_on = [
@@ -110,8 +111,9 @@ resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
     _MODEL                       = var.model
     _LOG_LEVEL                   = var.log_level
     _MAX_INSTANCES               = "1"
-    _AUTH_REQUIRED               = "True"
-    _RATE_LIMIT                  = "120"
+    _AUTH_REQUIRED                 = var.auth_required
+    _RATE_LIMIT                    = var.rate_limit
+    _GOOGLE_CLOUD_LOCATION         = var.google_cloud_location
   }
   depends_on = [
     resource.google_project_service.cicd_services, 

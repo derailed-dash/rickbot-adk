@@ -61,7 +61,7 @@
 - [x] Implement rate limiting for our API calls
 - [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Ensure Gemini model references are updated
-- [ ] Investigate moving frontend to existing Cloud Run service, and deploying backend to a separate service.
+- [ ] Move frontend to Cloud Run service
 - [ ] Restrict access to certain personalities based on user identity
 - [ ] Add more reference material as context to Dazbo
 - [x] Ensure React UI works on mobile.
