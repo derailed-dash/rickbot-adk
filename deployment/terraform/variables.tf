@@ -188,3 +188,21 @@ variable "artifact_repo_name" {
   description = "The name for the Artifact Registry repository."
   type        = string
 }
+
+variable "rate_limit" {
+  description = "Rate limit for the application (e.g., '60 per minute')."
+  type        = string
+  default     = "60"
+}
+
+variable "auth_required" {
+  description = "Whether authentication is required for the application."
+  type        = string # Cloud Build expects string "True"/"False"
+  default     = "True"
+}
+
+variable "google_cloud_location" {
+  description = "Google Cloud Location for GenAI resources (e.g., 'global')."
+  type        = string
+  default     = "global"
+}
