@@ -106,26 +106,7 @@ steps:
                     cpu: '0.8'
                     memory: 1536Mi
                 env:
-                - name: GOOGLE_CLOUD_PROJECT
-                  value: $_STAGING_PROJECT_ID
-                - name: GOOGLE_CLOUD_REGION
-                  value: $_REGION
-                - name: LOG_LEVEL
-                  value: $_LOG_LEVEL
-                - name: APP_NAME
-                  value: $_APP_NAME
-                - name: AGENT_NAME
-                  value: $_AGENT_NAME
-                - name: GOOGLE_GENAI_USE_VERTEXAI
-                  value: "$_GOOGLE_GENAI_USE_VERTEXAI"
-                - name: MODEL
-                  value: "$_MODEL"
-                - name: AUTH_REQUIRED
-                  value: "$_AUTH_REQUIRED"
-                - name: RATE_LIMIT
-                  value: "$_RATE_LIMIT"
-                - name: GOOGLE_CLOUD_LOCATION
-                  value: "$_GOOGLE_CLOUD_LOCATION"
+$COMMON_ENV_VARS
         EOF
           gcloud beta run services replace service.yaml --project=$_STAGING_PROJECT_ID --region=$_REGION
           
