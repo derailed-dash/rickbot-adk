@@ -38,5 +38,66 @@ locals {
     var.staging_project_id
   ]
 
+  included_files = [
+    "src/**",
+    "deployment/**",
+    "uv.lock",
+    "Dockerfile*",
+    "pyproject.toml",
+    "docker-compose.yml"
+  ]
+
+  # Configuration for containers based on UI type
+  # Note: These are placeholders used for initial service creation.
+  # CI/CD handles the actual image deployment.
+  containers = var.ui_type == "react" ? [
+    {
+      name  = "ingress"
+      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
+      ports = [3000]
+      resources = {
+        limits = {
+          cpu    = "1"
+          memory = "1Gi"
+        }
+      }
+      env = [
+        { name = "NEXT_PUBLIC_API_URL", value = "http://localhost:8000" },
+        { name = "NEXTAUTH_URL", value = "https://rickbot-adk.staging.derailed-dash.com" } # Placeholder, should be dynamic
+      ]
+    },
+    {
+      name  = "api-sidecar"
+      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
+      ports = [8000]
+      resources = {
+        limits = {
+          cpu    = "1"
+          memory = "2Gi"
+        }
+      }
+      env = [
+        { name = "GOOGLE_CLOUD_PROJECT", value = "STAGING_PROJECT_ID" }, # Placeholder
+        { name = "AGENT_NAME", value = var.agent_name }
+      ]
+    }
+  ] : [
+    {
+      name  = "streamlit"
+      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder
+      ports = [8080]
+      resources = {
+        limits = {
+          cpu    = "1"
+          memory = "2Gi"
+        }
+      }
+      env = [
+        { name = "GOOGLE_CLOUD_PROJECT", value = "STAGING_PROJECT_ID" }, # Placeholder
+        { name = "AGENT_NAME", value = var.agent_name }
+      ]
+    }
+  ]
+
 }
 

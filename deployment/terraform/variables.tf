@@ -1,3 +1,9 @@
+variable "ui_type" {
+  description = "The type of UI to deploy: 'react' (Sidecar) or 'streamlit' (Legacy)"
+  type        = string
+  default     = "react"
+}
+
 variable "project_name" {
   type        = string
   description = "Project name used as a base for resource naming"

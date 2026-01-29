@@ -16,32 +16,33 @@ resource "google_cloud_run_v2_service" "app_staging" {
   ingress             = "INGRESS_TRAFFIC_ALL"
 
   template {
-    containers {
-      # Placeholder, will be replaced by the CI/CD pipeline
-      image = "us-docker.pkg.dev/cloudrun/container/hello"
+    dynamic "containers" {
+      for_each = local.containers
+      content {
+        name  = containers.value.name
+        image = containers.value.image
 
-      resources {
-        limits = {
-          cpu    = "1"
-          memory = "2Gi"
+        dynamic "ports" {
+          for_each = containers.value.ports
+          content {
+            container_port = ports.value
+          }
         }
-        startup_cpu_boost = true
+
+        dynamic "env" {
+          for_each = containers.value.env
+          content {
+            name  = env.value.name
+            value = env.value.value
+          }
+        }
+
+        resources {
+
+
+          startup_cpu_boost = true
+        }
       }
-
-    #   env {
-    #     name  = "DB_HOST"
-    #     value = google_alloydb_instance.session_db_instance["staging"].ip_address
-    #   }
-
-    #   env {
-    #     name = "DB_PASS"
-    #     value_source {
-    #       secret_key_ref {
-    #         secret  = google_secret_manager_secret.db_password["staging"].secret_id
-    #         version = "latest"
-    #       }
-    #     }
-    #   }
     }
 
     service_account = google_service_account.app_sa["staging"].email
@@ -92,19 +93,27 @@ resource "google_cloud_run_v2_service" "app_prod" {
   ingress             = "INGRESS_TRAFFIC_ALL"
 
   template {
-    containers {
-      # Placeholder, will be replaced by the CI/CD pipeline
-      image = "us-docker.pkg.dev/cloudrun/container/hello"
+    dynamic "containers" {
+      for_each = local.containers
+      content {
+        name  = containers.value.name
+        image = containers.value.image
 
-      resources {
-        limits = {
-          cpu    = "2"
-          memory = "4Gi"
+        dynamic "ports" {
+          for_each = containers.value.ports
+          content {
+            container_port = ports.value
+          }
         }
-        # cpu_idle = false
-        startup_cpu_boost = true
-      }
 
+        resources {
+          # Use prod-specific limits if needed, otherwise use local defaults
+          limits = var.ui_type == "react" ? (
+            containers.value.name == "ingress" ? { cpu = "1", memory = "2Gi" } : { cpu = "2", memory = "4Gi" }
+          ) : { cpu = "2", memory = "4Gi" }
+          startup_cpu_boost = true
+        }
+      }
     }
 
     service_account = google_service_account.app_sa["prod"].email

@@ -14,15 +14,11 @@ resource "google_cloudbuild_trigger" "pr_checks" {
   }
 
   filename = ".cloudbuild/pr_checks.yaml"
-  included_files = [
-    "src/**",
-    "data_ingestion/**",
-    "deployment/**",
-    "uv.lock",
-    "Dockerfile",
-    "pyproject.toml"
-  ]
+  included_files = local.included_files
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
+  substitutions = {
+    _UI_TYPE = var.ui_type
+  }
   depends_on = [
     resource.google_project_service.cicd_services, 
     resource.google_project_service.deploy_project_services, 
@@ -48,14 +44,7 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
   }
 
   filename = ".cloudbuild/staging.yaml"
-  included_files = [
-    "src/**",
-    "data_ingestion/**",
-    "deployment/**",
-    "uv.lock",
-    "Dockerfile",
-    "pyproject.toml"
-  ]
+  included_files = local.included_files
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
   substitutions = {
     _STAGING_PROJECT_ID            = var.staging_project_id
@@ -73,6 +62,7 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     _AUTH_REQUIRED                 = var.auth_required
     _RATE_LIMIT                    = var.rate_limit
     _GOOGLE_CLOUD_LOCATION         = var.google_cloud_location
+    _UI_TYPE                       = var.ui_type
   }
 
   depends_on = [
@@ -114,6 +104,7 @@ resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
     _AUTH_REQUIRED                 = var.auth_required
     _RATE_LIMIT                    = var.rate_limit
     _GOOGLE_CLOUD_LOCATION         = var.google_cloud_location
+    _UI_TYPE                       = var.ui_type
   }
   depends_on = [
     resource.google_project_service.cicd_services, 
