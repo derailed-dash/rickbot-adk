@@ -88,6 +88,10 @@ app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)  # type: ignore
 app.add_middleware(SlowAPIMiddleware)
+# Note on Middleware Order:
+# FastAPI/Starlette middlewares are executed LIFO (Last Added = First Executed).
+# We add AuthMiddleware LAST so that it executes FIRST on the request path.
+# Request -> AuthMiddleware -> SlowAPIMiddleware -> ...
 app.add_middleware(AuthMiddleware)
 
 # Add CORS middleware
