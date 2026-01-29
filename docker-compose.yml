@@ -37,3 +37,31 @@ services:
     environment: *common-env
     volumes: *common-volumes
     command: adk web --host 0.0.0.0 --port 8080 src
+
+  api_sidecar:
+    container_name: rickbot-api-sidecar
+    build:
+      context: .
+      dockerfile: Dockerfile.api_sidecar
+    ports:
+      - "3000:3000" # Expose Next.js port from here since react_fe shares this network
+      - "8000:8000" # Expose FastAPI port
+    env_file:
+      - .env
+    environment: *common-env
+    volumes: *common-volumes
+    restart: unless-stopped
+
+  react_fe:
+    container_name: rickbot-react-fe
+    build:
+      context: .
+      dockerfile: Dockerfile.react_fe
+    network_mode: "service:api_sidecar" # Share network to communicate via localhost
+    env_file:
+      - src/nextjs_fe/.env.local
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - api_sidecar
+    restart: unless-stopped

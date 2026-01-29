@@ -29,6 +29,12 @@ docker-streamlit: docker-clean
 	@echo "================================================================================="
 	MOCK_AUTH_USER="mock.user@example.com" docker compose up streamlit_fe
 
+docker-react: docker-clean
+	@echo "================================================================================="
+	@echo "| 🚀 Launching React FE (Sidecar) in Docker                                     |"
+	@echo "================================================================================="
+	docker compose up api_sidecar react_fe
+
 docker-adk: docker-clean
 	@echo "================================================================================="
 	@echo "| 🚀 Launching Streamlit FE in Docker                                           |"
