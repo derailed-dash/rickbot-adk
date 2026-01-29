@@ -98,7 +98,8 @@ export default function Chat() {
             const token = session?.idToken || session?.accessToken || "";
             // console.log("Token:", token);
             try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/personas`, {
+                // Use relative path via Next.js rewrite
+                const response = await axios.get('/api/personas', {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -162,8 +163,8 @@ export default function Chat() {
                 });
             }
 
-            // Streaming implementation
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/chat_stream`, {
+            // Streaming implementation (Relative path via Rewrite)
+            const response = await fetch('/api/chat_stream', {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`
