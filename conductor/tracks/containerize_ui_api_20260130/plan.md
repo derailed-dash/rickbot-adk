@@ -17,7 +17,7 @@ This plan outlines the steps to modularize the Rickbot application's containeriz
 - [x] Task: Verify inter-service networking and ensure the React UI can communicate with the API backend. ef232a9
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Orchestration & Local Development' (Protocol in workflow.md)
 
-## Phase 4: Documentation
+## Phase 4: Documentation [checkpoint: 4cf0377]
 - [x] Task: Update `README.md` and `docs/design.md` with the new multi-container architecture details. 89334dd
 - [x] Task: Create `docs/containers.md` with a detailed walkthrough of the containerization strategy. 89334dd
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Documentation' (Protocol in workflow.md)
