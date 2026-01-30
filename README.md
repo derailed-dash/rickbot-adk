@@ -105,6 +105,9 @@ direnv allow
 | `make streamlit`              | Run Streamlit FE:<br>`MOCK_AUTH_USER="mock.user@example.com" uv run streamlit run src/streamlit_fe/app.py`|
 | `make docker-adk`             | Launch ADK UI in Docker |
 | `make docker-streamlit`       | Run Streamlit FE in Docker |
+| `make docker-frontend`        | Launch React Frontend in Docker |
+| `make docker-backend`         | Launch API and Backend in Docker |
+| `make docker-front-and-back`  | Launch all services (frontend + backend) in Docker |
 | `make docker-clean`           | Remove any orphaned containers |
 | `make test`                   | Run unit tests |
 | `make test-all`               | Run unit and integration tests (takes a little longer) |
@@ -182,14 +185,11 @@ docker run --rm -p 8080:8080 \
 To run the complete application (FastAPI Backend and React UI) in Docker containers mimicking the production sidecar architecture:
 
 ```bash
-# Start all services
+# Start all services using Make
+make docker-front-and-back
+
+# OR manually with Docker Compose
 docker compose up -d --build backend frontend
-
-# Access the React UI
-open http://localhost:3000
-
-# Access the API docs
-open http://localhost:8080/docs
 ```
 
 To stop the services:

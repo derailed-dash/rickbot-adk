@@ -41,6 +41,29 @@ docker-clean:
 	@echo "================================================================================="
 	docker compose down --remove-orphans
 
+docker-frontend: docker-clean
+	@echo "================================================================================="
+	@echo "| 🚀 Launching React Frontend in Docker                                        |"
+	@echo "| 🌐 Frontend available at http://localhost:3000                               |"
+	@echo "================================================================================="
+	docker compose up -d frontend
+
+docker-backend: docker-clean
+	@echo "================================================================================="
+	@echo "| 🚀 Launching API and Backend in Docker                                       |"
+	@echo "| 🌐 Available at http://localhost:8080                                        |"
+	@echo "================================================================================="
+	docker compose up -d backend
+
+docker-front-and-back: docker-clean
+	@echo "================================================================================="
+	@echo "| 🚀 Launching all services in Docker                                           |"
+	@echo "| 🌐 Frontend available at http://localhost:3000                                |"
+	@echo "| ⏳ The backend takes a while to start up.                                     |"
+	@echo "|     So refresh the frontend after a few seconds.                              |"
+	@echo "================================================================================="
+	docker compose up -d backend frontend
+
 # Run unit tests
 test:
 	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "Error: GOOGLE_CLOUD_PROJECT is not set. Setup environment before running tests" && exit 1)

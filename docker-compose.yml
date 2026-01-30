@@ -35,16 +35,13 @@ services:
         NEXT_PUBLIC_API_URL: http://localhost:8080
     ports:
       - "3000:3000"
+    env_file:
+      - src/nextjs_fe/.env.local
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8080
       - NEXTAUTH_URL=http://localhost:3000
-      - NEXTAUTH_SECRET=nzXsZfMELWdKaiAyh6eEsOGI0Jz0GOuSsqFrZhtNrDE= # Use dev secret
       - NEXT_PUBLIC_ALLOW_MOCK_AUTH=true
       - MOCK_AUTH_USER=mock@example.com
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
     restart: unless-stopped
     depends_on:
       - backend

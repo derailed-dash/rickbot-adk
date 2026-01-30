@@ -64,6 +64,7 @@ The `docker-compose.yml` file orchestrates these services for a seamless local d
     *   Builds from `src/nextjs_fe/Dockerfile`.
     *   Exposes port `3000`.
     *   **Critical Configuration**: Passes `NEXT_PUBLIC_API_URL: http://localhost:8080` as a build argument. This ensures the client-side React app knows where to find the API (which is mapped to localhost:8080 by Docker Compose).
+    *   **Environment Variables**: Loads secrets (like `NEXTAUTH_SECRET`, OAuth credentials) and configuration directly from `src/nextjs_fe/.env.local` via the `env_file` directive.
     *   Configured for Mock Auth by default (`NEXT_PUBLIC_ALLOW_MOCK_AUTH=true`).
 
 *   **`streamlit_fe`**:
@@ -77,6 +78,19 @@ To start the full stack:
 
 ```bash
 docker compose up -d --build backend frontend
+```
+
+Alternatively, you can use the Makefile convenience command:
+
+```bash
+make docker-front-and-back
+```
+
+You can also run services individually:
+
+```bash
+make docker-backend
+make docker-frontend
 ```
 
 *   **Frontend**: Access at [http://localhost:3000](http://localhost:3000)
