@@ -10,7 +10,7 @@ COPY ./pyproject.toml ./uv.lock* ./
 
 # Install dependencies into a virtual environment.
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
-    uv sync --locked --no-install-project
+    uv sync --locked --no-dev --no-install-project
 
 # Whitelist Copy for API Backend
 # We only copy what's needed for the API and Agent
@@ -20,7 +20,7 @@ COPY ./src/rickbot_utils ./src/rickbot_utils
 
 # Sync the project
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
-    uv sync --locked
+    uv sync --locked --no-dev
 
 # ---- Final Stage ----
 FROM python:3.12-slim
@@ -30,17 +30,17 @@ ENV WORKDIR=/app \
 
 WORKDIR ${WORKDIR}
 
+# Create non-root user
+# We do this BEFORE copying files so we can chown them on copy, preventing layer duplication
+RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER}
+
 # Copy the virtual environment from the builder stage
-COPY --from=builder ${WORKDIR}/.venv ./.venv
+COPY --from=builder --chown=${APP_USER}:${APP_USER} ${WORKDIR}/.venv ./.venv
 
 # Copy the whitelisted application source code from the builder stage
-COPY --from=builder ${WORKDIR}/src ./src
+COPY --from=builder --chown=${APP_USER}:${APP_USER} ${WORKDIR}/src ./src
 
 ENV PATH="${WORKDIR}/.venv/bin:$PATH"
-
-# Create non-root user
-RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER} && \
-    chown -R ${APP_USER} ${WORKDIR}
 
 USER ${APP_USER}
 

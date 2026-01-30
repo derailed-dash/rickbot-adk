@@ -59,10 +59,12 @@
 - [x] Implement File Search Tool for Dazbo
 - [x] Externalise file search store name into personalities.yaml
 - [x] Implement rate limiting for our API calls
+- [x] Containerise React frontend
+- [x] Add more reference material as context to Dazbo
+- [x] Optimise container build times and image sizes
 - [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Ensure Gemini model references are updated
-- [ ] Move frontend to Cloud Run service
-- [ ] Restrict access to certain personalities based on user identity
-- [ ] Add more reference material as context to Dazbo
+- [ ] Move frontend to Cloud Run service - use sidecar
 - [x] Ensure React UI works on mobile.
+- [ ] Restrict access to certain personalities based on user identity
 - [ ] Add voice / live.

@@ -20,7 +20,7 @@ COPY ./pyproject.toml ./uv.lock* ./
 # The --mount options provide access to the files and a cache directory
 # without invalidating the layer cache on content changes.
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
-    uv sync --locked --no-install-project
+    uv sync --locked --no-dev --no-install-project
 
 # Copy the application source code to /app/src. 
 # This is done after installing dependencies so we don't invalidate the dependency cache layer.
@@ -28,7 +28,7 @@ COPY ./src ./src
 
 # Sync the project
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
-    uv sync --locked
+    uv sync --locked --no-dev
 
 # ---- Final Stage ----
 # Uses the virtual environment from the builder stage to create a smaller final image.
@@ -39,17 +39,17 @@ ENV WORKDIR=/app \
 
 WORKDIR ${WORKDIR}
 
+# Create non-root user for the application with required permissions
+# We do this BEFORE copying files so we can chown them on copy, preventing layer duplication
+RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER}
+
 # Copy the virtual environment from the builder stage
-COPY --from=builder ${WORKDIR}/.venv ./.venv
+COPY --from=builder --chown=${APP_USER}:${APP_USER} ${WORKDIR}/.venv ./.venv
 
 # Copy the application source code from the builder stage
-COPY --from=builder ${WORKDIR}/src ./src
+COPY --from=builder --chown=${APP_USER}:${APP_USER} ${WORKDIR}/src ./src
 
 ENV PATH="${WORKDIR}/.venv/bin:$PATH"
-
-# Create non-root user for the application with required permissions
-RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER} && \
-    chown -R ${APP_USER} ${WORKDIR}
 
 USER ${APP_USER}
 

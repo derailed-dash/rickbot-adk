@@ -26,12 +26,13 @@ streamlit:
 docker-streamlit: docker-clean
 	@echo "================================================================================="
 	@echo "| 🚀 Launching Streamlit FE in Docker                                           |"
+	@echo "| 🌐 Frontend available at http://localhost:8501                                |"
 	@echo "================================================================================="
 	MOCK_AUTH_USER="mock.user@example.com" docker compose up streamlit_fe
 
 docker-adk: docker-clean
 	@echo "================================================================================="
-	@echo "| 🚀 Launching Streamlit FE in Docker                                           |"
+	@echo "| 🚀 Launching ADK in Docker                                                    |"
 	@echo "================================================================================="
 	MOCK_AUTH_USER="mock.user@example.com" docker compose up adk ${GREP_FILTER}
 
