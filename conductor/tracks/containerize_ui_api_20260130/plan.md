@@ -15,7 +15,7 @@ This plan outlines the steps to modularize the Rickbot application's containeriz
 ## Phase 3: Orchestration & Local Development
 - [x] Task: Update `docker-compose.yml` to include `frontend`, `backend`, and `streamlit_fe` services. a1d8a0a
 - [x] Task: Verify inter-service networking and ensure the React UI can communicate with the API backend. ef232a9
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Orchestration & Local Development' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Orchestration & Local Development' (Protocol in workflow.md)
 
 ## Phase 4: Documentation
 - [ ] Task: Update `README.md` and `docs/design.md` with the new multi-container architecture details.
