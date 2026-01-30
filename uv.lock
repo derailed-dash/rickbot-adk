@@ -4670,6 +4670,7 @@ dependencies = [
     { name = "google-cloud-aiplatform", extra = ["adk", "agent-engines", "evaluation"] },
     { name = "google-cloud-logging" },
     { name = "google-cloud-secret-manager" },
+    { name = "google-genai" },
     { name = "langchain" },
     { name = "langchain-core" },
     { name = "langchain-google-vertexai" },
@@ -4686,7 +4687,6 @@ dependencies = [
 
 [package.optional-dependencies]
 jupyter = [
-    { name = "google-genai" },
     { name = "ipython" },
     { name = "jupyter" },
 ]
@@ -4718,7 +4718,7 @@ requires-dist = [
     { name = "google-cloud-aiplatform", extras = ["adk", "evaluation", "agent-engines"] },
     { name = "google-cloud-logging" },
     { name = "google-cloud-secret-manager" },
-    { name = "google-genai", marker = "extra == 'jupyter'" },
+    { name = "google-genai" },
     { name = "ipython", marker = "extra == 'jupyter'" },
     { name = "jupyter", marker = "extra == 'jupyter'" },
     { name = "langchain" },
