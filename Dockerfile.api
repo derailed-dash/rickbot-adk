@@ -42,6 +42,10 @@ COPY --from=builder --chown=${APP_USER}:${APP_USER} ${WORKDIR}/src ./src
 
 ENV PATH="${WORKDIR}/.venv/bin:$PATH"
 
+
+# Give app-user write permissions to the working directory (non-recursive)
+RUN chown ${APP_USER}:${APP_USER} ${WORKDIR}
+
 USER ${APP_USER}
 
 ENV PYTHONPATH="${WORKDIR}"
