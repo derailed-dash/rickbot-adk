@@ -1,0 +1,23 @@
+# Plan: Containerization Refinement (React UI & API Backend)
+
+This plan outlines the steps to modularize the Rickbot application's containerization strategy, creating optimized Dockerfiles for both the React frontend and the FastAPI backend.
+
+## Phase 1: API Backend Containerization [checkpoint: b958abf]
+- [x] Task: Create `Dockerfile.api` for the FastAPI backend using a whitelist approach. 90f8231
+- [x] Task: Verify the build and basic execution of the backend container. abeba12
+- [x] Task: Conductor - User Manual Verification 'Phase 1: API Backend Containerization' (Protocol in workflow.md)
+
+## Phase 2: React UI Containerization [checkpoint: cce893a]
+- [x] Task: Create `src/nextjs_fe/Dockerfile` using a multi-stage build strategy. 7cf2906
+- [x] Task: Verify the build and basic execution of the React UI container. 99c74e0
+- [x] Task: Conductor - User Manual Verification 'Phase 2: React UI Containerization' (Protocol in workflow.md)
+
+## Phase 3: Orchestration & Local Development [checkpoint: 548c219]
+- [x] Task: Update `docker-compose.yml` to include `frontend`, `backend`, and `streamlit_fe` services. a1d8a0a
+- [x] Task: Verify inter-service networking and ensure the React UI can communicate with the API backend. ef232a9
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Orchestration & Local Development' (Protocol in workflow.md)
+
+## Phase 4: Documentation [checkpoint: 4cf0377]
+- [x] Task: Update `README.md` and `docs/design.md` with the new multi-container architecture details. 89334dd
+- [x] Task: Create `docs/containers.md` with a detailed walkthrough of the containerization strategy. 89334dd
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Documentation' (Protocol in workflow.md)

@@ -87,8 +87,10 @@ def create_agent(personality: Personality) -> Agent:
     if personality.file_search_store_name:
         logger.debug(f"Adding {personality.file_search_store_name} for personality: {personality.name}")
         instruction += dedent("""
-        IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent.
+        IMPORTANT: If you are asked a question that might be answered by your reference materials, 
+        you MUST start by searching your reference materials using the RagAgent.
         Only use the SearchAgent if the RagAgent does not provide a relevant answer.
+        You do not need to use the RagAgent to respond to greetings or small talk.
 
         """)
         rag_agent = create_rag_agent(personality.file_search_store_name)

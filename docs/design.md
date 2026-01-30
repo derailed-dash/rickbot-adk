@@ -54,10 +54,31 @@ graph TD
     Vertex -->|Inference| Gemini
 ```
 
+### Container Architecture
+
+The application adopts a modern containerization strategy designed for security, performance, and scalability.
+
+1.  **Sidecar Pattern (Production)**:
+    -   In production (Google Cloud Run), the React Frontend and FastAPI Backend are deployed as **separate containers within the same service**.
+    -   They share a localhost network namespace, allowing the frontend to communicate with the backend via `http://localhost:8080` with minimal latency and no exposure to the public internet for internal traffic.
+    -   This simplifies deployment management, as the two components scale together as a single unit.
+
+2.  **Multi-Stage Builds**:
+    -   Both the API and Frontend Dockerfiles utilize multi-stage builds to minimize the final image size.
+    -   **API**: Uses a "builder" stage to compile dependencies with `uv`, then copies only the necessary virtual environment and source code to the final runtime image.
+    -   **Frontend**: Uses a "builder" stage to compile the Next.js app, then copies only the standalone production artifacts to the final image.
+
+3.  **Security Best Practices**:
+    -   **Non-Root Execution**: All containers (API, Frontend, Streamlit) are explicitly configured to run as non-root users (`app-user`, `nextjs`). This mitigates the risk of container breakout attacks.
+    -   **Minimal Base Images**: We use `python:slim` and `node:alpine` to reduce the attack surface area.
+    -   **Whitelist Copying**: Dockerfiles explicitly copy only required source directories, preventing accidental inclusion of sensitive files or unnecessary artifacts.
+
 ### Products and Services Used
 
 *   **Hosting Services**:
-    *   **Google Cloud Run**: Hosts both the generic API backend and the Streamlit frontend container. It provides a serverless, scalable environment. Cloud Run also offers a native domain name mapping feature to map custom domains to our Cloud Run services. Note that any custom domains used must be added to the OAuth authorised domains and authorised redirect URIs. 
+    *   **Google Cloud Run**: Hosts both the generic API backend and the frontend containers.
+        *   **Multi-Container (Sidecar) Deployment**: The production architecture deploys the API Backend and React UI as two containers within the same Cloud Run service (sidecar pattern). This allows them to communicate over `localhost` while sharing the same lifecycle and autoscaling properties.
+    *   Cloud Run provides a serverless, scalable environment. It also offers a native domain name mapping feature to map custom domains to our Cloud Run services. Note that any custom domains used must be added to the OAuth authorised domains and authorised redirect URIs. 
 *   **Agentic Services**:
     *   **Vertex AI Agent Engine**: The core runtime for the agent.
     *   **Google Gemini Models**: The underlying Large Language Models (LLMs) driving the personalities (e.g., `gemini-2.5-flash`).
@@ -65,8 +86,8 @@ graph TD
 *   **API Layer**:
     *   **FastAPI**: Powers the backend API, exposing RESTful endpoints.
 *   **Frontend**:
-    *   **Streamlit**: Powers the current frontend user interface for rapid prototyping.
-    *   **Next.js / React (Primary)**: The modern, material-design chat interface located in `src/nextjs_fe`.
+    *   **Streamlit**: Powers the current frontend user interface for rapid prototyping. (Built using `Dockerfile.streamlit`).
+    *   **Next.js / React (Primary)**: The modern, material-design chat interface located in `src/nextjs_fe`. (Built using `src/nextjs_fe/Dockerfile`).
 *   **Auth**:
     *   **Google Auth Platform**: Handles OAuth 2.0 authentication for users.
 *   **Data, Infrastructure & Tools**:
@@ -74,6 +95,8 @@ graph TD
     *   **File Search Store (Gemini Developer API)**: Acts as the knowledge base for RAG (Retrieval Augmented Generation), allowing specific personas to reference uploaded documents.
         > Note: This uses the Gemini Developer API and is managed via `notebooks/file_search_store.ipynb`.
     *   **Secret Manager**: Securely stores sensitive configuration like OAuth client IDs and API keys.
+        *   **Production**: Cloud Run services are configured to mount these secrets directly as environment variables at runtime.
+        *   **Local Development**: Secrets are loaded from local, git-ignored `.env` files (e.g., `src/nextjs_fe/.env.local`) to emulate the production environment without exposing credentials in the codebase.
     *   **Terraform**: Manages all infrastructure provisioning.
     *   **Google Cloud Build**: Orchestrates the CI/CD pipeline for testing and deployment.
 
@@ -97,7 +120,10 @@ graph TD
 ### 4. Runner Re-initialization for Context Isolation (Streamlit vs API)
 *   **Decision**: Handle persona switching differently based on the interface's nature.
     *   **Streamlit (Stateful)**: Forces a full re-initialization of the ADK `Runner` instance when the selection changes. This guarantees zero "context leakage" for the stateful UI.
-    *   **FastAPI (Stateless)**: Accepts a `personality` parameter on every request. The agent is strictly scoped to the individual request lifecycle.
+    *   **FastAPI (Stateless)**: 
+        *   **Per-Request Lifecycle**: The API is designed to be effectively stateless regarding the agent configuration. It accepts a `personality` parameter on every request (header or query param).
+        *   **Dynamic Instantiation**: For each incoming request, the backend checks if the requested personality matches the cached runner. If not, or if it's a new request, it instantiates the appropriate agent configuration on-the-fly.
+        *   **Scope**: The agent instance is strictly scoped to the individual request lifecycle (or a short-lived cache), ensuring that a request for "Yoda" never accidentally receives context or behaviors from a previous "Rick" request.
 *   **Rationale**: The Streamlit app simulates a continuous session with a specific character, requiring a hard reset to switch. The API is designed to be flexible and stateless, allowing a client to potentially mix-and-match or switch personalities instantly between calls without backend reconfiguration.
 
 ## User Interfaces (UIs)

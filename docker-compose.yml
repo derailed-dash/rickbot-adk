@@ -1,15 +1,14 @@
 services:
-  streamlit_fe:
-    container_name: rickbot-streamlit-ui
-    build: &common-build
+  backend:
+    container_name: rickbot-api
+    build:
       context: .
-      dockerfile: Dockerfile # Dockerfile is the default
+      dockerfile: Dockerfile.api
     ports:
       - "8080:8080"
     env_file:
-      - .env # Load environment variables from .env file
-    environment: &common-env
-      # Pass through environment variables from the .env file
+      - .env
+    environment:
       - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
       - GOOGLE_CLOUD_REGION=${GOOGLE_CLOUD_REGION}
       - LOG_LEVEL=${LOG_LEVEL}
@@ -19,21 +18,73 @@ services:
       - MODEL=${MODEL}
       - AUTH_REQUIRED=${AUTH_REQUIRED}
       - RATE_LIMIT=${RATE_LIMIT}
-      # Set the path to the ADC file inside the container
       - GOOGLE_APPLICATION_CREDENTIALS=/app/.config/gcloud/application_default_credentials.json
-      # Pass through the COMMIT_SHA from the host environment if it exists
       - COMMIT_SHA=${COMMIT_SHA:-}
-    volumes: &common-volumes
-      - ./src:/app/src # Mount the src directory for development - overwrites folder in the container
-      - ${HOME}/.config/gcloud:/app/.config/gcloud # Mount gcloud config for ADC
+      - BACKEND_ALLOW_MOCK_AUTH=true # Enable mock auth for local docker dev
+    volumes:
+      - ./src:/app/src
+      - ${HOME}/.config/gcloud:/app/.config/gcloud
     restart: unless-stopped
-    # The command is already defined in the Dockerfile, so no need to repeat it here
-    # command: ["streamlit", "run", "streamlit_fe/app.py", "--server.port=8080", "--server.address=0.0.0.0"]
+
+  frontend:
+    container_name: rickbot-frontend
+    build:
+      context: src/nextjs_fe
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8080
+    ports:
+      - "3000:3000"
+    env_file:
+      - src/nextjs_fe/.env.local
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXT_PUBLIC_ALLOW_MOCK_AUTH=true
+      - MOCK_AUTH_USER=mock@example.com
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  streamlit_fe:
+    container_name: rickbot-streamlit-ui
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    ports:
+      - "8501:8080"
+    env_file:
+      - .env
+    environment:
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_CLOUD_REGION=${GOOGLE_CLOUD_REGION}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - APP_NAME=${APP_NAME}
+      - AGENT_NAME=${AGENT_NAME}
+      - GOOGLE_GENAI_USE_VERTEXAI=${GOOGLE_GENAI_USE_VERTEXAI}
+      - MODEL=${MODEL}
+      - AUTH_REQUIRED=${AUTH_REQUIRED}
+      - RATE_LIMIT=${RATE_LIMIT}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/.config/gcloud/application_default_credentials.json
+      - COMMIT_SHA=${COMMIT_SHA:-}
+      - MOCK_AUTH_USER=mock@example.com
+    volumes:
+      - ./src:/app/src
+      - ${HOME}/.config/gcloud:/app/.config/gcloud
+    restart: unless-stopped
+
   adk:
     container_name: rickbot-adk-web
-    build: *common-build
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
     ports:
-      - "8080:8080"
-    environment: *common-env
-    volumes: *common-volumes
+      - "8081:8080"
+    environment:
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_CLOUD_REGION=${GOOGLE_CLOUD_REGION}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/.config/gcloud/application_default_credentials.json
+    volumes:
+      - ./src:/app/src
+      - ${HOME}/.config/gcloud:/app/.config/gcloud
     command: adk web --host 0.0.0.0 --port 8080 src
