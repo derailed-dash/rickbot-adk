@@ -21,10 +21,10 @@
     "@mui/material": "^5.14.9",
     "axios": "^1.5.0",
     "framer-motion": "^12.23.26",
-    "next": "13.4.19",
+    "next": "^14.2.35",
     "next-auth": "^4.24.13",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-markdown": "^8.0.7"
   },
   "devDependencies": {
