@@ -20,7 +20,7 @@ COPY ./pyproject.toml ./uv.lock* ./
 # The --mount options provide access to the files and a cache directory
 # without invalidating the layer cache on content changes.
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
-    uv sync --locked --no-install-project
+    uv sync --locked --no-dev --no-install-project
 
 # Copy the application source code to /app/src. 
 # This is done after installing dependencies so we don't invalidate the dependency cache layer.
@@ -28,7 +28,7 @@ COPY ./src ./src
 
 # Sync the project
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
-    uv sync --locked
+    uv sync --locked --no-dev
 
 # ---- Final Stage ----
 # Uses the virtual environment from the builder stage to create a smaller final image.

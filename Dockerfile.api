@@ -10,7 +10,7 @@ COPY ./pyproject.toml ./uv.lock* ./
 
 # Install dependencies into a virtual environment.
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
-    uv sync --locked --no-install-project
+    uv sync --locked --no-dev --no-install-project
 
 # Whitelist Copy for API Backend
 # We only copy what's needed for the API and Agent
@@ -20,7 +20,7 @@ COPY ./src/rickbot_utils ./src/rickbot_utils
 
 # Sync the project
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
-    uv sync --locked
+    uv sync --locked --no-dev
 
 # ---- Final Stage ----
 FROM python:3.12-slim
