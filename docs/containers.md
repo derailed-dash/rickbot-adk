@@ -39,6 +39,14 @@ This Dockerfile builds the Next.js frontend application.
 *   **Standalone Output**: We use Next.js's `output: 'standalone'` feature (configured in `next.config.js`) to automatically trace and include only the necessary files for production, significantly reducing image size.
 *   **Security**: Runs as a non-root user `nextjs`.
 
+### 3. Streamlit UI (`Dockerfile.streamlit`)
+
+This file builds the legacy Streamlit interface (and is also used by the ADK web playground).
+
+*   **Original Name:** `Dockerfile` (Renamed to `Dockerfile.streamlit` for clarity).
+*   **Base Image**: `python:3.12-slim`.
+*   **Usage**: Used for the `streamlit_fe` service and CI/CD pipelines (until they are fully migrated to the sidecar pattern).
+
 ## Local Development (Docker Compose)
 
 The `docker-compose.yml` file orchestrates these services for a seamless local development experience that mirrors our production architecture.
@@ -60,6 +68,7 @@ The `docker-compose.yml` file orchestrates these services for a seamless local d
 
 *   **`streamlit_fe`**:
     *   Legacy interface, also available for testing.
+    *   Builds from `Dockerfile.streamlit`.
     *   Exposes port `8501`.
 
 ### Running the Environment

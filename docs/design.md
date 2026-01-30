@@ -67,8 +67,8 @@ graph TD
 *   **API Layer**:
     *   **FastAPI**: Powers the backend API, exposing RESTful endpoints.
 *   **Frontend**:
-    *   **Streamlit**: Powers the current frontend user interface for rapid prototyping.
-    *   **Next.js / React (Primary)**: The modern, material-design chat interface located in `src/nextjs_fe`.
+    *   **Streamlit**: Powers the current frontend user interface for rapid prototyping. (Built using `Dockerfile.streamlit`).
+    *   **Next.js / React (Primary)**: The modern, material-design chat interface located in `src/nextjs_fe`. (Built using `src/nextjs_fe/Dockerfile`).
 *   **Auth**:
     *   **Google Auth Platform**: Handles OAuth 2.0 authentication for users.
 *   **Data, Infrastructure & Tools**:

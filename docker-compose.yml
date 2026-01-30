@@ -31,6 +31,8 @@ services:
     build:
       context: src/nextjs_fe
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8080
     ports:
       - "3000:3000"
     environment:
@@ -51,7 +53,7 @@ services:
     container_name: rickbot-streamlit-ui
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.streamlit
     ports:
       - "8501:8080"
     env_file:
@@ -78,7 +80,7 @@ services:
     container_name: rickbot-adk-web
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.streamlit
     ports:
       - "8081:8080"
     environment:

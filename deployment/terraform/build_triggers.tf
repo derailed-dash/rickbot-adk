@@ -19,7 +19,7 @@ resource "google_cloudbuild_trigger" "pr_checks" {
     "data_ingestion/**",
     "deployment/**",
     "uv.lock",
-    "Dockerfile",
+    "Dockerfile.streamlit",
     "pyproject.toml"
   ]
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
@@ -53,7 +53,7 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     "data_ingestion/**",
     "deployment/**",
     "uv.lock",
-    "Dockerfile",
+    "Dockerfile.streamlit",
     "pyproject.toml"
   ]
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
