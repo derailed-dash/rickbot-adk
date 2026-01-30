@@ -3,8 +3,8 @@
 This plan outlines the steps to modularize the Rickbot application's containerization strategy, creating optimized Dockerfiles for both the React frontend and the FastAPI backend.
 
 ## Phase 1: API Backend Containerization
-- [ ] Task: Create `Dockerfile.api` for the FastAPI backend using a whitelist approach.
-- [ ] Task: Verify the build and basic execution of the backend container.
+- [x] Task: Create `Dockerfile.api` for the FastAPI backend using a whitelist approach. 90f8231
+- [~] Task: Verify the build and basic execution of the backend container.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: API Backend Containerization' (Protocol in workflow.md)
 
 ## Phase 2: React UI Containerization
