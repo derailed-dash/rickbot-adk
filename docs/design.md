@@ -57,7 +57,9 @@ graph TD
 ### Products and Services Used
 
 *   **Hosting Services**:
-    *   **Google Cloud Run**: Hosts both the generic API backend and the Streamlit frontend container. It provides a serverless, scalable environment. Cloud Run also offers a native domain name mapping feature to map custom domains to our Cloud Run services. Note that any custom domains used must be added to the OAuth authorised domains and authorised redirect URIs. 
+    *   **Google Cloud Run**: Hosts both the generic API backend and the frontend containers.
+        *   **Multi-Container (Sidecar) Deployment**: The production architecture deploys the API Backend and React UI as two containers within the same Cloud Run service (sidecar pattern). This allows them to communicate over `localhost` while sharing the same lifecycle and autoscaling properties.
+    *   Cloud Run provides a serverless, scalable environment. It also offers a native domain name mapping feature to map custom domains to our Cloud Run services. Note that any custom domains used must be added to the OAuth authorised domains and authorised redirect URIs. 
 *   **Agentic Services**:
     *   **Vertex AI Agent Engine**: The core runtime for the agent.
     *   **Google Gemini Models**: The underlying Large Language Models (LLMs) driving the personalities (e.g., `gemini-2.5-flash`).

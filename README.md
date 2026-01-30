@@ -177,6 +177,26 @@ docker run --rm -p 8080:8080 \
    $SERVICE_NAME:$VERSION
 ```
 
+### Running the Full Stack in Docker (Recommended)
+
+To run the complete application (FastAPI Backend and React UI) in Docker containers mimicking the production sidecar architecture:
+
+```bash
+# Start all services
+docker compose up -d --build backend frontend
+
+# Access the React UI
+open http://localhost:3000
+
+# Access the API docs
+open http://localhost:8080/docs
+```
+
+To stop the services:
+```bash
+docker compose down
+```
+
 ### Running the React UI
 
 The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to the FastAPI backend (`make api`) to provide a modern, chat-based interface.
