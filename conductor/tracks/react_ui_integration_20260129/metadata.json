@@ -1,8 +1,0 @@
-{
-  "track_id": "react_ui_integration_20260129",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-01-29T10:00:00Z",
-  "updated_at": "2026-01-29T10:00:00Z",
-  "description": "Incorporate the new React UI frontend into our container build. Ensure the container build creates a lightweight container that starts as quickly as possible. Help me understand how I set the UI to use React UI and to NOT use the Streamlit UI."
-}
