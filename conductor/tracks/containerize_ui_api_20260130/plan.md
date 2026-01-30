@@ -7,7 +7,7 @@ This plan outlines the steps to modularize the Rickbot application's containeriz
 - [x] Task: Verify the build and basic execution of the backend container. abeba12
 - [x] Task: Conductor - User Manual Verification 'Phase 1: API Backend Containerization' (Protocol in workflow.md)
 
-## Phase 2: React UI Containerization
+## Phase 2: React UI Containerization [checkpoint: cce893a]
 - [x] Task: Create `src/nextjs_fe/Dockerfile` using a multi-stage build strategy. 7cf2906
 - [x] Task: Verify the build and basic execution of the React UI container. 99c74e0
 - [x] Task: Conductor - User Manual Verification 'Phase 2: React UI Containerization' (Protocol in workflow.md)
