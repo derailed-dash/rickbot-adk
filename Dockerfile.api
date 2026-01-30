@@ -48,7 +48,8 @@ RUN chown ${APP_USER}:${APP_USER} ${WORKDIR}
 
 USER ${APP_USER}
 
-ENV PYTHONPATH="${WORKDIR}"
+# Explicitly set the PYTHONPATH to include both /app and /app/src to ensure modules are found
+ENV PYTHONPATH="${WORKDIR}:${WORKDIR}/src"
 
 ARG COMMIT_SHA=""
 ENV COMMIT_SHA=${COMMIT_SHA}

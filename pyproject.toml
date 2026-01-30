@@ -27,6 +27,7 @@ dependencies = [
     "streamlit-feedback",
     "langchain-google-vertexai",
     "slowapi>=0.1.9",
+    "google-genai",
 ]
 
 requires-python = ">=3.12"
@@ -44,7 +45,6 @@ dev = [
 jupyter = [
     "jupyter",
     "ipython",
-    "google-genai"
 ]
 lint = [
     "ruff",

@@ -43,6 +43,9 @@ WORKDIR ${WORKDIR}
 # We do this BEFORE copying files so we can chown them on copy, preventing layer duplication
 RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER}
 
+# Create .streamlit directory and ensure it's writable by app-user
+RUN mkdir -p ${WORKDIR}/.streamlit && chown -R ${APP_USER}:${APP_USER} ${WORKDIR}/.streamlit
+
 # Copy the virtual environment from the builder stage
 COPY --from=builder --chown=${APP_USER}:${APP_USER} ${WORKDIR}/.venv ./.venv
 
@@ -57,8 +60,8 @@ RUN chown ${APP_USER}:${APP_USER} ${WORKDIR}
 
 USER ${APP_USER}
 
-# Explicitly set the PYTHONPATH to the app directory to ensure modules are found
-ENV PYTHONPATH="${WORKDIR}"
+# Explicitly set the PYTHONPATH to include both /app and /app/src to ensure modules are found
+ENV PYTHONPATH="${WORKDIR}:${WORKDIR}/src"
 
 ARG COMMIT_SHA=""
 ENV COMMIT_SHA=${COMMIT_SHA}
