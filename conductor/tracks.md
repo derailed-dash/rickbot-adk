@@ -47,3 +47,11 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Update the React UI so that it shows when tools are used and which tools.
 *Link: [./conductor/archive/ui_tool_visibility_20260104/](./conductor/archive/ui_tool_visibility_20260104/)*
+
+---
+
+
+
+## [ ] **Track: Create separate Dockerfiles for React UI and API Backend, update docker-compose, and update documentation.**
+
+*Link: [./conductor/tracks/containerize_ui_api_20260130/](./conductor/tracks/containerize_ui_api_20260130/)*

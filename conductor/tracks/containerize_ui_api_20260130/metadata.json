@@ -1,0 +1,8 @@
+{
+  "track_id": "containerize_ui_api_20260130",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-30T10:00:00Z",
+  "updated_at": "2026-01-30T10:00:00Z",
+  "description": "Create separate Dockerfiles for React UI and API Backend, update docker-compose, and update documentation."
+}
