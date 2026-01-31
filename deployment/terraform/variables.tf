@@ -66,7 +66,7 @@ variable "agent_name" {
 variable "google_genai_use_vertexai" {
   description  = "Whether to use Vertex AI for auth, rather than API Key"
   type         = bool
-  default      = true
+  default      = false
 }
 
 variable "model" {
