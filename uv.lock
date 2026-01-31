@@ -4689,6 +4689,7 @@ dependencies = [
 jupyter = [
     { name = "ipython" },
     { name = "jupyter" },
+    { name = "tqdm" },
 ]
 lint = [
     { name = "codespell" },
@@ -4735,6 +4736,7 @@ requires-dist = [
     { name = "slowapi", specifier = ">=0.1.9" },
     { name = "streamlit" },
     { name = "streamlit-feedback" },
+    { name = "tqdm", marker = "extra == 'jupyter'" },
     { name = "types-pyyaml", marker = "extra == 'lint'" },
     { name = "types-requests", marker = "extra == 'lint'" },
     { name = "uvicorn" },

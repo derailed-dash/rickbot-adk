@@ -62,6 +62,7 @@
 - [x] Containerise React frontend
 - [x] Add more reference material as context to Dazbo
 - [x] Optimise container build times and image sizes
+- [ ] Robust handling if RagAgent not created
 - [ ] Review env var changes and update Deployment / TF accordingly
 - [ ] Ensure Gemini model references are updated
 - [ ] Move frontend to Cloud Run service - use sidecar

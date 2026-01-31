@@ -45,7 +45,10 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_get_sto
     agent = create_agent(personality)
 
     # 1. Check instruction contains stricter search text and leading newline
-    expected_instruction_part = "IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent."
+    expected_instruction_part = (
+        "IMPORTANT: If you are asked a question that might be answered by your reference materials, \n"
+        "you MUST start by searching your reference materials using the RagAgent."
+    )
     assert expected_instruction_part in agent.instruction
 
     # 2. Check tools include AgentTool for RagAgent
@@ -81,3 +84,33 @@ def test_create_agent_no_file_search_tool_when_id_missing(mock_config):
     # 2. Check tools do NOT include FileSearchTool
     file_search_tools = [t for t in agent.tools if isinstance(t, FileSearchTool)]
     assert len(file_search_tools) == 0
+
+
+@patch("rickbot_agent.agent.get_store")
+def test_create_agent_no_rag_agent_when_store_not_found(mock_get_store, mock_config):
+    """Test that if the store is not found, RagAgent is not added but creation continues."""
+    mock_get_store.return_value = None  # Simulate store not found
+
+    personality = Personality(
+        name="Yoda",
+        menu_name="Yoda",
+        title="Yoda",
+        overview="Wise one.",
+        welcome="Welcome.",
+        prompt_question="Query?",
+        temperature=0.7,
+        file_search_store_name="missing-store",
+    )
+    personality.system_instruction = "You are Yoda."
+
+    agent = create_agent(personality)
+
+    # 1. Check instruction does NOT contain RagAgent info
+    assert "RagAgent: For bespoke information" not in agent.instruction
+
+    # 2. Check RagAgent is not in tools
+    rag_agent_tool = next((t for t in agent.tools if isinstance(t, AgentTool) and t.agent.name == "RagAgent"), None)
+    assert rag_agent_tool is None
+
+    # 3. Check description matches fallback
+    assert "with access to a SearchAgent to perform Google Search." in agent.description
