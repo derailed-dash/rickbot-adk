@@ -20,3 +20,16 @@ resource "google_secret_manager_secret" "rickbot-streamlit-secrets-toml" {
     auto {}
   }
 }
+
+# This creates the secret placeholder.
+# We can then populate the secret like this:
+# gcloud secrets versions add gemini-api-key --data="<API_KEY>"
+resource "google_secret_manager_secret" "gemini_api_key" {
+  for_each = local.deploy_project_ids
+  project  = each.value
+  secret_id = "gemini-api-key"
+
+  replication {
+    auto {}
+  }
+}

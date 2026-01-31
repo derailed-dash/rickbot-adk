@@ -29,6 +29,7 @@ steps:
       - '--service-account=$_SERVICE_NAME-app-sa@$_STAGING_PROJECT_ID.iam.gserviceaccount.com'
       - '--allow-unauthenticated' # Allow unauthenticated invocations - end user needs IAP-secured Web App User role (roles/iap.httpsResourceAccessor)
       - '--iap' # Enable direct IAP
+      - '--set-secrets=GOOGLE_API_KEY=gemini-api-key:latest'
 
   # Fetch Staging Service URL
   - name: "gcr.io/cloud-builders/gcloud"
@@ -121,7 +122,7 @@ substitutions:
   _APP_NAME: rickbot_st_ui
   _AGENT_NAME: rickbot_agent
   _LOG_LEVEL: DEBUG
-  _GOOGLE_GENAI_USE_VERTEXAI: "True"
+  _GOOGLE_GENAI_USE_VERTEXAI: "False"
   _MODEL: "gemini-2.5-flash"
   _AUTH_REQUIRED: "False"
   _RATE_LIMIT: "120"
