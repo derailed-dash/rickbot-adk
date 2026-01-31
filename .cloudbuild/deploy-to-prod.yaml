@@ -29,7 +29,7 @@ substitutions:
   _GOOGLE_GENAI_USE_VERTEXAI: "False"
   _MODEL: "gemini-2.5-flash"
   _AUTH_REQUIRED: "True"
-  _RATE_LIMIT: "120"
+  _RATE_LIMIT: "60"
   _GOOGLE_CLOUD_LOCATION: "global"
   _MAX_INSTANCES: "1"
 
