@@ -44,12 +44,10 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_get_sto
 
     agent = create_agent(personality)
 
-    # 1. Check instruction contains stricter search text and leading newline
-    expected_instruction_part = (
-        "IMPORTANT: If you are asked a question that might be answered by your reference materials, \n"
-        "you MUST start by searching your reference materials using the RagAgent."
-    )
-    assert expected_instruction_part in agent.instruction
+    # 1. Check instruction contains the new Tool Usage Policy header and prioritization
+    assert "## TOOL USAGE POLICY:" in agent.instruction
+    assert "1. **RagAgent (Internal Knowledge)**: This is your PRIORITIZED source" in agent.instruction
+    assert "CRITICAL: If a user asks a question related to any of the topics" in agent.instruction
 
     # 2. Check tools include AgentTool for RagAgent
     rag_agent_tool = next((t for t in agent.tools if isinstance(t, AgentTool) and t.agent.name == "RagAgent"), None)
@@ -78,8 +76,9 @@ def test_create_agent_no_file_search_tool_when_id_missing(mock_config):
 
     agent = create_agent(personality)
 
-    # 1. Check instruction does NOT contain generic search text
-    assert "IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent." not in agent.instruction
+    # 1. Check instruction does NOT contain the Tool Usage Policy
+    assert "## TOOL USAGE POLICY:" not in agent.instruction
+    assert "RagAgent (Internal Knowledge)" not in agent.instruction
 
     # 2. Check tools do NOT include FileSearchTool
     file_search_tools = [t for t in agent.tools if isinstance(t, FileSearchTool)]
@@ -106,7 +105,8 @@ def test_create_agent_no_rag_agent_when_store_not_found(mock_get_store, mock_con
     agent = create_agent(personality)
 
     # 1. Check instruction does NOT contain RagAgent info
-    assert "RagAgent: For bespoke information" not in agent.instruction
+    assert "## TOOL USAGE POLICY:" not in agent.instruction
+    assert "RagAgent (Internal Knowledge)" not in agent.instruction
 
     # 2. Check RagAgent is not in tools
     rag_agent_tool = next((t for t in agent.tools if isinstance(t, AgentTool) and t.agent.name == "RagAgent"), None)

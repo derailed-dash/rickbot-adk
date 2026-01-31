@@ -61,22 +61,29 @@ search_agent = Agent(
 
 
 # RAG Specialist Agent (File Search only)
-def create_rag_agent(file_store_name: str) -> Agent | None:
+def create_rag_agent(file_store_name: str, personality_name: str, kb_description: str | None = None) -> Agent | None:
     store_name = get_store(file_store_name)
     if store_name:
         logger.info(f"Creating RagAgent connected to {store_name}")
-        instruction = """Use the file_search tool to retrieve information from the knowledge base."""
+
+        description_text = kb_description or f"Internal knowledge base for {personality_name}"
+
+        instruction = dedent(f"""
+            Search the knowledge base for: {description_text}.
+            Return ONLY the relevant facts or text snippets from {personality_name}'s materials.
+            Do not add preamble, greetings, or analysis. Be extremely brief.
+            If the information is not in the knowledge base, state: "NOT_FOUND"
+        """)
 
         return Agent(
             model=config.model,
             name="RagAgent",
             description=(
-                "Primary agent for answering questions using the internal knowledge base. "
-                "ALWAYS consult this agent before using other tools."
+                f"Specialist knowledge base for {personality_name}, containing: {description_text}. "
+                "CRITICAL: MUST be used as the primary source for all relevant queries before any other tool."
             ),
             instruction=instruction,
             tools=[FileSearchTool(file_search_store_names=[store_name])],
-
         )
     else:
         logger.warning("No File Search Store found. RagAgent will not be available.")
@@ -88,42 +95,52 @@ def create_agent(personality: Personality) -> Agent:
 
     logger.debug(f"Creating agent for personality: {personality.name}")
 
-    tools: list[Any] = [AgentTool(agent=search_agent)]
+    tools: list[Any] = []
     rag_agent: Agent | None = None
     instruction = ""
 
     if personality.file_search_store_name:
         logger.debug(f"Adding {personality.file_search_store_name} for personality: {personality.name}")
-        rag_agent = create_rag_agent(personality.file_search_store_name)
+        rag_agent = create_rag_agent(
+            personality.file_search_store_name, 
+            personality.menu_name, 
+            personality.file_search_description
+        )
         if rag_agent:
             tools.append(AgentTool(agent=rag_agent))
             logger.debug(f"Added {rag_agent.name}")
 
-            instruction += dedent("""
-            You have access to two specialist agents:
-            1. RagAgent: For bespoke information from the internal knowledge base.
-            2. SearchAgent: For general information from Google Search.
+            kb_topic = personality.file_search_description or "reference materials"
+            instruction += dedent(f"""## TOOL USAGE POLICY:
+                You have access to a hierarchical retrieval system:
+                1. **RagAgent (Internal Knowledge)**: This is your PRIORITIZED source. It contains information about: {kb_topic}.
+                2. **SearchAgent (External Web)**: Use ONLY if the RagAgent returns "NOT_FOUND".
 
-            IMPORTANT: If you are asked a question that might be answered by your reference materials, 
-            you MUST start by searching your reference materials using the RagAgent.
-            Only use the SearchAgent if the RagAgent does not provide a relevant answer.
-            You do not need to use the RagAgent to respond to greetings or small talk.
-
+                CRITICAL: If a user asks a question related to any of the topics in {kb_topic},
+                you MUST start by searching using the RagAgent.
+                Only use the SearchAgent if the RagAgent does not provide a relevant answer.
+                You do not need to use the RagAgent to respond to greetings or small talk.
             """)
+
+            desc_suffix = (
+                "with access to two specialist agents: a RagAgent for its knowledge base "
+                "and SearchAgent for Google Search."
+            )
         else:
             logger.warning(f"Failed to add {personality.file_search_store_name}")
     else:
         logger.debug(f"No File Search Store found for personality: {personality.name}")
 
-    instruction += f"""{personality.system_instruction}"""
-    instruction += dedent("""
-        IMPORTANT: Use the SearchAgent to perform a Google Search if you do not have the relevant answer,
-        or if the user's query requires an up-to-date answer.""")
+    if not rag_agent:
+        instruction += dedent("""IMPORTANT: Use the SearchAgent to perform a Google Search if you do not have the relevant answer,
+            or if the user's query requires an up-to-date answer.""")
 
-    if rag_agent:
-        desc_suffix = "with access to two specialist agents: a RagAgent for its knowledge base and SearchAgent for Google Search."
-    else:
         desc_suffix = "with access to a SearchAgent to perform Google Search."
+
+    instruction += f"""{personality.system_instruction}"""
+
+    # SearchAgent is always added as a fallback
+    tools.append(AgentTool(agent=search_agent))
 
     return Agent(
         name=f"{config.agent_name}_{personality.name}",  # Make agent name unique

@@ -36,6 +36,7 @@ class Personality:
     prompt_question: str
     temperature: float
     file_search_store_name: str | None = None
+    file_search_description: str | None = None
     avatar: str = field(init=False)
     system_instruction: str = field(init=False)
 
