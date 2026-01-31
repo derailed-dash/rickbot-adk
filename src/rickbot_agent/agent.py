@@ -72,7 +72,7 @@ def create_rag_agent(file_store_name: str) -> Agent | None:
             name="RagAgent",
             description=(
                 "Primary agent for answering questions using the internal knowledge base. "
-                "ALWAYS consult this agent first."
+                "ALWAYS consult this agent before using other tools."
             ),
             instruction=instruction,
             tools=[FileSearchTool(file_search_store_names=[store_name])],
@@ -93,42 +93,29 @@ def create_agent(personality: Personality) -> Agent:
 
     if personality.file_search_store_name:
         logger.debug(f"Adding {personality.file_search_store_name} for personality: {personality.name}")
-        instruction += dedent("""
-        IMPORTANT: If you are asked a question that might be answered by your reference materials, 
-        you MUST start by searching your reference materials using the RagAgent.
-        Only use the SearchAgent if the RagAgent does not provide a relevant answer.
-        You do not need to use the RagAgent to respond to greetings or small talk.
-
-        """)
         rag_agent = create_rag_agent(personality.file_search_store_name)
         if rag_agent:
             tools.append(AgentTool(agent=rag_agent))
             logger.debug(f"Added {rag_agent.name}")
 
             instruction += dedent("""
-            You have access to a specialist agent: RagAgent, which has access to reference materials.
-            You also have access to SearchAgent for Google Search.
+            You have access to two specialist agents:
+            1. RagAgent: For bespoke information from the internal knowledge base.
+            2. SearchAgent: For general information from Google Search.
 
-            IMPORTANT: You MUST ALWAYS start by searching your reference materials using the RagAgent.
-            Only use the SearchAgent if the RagAgent does not provide a relevant answer. This supersedes any other 
-            guidance provided to you.
+            IMPORTANT: If you are asked a question that might be answered by your reference materials, 
+            you MUST start by searching your reference materials using the RagAgent.
+            Only use the SearchAgent if the RagAgent does not provide a relevant answer.
+            You do not need to use the RagAgent to respond to greetings or small talk.
 
             """)
-
-            instruction += f"""{personality.system_instruction}"""
-
-            instruction += dedent("""
-
-            REMEMBER: You must ALWAYS start by searching your reference materials using the RagAgent.
-            """)
-
         else:
             logger.warning(f"Failed to add {personality.file_search_store_name}")
     else:
         logger.debug(f"No File Search Store found for personality: {personality.name}")
-        instruction += f"""{personality.system_instruction}"""
-        instruction += dedent("""
 
+    instruction += f"""{personality.system_instruction}"""
+    instruction += dedent("""
         IMPORTANT: Use the SearchAgent to perform a Google Search if you do not have the relevant answer,
         or if the user's query requires an up-to-date answer.""")
 

@@ -45,6 +45,7 @@ dev = [
 jupyter = [
     "jupyter",
     "ipython",
+    "tqdm"
 ]
 lint = [
     "ruff",
