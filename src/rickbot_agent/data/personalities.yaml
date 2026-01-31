@@ -53,3 +53,4 @@
   prompt_question: "Talk to me. I'm listening."
   temperature: 1.0
   file_search_store_name: "rickbot-dazbo-ref"
+  file_search_description: "Google Cloud (GCP), enterprise cloud architecture, architecture, cloud migration, agentic AI, Gemini, ADK."
