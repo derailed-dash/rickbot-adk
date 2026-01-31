@@ -39,12 +39,10 @@ ENV WORKDIR=/app \
 
 WORKDIR ${WORKDIR}
 
-# Create non-root user for the application with required permissions
-# We do this BEFORE copying files so we can chown them on copy, preventing layer duplication
-RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER}
-
-# Create .streamlit directory and ensure it's writable by app-user
-RUN mkdir -p ${WORKDIR}/.streamlit && chown -R ${APP_USER}:${APP_USER} ${WORKDIR}/.streamlit
+# Create non-root user and application directories with required permissions in one layer
+RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER} && \
+    mkdir -p ${WORKDIR}/.streamlit && \
+    chown -R ${APP_USER}:${APP_USER} ${WORKDIR}/.streamlit
 
 # Copy the virtual environment from the builder stage
 COPY --from=builder --chown=${APP_USER}:${APP_USER} ${WORKDIR}/.venv ./.venv

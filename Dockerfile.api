@@ -30,8 +30,7 @@ ENV WORKDIR=/app \
 
 WORKDIR ${WORKDIR}
 
-# Create non-root user
-# We do this BEFORE copying files so we can chown them on copy, preventing layer duplication
+# Create non-root user for the application with required permissions
 RUN adduser --disabled-password --gecos '' --home /home/${APP_USER} ${APP_USER}
 
 # Copy the virtual environment from the builder stage
