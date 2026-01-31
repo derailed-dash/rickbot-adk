@@ -89,6 +89,7 @@ def create_agent(personality: Personality) -> Agent:
     logger.debug(f"Creating agent for personality: {personality.name}")
 
     tools: list[Any] = [AgentTool(agent=search_agent)]
+    rag_agent: Agent | None = None
     instruction = ""
 
     if personality.file_search_store_name:
@@ -119,10 +120,14 @@ def create_agent(personality: Personality) -> Agent:
         IMPORTANT: Use the SearchAgent to perform a Google Search if you do not have the relevant answer,
         or if the user's query requires an up-to-date answer.""")
 
+    if rag_agent:
+        desc_suffix = "with access to two specialist agents: a RagAgent for its knowledge base and SearchAgent for Google Search."
+    else:
+        desc_suffix = "with access to a SearchAgent to perform Google Search."
+
     return Agent(
         name=f"{config.agent_name}_{personality.name}",  # Make agent name unique
-        description=f"""A chatbot with the personality of {personality.menu_name} 
-        with access to two specialist agents: a RagAgent for its knowledge base and SearchAgent for Google Search""",
+        description=f"""A chatbot with the personality of {personality.menu_name} {desc_suffix}""",
         model=config.model,
         instruction=instruction,
         tools=tools,
