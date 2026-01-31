@@ -69,11 +69,10 @@ def create_rag_agent(file_store_name: str, personality_name: str, kb_description
         description_text = kb_description or f"Internal knowledge base for {personality_name}"
 
         instruction = dedent(f"""
-            You are a Retrieval Specialist for {personality_name}.
-            Your sole purpose is to use the file_search tool to retrieve information from the knowledge base
-            about {description_text} and provide accurate, context-rich answers based ONLY on the retrieved documents.
-            If the information is not in the knowledge base, state clearly:
-            "I could not find specific information on this in the internal knowledge base."
+            Search the knowledge base for: {description_text}.
+            Return ONLY the relevant facts or text snippets from {personality_name}'s materials.
+            Do not add preamble, greetings, or analysis. Be extremely brief.
+            If the information is not in the knowledge base, state: "NOT_FOUND"
         """)
 
         return Agent(
@@ -116,7 +115,7 @@ def create_agent(personality: Personality) -> Agent:
                 ### TOOL USAGE POLICY:
                 You have access to a hierarchical retrieval system:
                 1. **RagAgent (Internal Knowledge)**: This is your PRIORITIZED source. It contains information about: {kb_topic}.
-                2. **SearchAgent (External Web)**: Use ONLY if the RagAgent specifically states it cannot find the information.
+                2. **SearchAgent (External Web)**: Use ONLY if the RagAgent returns "NOT_FOUND".
 
                 CRITICAL: If a user asks a question related to any of the topics in {kb_topic},
                 you MUST start by searching using the RagAgent.
