@@ -45,7 +45,7 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_get_sto
     agent = create_agent(personality)
 
     # 1. Check instruction contains the new Tool Usage Policy header and prioritization
-    assert "### TOOL USAGE POLICY:" in agent.instruction
+    assert "## TOOL USAGE POLICY:" in agent.instruction
     assert "1. **RagAgent (Internal Knowledge)**: This is your PRIORITIZED source" in agent.instruction
     assert "CRITICAL: If a user asks a question related to any of the topics" in agent.instruction
 
@@ -77,7 +77,7 @@ def test_create_agent_no_file_search_tool_when_id_missing(mock_config):
     agent = create_agent(personality)
 
     # 1. Check instruction does NOT contain the Tool Usage Policy
-    assert "### TOOL USAGE POLICY:" not in agent.instruction
+    assert "## TOOL USAGE POLICY:" not in agent.instruction
     assert "RagAgent (Internal Knowledge)" not in agent.instruction
 
     # 2. Check tools do NOT include FileSearchTool
@@ -105,7 +105,7 @@ def test_create_agent_no_rag_agent_when_store_not_found(mock_get_store, mock_con
     agent = create_agent(personality)
 
     # 1. Check instruction does NOT contain RagAgent info
-    assert "### TOOL USAGE POLICY:" not in agent.instruction
+    assert "## TOOL USAGE POLICY:" not in agent.instruction
     assert "RagAgent (Internal Knowledge)" not in agent.instruction
 
     # 2. Check RagAgent is not in tools

@@ -111,8 +111,7 @@ def create_agent(personality: Personality) -> Agent:
             logger.debug(f"Added {rag_agent.name}")
 
             kb_topic = personality.file_search_description or "reference materials"
-            instruction += dedent(f"""
-                ### TOOL USAGE POLICY:
+            instruction += dedent(f"""## TOOL USAGE POLICY:
                 You have access to a hierarchical retrieval system:
                 1. **RagAgent (Internal Knowledge)**: This is your PRIORITIZED source. It contains information about: {kb_topic}.
                 2. **SearchAgent (External Web)**: Use ONLY if the RagAgent returns "NOT_FOUND".
@@ -122,20 +121,23 @@ def create_agent(personality: Personality) -> Agent:
                 Only use the SearchAgent if the RagAgent does not provide a relevant answer.
                 You do not need to use the RagAgent to respond to greetings or small talk.
             """)
+
+            desc_suffix = (
+                "with access to two specialist agents: a RagAgent for its knowledge base "
+                "and SearchAgent for Google Search."
+            )
         else:
             logger.warning(f"Failed to add {personality.file_search_store_name}")
     else:
         logger.debug(f"No File Search Store found for personality: {personality.name}")
 
-    instruction += f"""{personality.system_instruction}"""
-    instruction += dedent("""
-        IMPORTANT: Use the SearchAgent to perform a Google Search if you do not have the relevant answer,
-        or if the user's query requires an up-to-date answer.""")
+    if not rag_agent:
+        instruction += dedent("""IMPORTANT: Use the SearchAgent to perform a Google Search if you do not have the relevant answer,
+            or if the user's query requires an up-to-date answer.""")
 
-    if rag_agent:
-        desc_suffix = "with access to two specialist agents: a RagAgent for its knowledge base and SearchAgent for Google Search."
-    else:
         desc_suffix = "with access to a SearchAgent to perform Google Search."
+
+    instruction += f"""{personality.system_instruction}"""
 
     # SearchAgent is always added as a fallback
     tools.append(AgentTool(agent=search_agent))
