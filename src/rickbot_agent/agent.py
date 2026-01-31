@@ -25,14 +25,21 @@ if not client:
 
 @functools.cache
 def get_store(store_name: str):
-    """Retrieve the store from the store name."""
+    """Retrieve the store from the store name.
+
+    Note: File Search Stores are a feature of the Gemini Developer API (AI Studio).
+    They are NOT currently supported in Vertex AI. Therefore, we explicitly use 
+    a non-Vertex client to list and retrieve stores.
+    """
     try:
-        for a_store in client.file_search_stores.list():
+        # Use a non-Vertex client for store management
+        store_client = genai.Client(vertexai=False)
+        for a_store in store_client.file_search_stores.list():
             if a_store.display_name == store_name:
                 logger.debug(f"Found and returning store: {a_store.name}")
                 return a_store.name
     except Exception as e:
-        logger.error(f"Error in get_store path: {e}")
+        logger.error(f"Error in get_store path (check if Generative Language API is enabled): {e}")
 
     return None
 

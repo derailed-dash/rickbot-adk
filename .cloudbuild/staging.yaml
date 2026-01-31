@@ -121,7 +121,7 @@ substitutions:
   _APP_NAME: rickbot_st_ui
   _AGENT_NAME: rickbot_agent
   _LOG_LEVEL: DEBUG
-  _GOOGLE_GENAI_USE_VERTEXAI: "True"
+  _GOOGLE_GENAI_USE_VERTEXAI: "False"
   _MODEL: "gemini-2.5-flash"
   _AUTH_REQUIRED: "False"
   _RATE_LIMIT: "120"
