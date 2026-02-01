@@ -68,11 +68,11 @@ resource "google_project_iam_member" "cicd_run_invoker_artifact_registry_reader"
 }
 
 resource "google_secret_manager_secret_iam_member" "dazbo_system_prompt_access" {
-  for_each = local.deploy_project_ids
-  project = each.value
-  secret_id = "dazbo-system-prompt"
-  role = "roles/secretmanager.secretAccessor"
-  member = "serviceAccount:service-${data.google_project.projects[each.key].number}@gcp-sa-aiplatform-re.iam.gserviceaccount.com"
+  for_each   = local.deploy_project_ids
+  project    = each.value
+  secret_id  = "dazbo-system-prompt"
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:service-${data.google_project.projects[each.key].number}@gcp-sa-aiplatform-re.iam.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.dazbo_system_prompt]
 }
 
