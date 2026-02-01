@@ -4671,17 +4671,12 @@ dependencies = [
     { name = "google-cloud-logging" },
     { name = "google-cloud-secret-manager" },
     { name = "google-genai" },
-    { name = "langchain" },
-    { name = "langchain-core" },
-    { name = "langchain-google-vertexai" },
     { name = "limits" },
     { name = "opentelemetry-exporter-gcp-trace" },
     { name = "psycopg2-binary" },
     { name = "python-dotenv" },
     { name = "pyyaml" },
     { name = "slowapi" },
-    { name = "streamlit" },
-    { name = "streamlit-feedback" },
     { name = "uvicorn" },
 ]
 
@@ -4700,6 +4695,13 @@ lint = [
 ]
 load-test = [
     { name = "locust" },
+]
+streamlit = [
+    { name = "langchain" },
+    { name = "langchain-core" },
+    { name = "langchain-google-vertexai" },
+    { name = "streamlit" },
+    { name = "streamlit-feedback" },
 ]
 
 [package.dev-dependencies]
@@ -4722,9 +4724,9 @@ requires-dist = [
     { name = "google-genai" },
     { name = "ipython", marker = "extra == 'jupyter'" },
     { name = "jupyter", marker = "extra == 'jupyter'" },
-    { name = "langchain" },
-    { name = "langchain-core" },
-    { name = "langchain-google-vertexai" },
+    { name = "langchain", marker = "extra == 'streamlit'" },
+    { name = "langchain-core", marker = "extra == 'streamlit'" },
+    { name = "langchain-google-vertexai", marker = "extra == 'streamlit'" },
     { name = "limits" },
     { name = "locust", marker = "extra == 'load-test'" },
     { name = "mypy", marker = "extra == 'lint'" },
@@ -4734,14 +4736,14 @@ requires-dist = [
     { name = "pyyaml" },
     { name = "ruff", marker = "extra == 'lint'" },
     { name = "slowapi", specifier = ">=0.1.9" },
-    { name = "streamlit" },
-    { name = "streamlit-feedback" },
+    { name = "streamlit", marker = "extra == 'streamlit'" },
+    { name = "streamlit-feedback", marker = "extra == 'streamlit'" },
     { name = "tqdm", marker = "extra == 'jupyter'" },
     { name = "types-pyyaml", marker = "extra == 'lint'" },
     { name = "types-requests", marker = "extra == 'lint'" },
     { name = "uvicorn" },
 ]
-provides-extras = ["jupyter", "lint", "load-test"]
+provides-extras = ["jupyter", "lint", "load-test", "streamlit"]
 
 [package.metadata.requires-dev]
 dev = [

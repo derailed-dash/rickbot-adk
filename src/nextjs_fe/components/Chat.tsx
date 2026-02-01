@@ -184,48 +184,69 @@ export default function Chat() {
             const decoder = new TextDecoder();
             let accumulatedText = '';
             let currentSessionId = sessionId;
+            let buffer = '';
+
+            const processLine = (line: string) => {
+                if (!line.trim()) return;
+                if (line.startsWith('data: ')) {
+                    try {
+                        const data = JSON.parse(line.slice(6));
+                        if (data.session_id && !currentSessionId) {
+                            currentSessionId = data.session_id;
+                            setSessionId(data.session_id);
+                        }
+                        if (data.tool_call) {
+                            const toolCall = data.tool_call as ToolCall;
+                            setBotAction(`Using tool: ${toolCall.name}...`);
+                            setActiveTool({ name: toolCall.name, status: 'running' });
+                        }
+                        if (data.tool_response) {
+                             setActiveTool(prev => prev ? { ...prev, status: 'completed' } : null);
+                        }
+                        if (data.agent_transfer) {
+                            setBotAction(`Transferring to agent: ${data.agent_transfer}...`);
+                            setActiveTool(null);
+                        }
+                        if (data.chunk) {
+                            if (botAction !== 'Responding...') {
+                                setBotAction('Responding...');
+                            }
+                            accumulatedText += data.chunk;
+                            setStreamingText(accumulatedText);
+                            setActiveTool(null); 
+                        }
+                        if (data.done) {
+                            setBotAction(null);
+                        }
+                        if (data.error) {
+                             console.error("Backend error:", data.error);
+                        }
+                    } catch (e) {
+                        console.error("JSON parse error:", e, "Line:", line);
+                    }
+                }
+            };
 
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
 
-                const chunk = decoder.decode(value);
-                const lines = chunk.split('\n\n');
+                buffer += decoder.decode(value, { stream: true });
+                
+                // Split on double newline (standard SSE delimiter)
+                const parts = buffer.split(/\n\n/);
+                
+                // The last part is either incomplete or empty (if stream ended with \n\n)
+                buffer = parts.pop() || '';
 
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        try {
-                            const data = JSON.parse(line.slice(6));
-                            if (data.session_id && !currentSessionId) {
-                                currentSessionId = data.session_id;
-                                setSessionId(data.session_id);
-                            }
-                            if (data.tool_call) {
-                                const toolCall = data.tool_call as ToolCall;
-                                setBotAction(`Using tool: ${toolCall.name}...`);
-                                setActiveTool({ name: toolCall.name, status: 'running' });
-                            }
-                            if (data.tool_response) {
-                                const toolResponse = data.tool_response as ToolResponse;
-                                // Ideally we show "Tool X finished" briefly, but maybe just clear active tool
-                                // or update status. For now, keep showing "Using tool X..." until next tool or response starts
-                                setActiveTool(prev => prev ? { ...prev, status: 'completed' } : null);
-                            }
-                            if (data.agent_transfer) {
-                                setBotAction(`Transferring to agent: ${data.agent_transfer}...`);
-                                setActiveTool(null);
-                            }
-                            if (data.chunk) {
-                                setBotAction('Responding...');
-                                accumulatedText += data.chunk;
-                                setStreamingText(accumulatedText);
-                                setActiveTool(null); // Clear tool when response starts
-                            }
-                        } catch (e) {
-                            console.error("Error parsing JSON chunk", e);
-                        }
-                    }
+                for (const part of parts) {
+                     processLine(part);
                 }
+            }
+            
+            // Process any remaining buffer content
+            if (buffer.trim()) {
+                processLine(buffer);
             }
 
              const botMessage: Message = {

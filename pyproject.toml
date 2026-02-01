@@ -17,15 +17,9 @@ dependencies = [
     "uvicorn",
     "pyyaml",
     # Frontend
-    "streamlit",
     "psycopg2-binary",
     "Authlib",
     "limits",
-    # Required for the sample Streamlit UI from agent-starter-pack
-    "langchain",
-    "langchain-core",
-    "streamlit-feedback",
-    "langchain-google-vertexai",
     "slowapi>=0.1.9",
     "google-genai",
 ]
@@ -56,6 +50,14 @@ lint = [
 ]
 load-test = [
     "locust",
+]
+
+streamlit = [
+    "streamlit",
+    "langchain",
+    "langchain-core",
+    "streamlit-feedback",
+    "langchain-google-vertexai",
 ]
 
 [tool.ruff]

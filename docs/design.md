@@ -73,7 +73,29 @@ The application adopts a modern containerization strategy designed for security,
     -   **Minimal Base Images**: We use `python:slim` and `node:alpine` to reduce the attack surface area.
     -   **Whitelist Copying**: Dockerfiles explicitly copy only required source directories, preventing accidental inclusion of sensitive files or unnecessary artifacts.
 
-### Products and Services Used
+3.  **Unified Container (Development & Simplified Deploy)**:
+    -   To simplify local development and some deployment scenarios, we also support a **Unified Container** strategy (`Dockerfile.unified`).
+    -   This image combines both the FastAPI backend and the Next.js frontend into a single runnable unit.
+    -   **Nginx-less Proxy**: It uses a lightweight `start-unified.sh` script to launch both processes. The Next.js frontend is configured with `rewrites` to proxy API requests (`/chat`, `/personas`) directly to the localhost FastAPI backend, eliminating the need for an external Nginx sidecar or complex networking in this mode.
+
+### Implementation Details & Workarounds
+
+#### 1. RAG Stability & File Search (Gemini Developer API)
+To support RAG capability using the Gemini Developer API's "File Search" feature (which is distinct from Vertex AI Search), the application implements specific middleware:
+
+*   **Client Monkey-Patching**: The ADK framework defaults to using Vertex AI clients when running in a Google Cloud environment. To force the use of the Gemini Developer API (AI Studio) for File Search, we monkey-patch `google.genai.Client` at runtime in `src/rickbot_agent/agent.py`. This forces `vertexai=False` and ensures correct API Key injection.
+*   **Timeout Handling**: Due to potential gRPC transport ambiguities (unit interpretation of ms vs seconds) in certain containerized environments, the client is configured with a robust timeout (`60000`) to prevent immediate fail-fast errors while allowing sufficient time for RAG retrieval operations to complete.
+
+#### 2. Streaming Reliability (SSE Buffering)
+To ensure smooth "Typewriter" effects and "Thinking" indicator updates over Server-Sent Events (SSE):
+
+*   **Compression**: Logic is implemented (or compression disabled via `next.config.js`) to prevent Gzip buffering from holding back small status update events.
+*   **Padding**: The backend injects 4KB of whitespace padding after critical `tool_call` events to force network buffers to flush immediately, ensuring the UI receives the "Thinking..." signal without delay.
+
+#### 3. Secrets & Key Management
+The application supports a dual-mode configuration for flexibility:
+*   **Google Cloud Project**: If `GOOGLE_CLOUD_PROJECT` is set, the system attempts to auto-discover credentials.
+*   **Gemini API Key**: If `GOOGLE_GENAI_USE_VERTEXAI` is false, a `GEMINI_API_KEY` is required. This is injected securely via Secret Manager (Prod) or `.env` (Dev).
 
 *   **Hosting Services**:
     *   **Google Cloud Run**: Hosts both the generic API backend and the frontend containers.

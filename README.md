@@ -108,6 +108,7 @@ direnv allow
 | `make docker-frontend`        | Launch React Frontend in Docker |
 | `make docker-backend`         | Launch API and Backend in Docker |
 | `make docker-front-and-back`  | Launch all services (frontend + backend) in Docker |
+| `make docker-unified`         | Launch Unified Container (Frontend + Backend in one) |
 | `make docker-clean`           | Remove any orphaned containers |
 | `make test`                   | Run unit tests |
 | `make test-all`               | Run unit and integration tests (takes a little longer) |
