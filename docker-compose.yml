@@ -88,3 +88,35 @@ services:
       - ./src:/app/src
       - ${HOME}/.config/gcloud:/app/.config/gcloud
     command: adk web --host 0.0.0.0 --port 8080 src
+
+  unified:
+    container_name: rickbot-unified
+    build:
+      context: .
+      dockerfile: Dockerfile.unified
+      args:
+        NEXT_PUBLIC_API_URL: /api
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+      - src/nextjs_fe/.env.local
+    environment:
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_CLOUD_REGION=${GOOGLE_CLOUD_REGION}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - APP_NAME=${APP_NAME}
+      - AGENT_NAME=${AGENT_NAME}
+      - GOOGLE_GENAI_USE_VERTEXAI=${GOOGLE_GENAI_USE_VERTEXAI}
+      - MODEL=${MODEL}
+      - AUTH_REQUIRED=${AUTH_REQUIRED}
+      - RATE_LIMIT=${RATE_LIMIT}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/.config/gcloud/application_default_credentials.json
+      - COMMIT_SHA=${COMMIT_SHA:-}
+      - BACKEND_ALLOW_MOCK_AUTH=true
+      - NEXTAUTH_URL=http://localhost:8080
+      - NEXT_PUBLIC_ALLOW_MOCK_AUTH=true
+      - MOCK_AUTH_USER=mock@example.com
+    volumes:
+      - ${HOME}/.config/gcloud:/app/.config/gcloud
+    restart: unless-stopped

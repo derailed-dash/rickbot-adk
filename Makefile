@@ -65,6 +65,13 @@ docker-front-and-back: docker-clean
 	@echo "================================================================================="
 	docker compose up -d backend frontend
 
+docker-unified: docker-clean
+	@echo "================================================================================="
+	@echo "| 🚀 Launching Unified Container (Frontend + Backend)                           |"
+	@echo "| 🌐 Available at http://localhost:8080                                         |"
+	@echo "================================================================================="
+	docker compose up -d --build unified
+
 # Run unit tests
 test:
 	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "Error: GOOGLE_CLOUD_PROJECT is not set. Setup environment before running tests" && exit 1)
