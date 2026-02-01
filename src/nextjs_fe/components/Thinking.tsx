@@ -27,6 +27,11 @@ const toolMap: Record<string, { label: string; icon: React.ReactNode; color: str
     icon: <MoveToInboxIcon fontSize="small" />,
     color: '#34A853',
   },
+  'RagAgent': {
+    label: 'RagAgent',
+    icon: <PsychologyIcon fontSize="small" />,
+    color: '#39FF14', // Match portal green for consistency with the screenshot
+  },
   'Responding': {
     label: 'Responding',
     icon: <PsychologyIcon fontSize="small" />,
@@ -48,9 +53,9 @@ const Thinking: React.FC<ThinkingProps> = ({ action, activeTool }) => {
   const isRunning = activeTool?.status === 'running' || action === 'Thinking...' || isResponding;
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 0.5 }}>
-      <Box sx={{ 
-        display: 'flex', 
+    <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, my: 0.5 }}>
+      <Box component="span" sx={{ 
+        display: 'inline-flex', 
         alignItems: 'center', 
         justifyContent: 'center',
         color: color,
