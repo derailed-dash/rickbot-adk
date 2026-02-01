@@ -38,25 +38,22 @@ if not config.genai_use_vertexai:
         class _PatchedClient(_OriginalClient):
             _is_patched = True
             def __init__(self, *args, **kwargs):
-                logger.debug(f"Intercepted genai.Client init. Args: {args}, Kwargs: {kwargs}")
                 kwargs['vertexai'] = False  # Force vertexai=False
                 if 'api_key' not in kwargs or kwargs['api_key'] is None:
                      kwargs['api_key'] = os.getenv("GEMINI_API_KEY")
 
-                # Set large timeout to cover ms vs seconds ambiguity
-                # The 'read operation timed out' error with small values suggests the unit might be mapped
-                # to milliseconds in some contexts, or that network latency varies significantly.
-                # 60000 ensures that:
-                # 1. If unit is ms, we wait 60s (reasonable for RAG).
-                # 2. If unit is seconds, we effectively eliminate the timeout (preventing premature disconnects),
-                #    relying on the underlying transport to eventually succeed or fail.
-                # This fixes the "Intermittent Hang" issue where the client would stall or fail instantly.
+                # Set timeout for HTTP operations (in milliseconds)
+                # 60000ms = 60 seconds, which provides sufficient time for:
+                # - RAG store initialization and retrieval operations
+                # - Network latency in containerized environments
+                # - Complex agent reasoning and tool execution
+                # This prevents premature timeouts while still failing eventually on genuine errors.
                 if 'http_options' not in kwargs:
                     kwargs['http_options'] = {}
                 if kwargs['http_options'] is None:
                      kwargs['http_options'] = {}
 
-                kwargs['http_options']['timeout'] = 60000
+                kwargs['http_options']['timeout'] = 60000  # 60 seconds in milliseconds
 
                 super().__init__(*args, **kwargs)
 
