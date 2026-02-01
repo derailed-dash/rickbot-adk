@@ -55,4 +55,3 @@ async def test_dazbo_rag_agent_transfer():
 
         # Verify that the RagAgent was indeed triggered
         assert found_rag_usage, f"Did not find 'RagAgent' usage in events: {events}"
-        print("\nSuccessfully detected usage of RagAgent for Dazbo persona.")

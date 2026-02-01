@@ -2,6 +2,8 @@ import { render, screen, fireEvent, waitFor, within, act } from '@testing-librar
 import Chat from '../components/Chat'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
+import { ThemeProvider } from '@mui/material/styles'
+import theme from '../styles/theme'
 
 // Mock next-auth/react
 jest.mock('next-auth/react')
@@ -40,6 +42,20 @@ const waitForPersonalities = async () => {
     })
 }
 
+const renderChatAndWait = async (useTheme = false) => {
+    const result = render(
+        useTheme ? (
+            <ThemeProvider theme={theme}>
+                <Chat />
+            </ThemeProvider>
+        ) : (
+            <Chat />
+        )
+    )
+    await waitForPersonalities()
+    return result
+}
+
 describe('Chat', () => {
   const mockSession = {
     data: {
@@ -73,8 +89,7 @@ describe('Chat', () => {
   })
 
   it('includes Authorization header in fetchPersonalities', async () => {
-    render(<Chat />)
-    await waitForPersonalities()
+    await renderChatAndWait()
     
     await waitFor(() => {
         expect(axios.get).toHaveBeenCalledWith(
@@ -89,8 +104,7 @@ describe('Chat', () => {
   })
 
   it('includes Authorization header in handleSendMessage', async () => {
-    render(<Chat />)
-    await waitForPersonalities()
+    await renderChatAndWait()
     
     const input = screen.getByPlaceholderText('What do you want?')
     fireEvent.change(input, { target: { value: 'Hi' } })
@@ -111,8 +125,7 @@ describe('Chat', () => {
   })
 
   it('clears messages and session_id when Clear Chat is clicked', async () => {
-    render(<Chat />)
-    await waitForPersonalities()
+    await renderChatAndWait()
     
     // Send a message first to populate state
     const input = screen.getByPlaceholderText('What do you want?')
@@ -153,7 +166,7 @@ describe('Chat', () => {
         }
     })
 
-    render(<Chat />)
+    await renderChatAndWait()
     const input = screen.getByPlaceholderText('What do you want?')
     fireEvent.change(input, { target: { value: 'Search something' } })
     fireEvent.click(screen.getByText('Send'))
@@ -189,8 +202,7 @@ describe('Chat', () => {
         }
     })
 
-    render(<Chat />)
-    await waitForPersonalities()
+    await renderChatAndWait()
 
     const input = screen.getByPlaceholderText('What do you want?')
     fireEvent.change(input, { target: { value: 'What is in your knowledge base?' } })
@@ -208,8 +220,7 @@ describe('Chat', () => {
   })
 
   it('handles multi-file upload and renders them inline', async () => {
-    const { container } = render(<Chat />)
-    await waitForPersonalities()
+    const { container } = await renderChatAndWait()
     
     const input = container.querySelector('input[type="file"]') as HTMLInputElement
     const file1 = new File(['hello'], 'hello.png', { type: 'image/png' })
@@ -237,8 +248,7 @@ describe('Chat', () => {
   })
 
   it('renders the Meeseeks Box icon for the New Chat button with a Badge', async () => {
-    render(<Chat />)
-    await waitForPersonalities()
+    await renderChatAndWait()
     const icon = screen.getByTestId('meeseeks-box-icon')
     expect(icon).toBeInTheDocument()
     expect(icon).toHaveAttribute('src', '/meeseeks.webp')
@@ -247,8 +257,7 @@ describe('Chat', () => {
   })
 
   it('renders the Portal Gun icon for the Send button and triggers animation', async () => {
-    render(<Chat />)
-    await waitForPersonalities()
+    await renderChatAndWait()
     const icon = screen.getByTestId('portal-gun-icon')
     expect(icon).toBeInTheDocument()
     expect(icon).toHaveAttribute('src', '/portal_gun_trans.png')
@@ -264,16 +273,7 @@ describe('Chat', () => {
   })
 
   it('applies the Portal Green primary color to key elements', async () => {
-    // We need to wrap in ThemeProvider to test the actual theme application
-    const { ThemeProvider } = require('@mui/material/styles')
-    const theme = require('../styles/theme').default
-
-    const { container } = render(
-        <ThemeProvider theme={theme}>
-            <Chat />
-        </ThemeProvider>
-    )
-    await waitForPersonalities()
+    const { container } = await renderChatAndWait(true)
 
     // The Rickbot title should use primary color
     // We target the H4 specifically to avoid ambiguity if 'Rickbot' appears elsewhere
@@ -322,8 +322,7 @@ describe('Chat', () => {
       }
     ])('it should display correct avatar for $case', async ({ session, message, expectedAvatar }) => {
       (useSession as jest.Mock).mockReturnValue(session);
-      render(<Chat />);
-      await waitForPersonalities();
+      await renderChatAndWait();
       const messageItem = await sendMessage(message);
       const avatarInMessage = within(messageItem!).getByRole('img');
       expect(avatarInMessage).toHaveAttribute('src', expectedAvatar);
