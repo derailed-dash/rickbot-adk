@@ -94,28 +94,28 @@ export default function Chat() {
     }, [messages, streamingText, botAction]);
 
     useEffect(() => {
+        let isMounted = true;
         const fetchPersonalities = async () => {
             const token = session?.idToken || session?.accessToken || "";
-            // console.log("Token:", token);
             try {
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/personas`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                if (response.data && Array.isArray(response.data)) {
+                if (isMounted && response.data && Array.isArray(response.data)) {
                     setPersonalities(response.data);
-                    // Update selected personality object if it was the default or exists in the new list
                     const updatedSelected = response.data.find((p: Personality) => p.name === selectedPersonality.name);
                     if (updatedSelected) {
                         setSelectedPersonality(updatedSelected);
                     }
                 }
             } catch (error: any) {
-                console.error("Failed to fetch personalities:", error);
-                if (error.response?.status === 401 || error.response?.status === 403) {
-                    console.warn("Auth failure detected in fetchPersonalities. Signing out.");
-                    signOut();
+                if (isMounted) {
+                    console.error("Failed to fetch personalities:", error);
+                    if (error.response?.status === 401 || error.response?.status === 403) {
+                        signOut();
+                    }
                 }
             }
         };
@@ -123,6 +123,7 @@ export default function Chat() {
         if (session) {
             fetchPersonalities();
         }
+        return () => { isMounted = false; };
     }, [session]);
 
 
@@ -145,7 +146,7 @@ export default function Chat() {
         setBotAction('Thinking...');
         setActiveTool(null);
         setShowPortal(true);
-        setTimeout(() => setShowPortal(false), 1000);
+        setTimeout(() => setShowPortal(false), process.env.NODE_ENV === 'test' ? 10 : 1000);
 
         try {
             const token = session?.idToken || session?.accessToken || "";
@@ -366,8 +367,9 @@ export default function Chat() {
                                         {msg.sender === 'user' ? 'You' : msg.personality}
                                     </Box>
                                 }
+                                secondaryTypographyProps={{ component: 'div' }}
                                 secondary={
-                                    <Box component="span" sx={{ color: 'text.primary' }}>
+                                    <Box sx={{ color: 'text.primary' }}>
                                         {msg.attachments && msg.attachments.length > 0 && (
                                             <Box sx={{ mb: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                                                 {msg.attachments.map((att, i) => {
@@ -393,14 +395,15 @@ export default function Chat() {
                             <ListItemAvatar>
                                 <Avatar src={`/avatars/${selectedPersonality.name.toLowerCase()}.png`} />
                             </ListItemAvatar>
-                            <ListItemText
+                             <ListItemText
                                 primary={
                                     <Box component="span" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                                         {selectedPersonality.name}
                                     </Box>
                                 }
+                                secondaryTypographyProps={{ component: 'div' }}
                                 secondary={
-                                    <Box component="span" sx={{ color: 'text.primary' }}>
+                                    <Box sx={{ color: 'text.primary' }}>
                                         <Thinking action={botAction} activeTool={activeTool} />
                                         {streamingText && (
                                             <ReactMarkdown

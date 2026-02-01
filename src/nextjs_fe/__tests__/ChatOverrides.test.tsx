@@ -30,7 +30,7 @@ describe('Chat Component Overrides', () => {
         name: 'Rick',
         description: 'Rick Sanchez',
         avatar: '/avatars/rick.png',
-        title: "I'm Rickbot!",
+        title: "Override Test Title",
         overview: "Smartest man",
         welcome: "Whatever",
         prompt_question: "What do you want?"
@@ -48,8 +48,8 @@ describe('Chat Component Overrides', () => {
 
     // Wait for the component to render (and potential async effects)
     // The Persona Profile area has a borderLeft style.
-    // We can identify it by the text content, e.g., "I'm Rickbot!"
-    const profileTitle = await screen.findByText("I'm Rickbot!");
+    // We can identify it by the text content, e.g., "Override Test Title"
+    const profileTitle = await screen.findByText("Override Test Title");
     
     // The parent Paper component has the border. We need to find the specific element.
     // We traverse up to find the Paper component (MuiPaper-root) that contains this title.

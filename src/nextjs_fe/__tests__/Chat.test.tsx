@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within, act } from '@testing-library/react'
 import Chat from '../components/Chat'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
@@ -34,6 +34,12 @@ const waitForBotResponse = async () => {
     })
 }
 
+const waitForPersonalities = async () => {
+    await waitFor(() => {
+        expect(screen.getByText("Test Rickbot Title")).toBeInTheDocument()
+    })
+}
+
 describe('Chat', () => {
   const mockSession = {
     data: {
@@ -49,7 +55,7 @@ describe('Chat', () => {
         name: 'Rick', 
         description: 'Rick Sanchez', 
         avatar: '/avatars/rick.png',
-        title: "I'm Rickbot!",
+        title: "Test Rickbot Title",
         overview: "Smartest man",
         welcome: "Whatever",
         prompt_question: "What do you want?"
@@ -68,6 +74,7 @@ describe('Chat', () => {
 
   it('includes Authorization header in fetchPersonalities', async () => {
     render(<Chat />)
+    await waitForPersonalities()
     
     await waitFor(() => {
         expect(axios.get).toHaveBeenCalledWith(
@@ -83,6 +90,7 @@ describe('Chat', () => {
 
   it('includes Authorization header in handleSendMessage', async () => {
     render(<Chat />)
+    await waitForPersonalities()
     
     const input = screen.getByPlaceholderText('What do you want?')
     fireEvent.change(input, { target: { value: 'Hi' } })
@@ -104,6 +112,7 @@ describe('Chat', () => {
 
   it('clears messages and session_id when Clear Chat is clicked', async () => {
     render(<Chat />)
+    await waitForPersonalities()
     
     // Send a message first to populate state
     const input = screen.getByPlaceholderText('What do you want?')
@@ -162,8 +171,45 @@ describe('Chat', () => {
     })
   })
 
+  it('displays RagAgent status when RagAgent tool_call is received', async () => {
+    const readMock = jest.fn()
+        .mockResolvedValueOnce({ done: false, value: new TextEncoder().encode('data: {"tool_call": {"name": "RagAgent"}}\n\n') })
+        .mockImplementationOnce(async () => {
+            await sleep(50);
+            return { done: false, value: new TextEncoder().encode('data: {"chunk": "Based on my files..."}\n\n') };
+        })
+        .mockResolvedValueOnce({ done: true })
+
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+        status: 200,
+        body: {
+            getReader: () => ({
+                read: readMock
+            })
+        }
+    })
+
+    render(<Chat />)
+    await waitForPersonalities()
+
+    const input = screen.getByPlaceholderText('What do you want?')
+    fireEvent.change(input, { target: { value: 'What is in your knowledge base?' } })
+    fireEvent.click(screen.getByText('Send'))
+
+    // Verify it shows RagAgent status
+    await waitFor(() => {
+        expect(screen.getByText(/RagAgent/i)).toBeInTheDocument()
+    })
+    
+    // Verify it eventually shows the response
+    await waitFor(() => {
+        expect(screen.getByText(/Based on my files/i)).toBeInTheDocument()
+    })
+  })
+
   it('handles multi-file upload and renders them inline', async () => {
     const { container } = render(<Chat />)
+    await waitForPersonalities()
     
     const input = container.querySelector('input[type="file"]') as HTMLInputElement
     const file1 = new File(['hello'], 'hello.png', { type: 'image/png' })
@@ -190,8 +236,9 @@ describe('Chat', () => {
     await waitForBotResponse()
   })
 
-  it('renders the Meeseeks Box icon for the New Chat button with a Badge', () => {
+  it('renders the Meeseeks Box icon for the New Chat button with a Badge', async () => {
     render(<Chat />)
+    await waitForPersonalities()
     const icon = screen.getByTestId('meeseeks-box-icon')
     expect(icon).toBeInTheDocument()
     expect(icon).toHaveAttribute('src', '/meeseeks.webp')
@@ -201,6 +248,7 @@ describe('Chat', () => {
 
   it('renders the Portal Gun icon for the Send button and triggers animation', async () => {
     render(<Chat />)
+    await waitForPersonalities()
     const icon = screen.getByTestId('portal-gun-icon')
     expect(icon).toBeInTheDocument()
     expect(icon).toHaveAttribute('src', '/portal_gun_trans.png')
@@ -215,7 +263,7 @@ describe('Chat', () => {
     await waitForBotResponse()
   })
 
-  it('applies the Portal Green primary color to key elements', () => {
+  it('applies the Portal Green primary color to key elements', async () => {
     // We need to wrap in ThemeProvider to test the actual theme application
     const { ThemeProvider } = require('@mui/material/styles')
     const theme = require('../styles/theme').default
@@ -225,6 +273,7 @@ describe('Chat', () => {
             <Chat />
         </ThemeProvider>
     )
+    await waitForPersonalities()
 
     // The Rickbot title should use primary color
     // We target the H4 specifically to avoid ambiguity if 'Rickbot' appears elsewhere
@@ -274,6 +323,7 @@ describe('Chat', () => {
     ])('it should display correct avatar for $case', async ({ session, message, expectedAvatar }) => {
       (useSession as jest.Mock).mockReturnValue(session);
       render(<Chat />);
+      await waitForPersonalities();
       const messageItem = await sendMessage(message);
       const avatarInMessage = within(messageItem!).getByRole('img');
       expect(avatarInMessage).toHaveAttribute('src', expectedAvatar);
