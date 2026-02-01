@@ -5,6 +5,7 @@ We then cache these agents for fast retrieval.
 """
 
 import functools
+import os
 from textwrap import dedent
 from typing import Any
 
@@ -18,10 +19,54 @@ from rickbot_utils.config import config, logger
 from .personality import Personality, get_personalities
 from .tools_custom import FileSearchTool
 
-client = genai.Client()
+client = genai.Client(
+    vertexai=config.genai_use_vertexai,
+    api_key=os.getenv("GEMINI_API_KEY") if not config.genai_use_vertexai else None
+)
 if not client:
     logger.error("Could not initialize GenAI client.")
     raise ValueError("Could not initialize GenAI client.")
+
+# Monkey-patch genai.Client to force non-Vertex use if configured
+# This is necessary because ADK Agents instantiate their own client and don't accept one as an argument
+if not config.genai_use_vertexai:
+    # Protect against multiple patching (e.g. reloads)
+    if not getattr(genai.Client, "_is_patched", False):
+        logger.info("Monkey-patching google.genai.Client to force vertexai=False")
+        _OriginalClient = genai.Client
+
+        class _PatchedClient(_OriginalClient):
+            _is_patched = True
+            def __init__(self, *args, **kwargs):
+                logger.debug(f"Intercepted genai.Client init. Args: {args}, Kwargs: {kwargs}")
+                kwargs['vertexai'] = False  # Force vertexai=False
+                if 'api_key' not in kwargs or kwargs['api_key'] is None:
+                     kwargs['api_key'] = os.getenv("GEMINI_API_KEY")
+
+                # Set large timeout to cover ms vs seconds ambiguity
+                # The 'read operation timed out' error with small values suggests the unit might be mapped
+                # to milliseconds in some contexts, or that network latency varies significantly.
+                # 60000 ensures that:
+                # 1. If unit is ms, we wait 60s (reasonable for RAG).
+                # 2. If unit is seconds, we effectively eliminate the timeout (preventing premature disconnects),
+                #    relying on the underlying transport to eventually succeed or fail.
+                # This fixes the "Intermittent Hang" issue where the client would stall or fail instantly.
+                if 'http_options' not in kwargs:
+                    kwargs['http_options'] = {}
+                if kwargs['http_options'] is None:
+                     kwargs['http_options'] = {}
+
+                kwargs['http_options']['timeout'] = 60000
+
+                super().__init__(*args, **kwargs)
+
+        # Apply the monkey-patch to the class
+        # This ensures that ANY instantiation of genai.Client within the application (e.g. by ADK agents)
+        # automatically uses the configured behavior (AI Studio backend, API Key injection, and Timeout safety).
+        genai.Client = _PatchedClient
+    else:
+        logger.debug("google.genai.Client is already monkey-patched.")
+
 
 @functools.cache
 def get_store(store_name: str):
@@ -33,7 +78,8 @@ def get_store(store_name: str):
     """
     try:
         # Use a non-Vertex client for store management
-        store_client = genai.Client(vertexai=False)
+        # Note: genai.Client is now patched, so calling Client() works correctly
+        store_client = genai.Client()
         for a_store in store_client.file_search_stores.list():
             if a_store.display_name == store_name:
                 logger.debug(f"Found and returning store: {a_store.name}")
@@ -116,10 +162,12 @@ def create_agent(personality: Personality) -> Agent:
                 1. **RagAgent (Internal Knowledge)**: This is your PRIORITIZED source. It contains information about: {kb_topic}.
                 2. **SearchAgent (External Web)**: Use ONLY if the RagAgent returns "NOT_FOUND".
 
-                CRITICAL: If a user asks a question related to any of the topics in {kb_topic},
-                you MUST start by searching using the RagAgent.
-                Only use the SearchAgent if the RagAgent does not provide a relevant answer.
-                You do not need to use the RagAgent to respond to greetings or small talk.
+                CRITICAL: The RagAgent contains the DEFINITIVE and REQUIRED opinions, methodologies, and facts for {kb_topic}.
+                Even if you have general knowledge about these topics, you MUST consult the RagAgent first to ensure your response
+                aligns with the specific internal standards and philosophy.
+                NEVER answer questions about these topics based solely on your training data.
+                Only use the SearchAgent if the RagAgent returns "NOT_FOUND".
+                You do not need to use the RagAgent to respond to simple greetings or small talk.
             """)
 
             desc_suffix = (

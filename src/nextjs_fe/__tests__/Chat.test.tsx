@@ -210,7 +210,7 @@ describe('Chat', () => {
 
     // Verify it shows RagAgent status
     await waitFor(() => {
-        expect(screen.getByText(/RagAgent/i)).toBeInTheDocument()
+        expect(screen.getByText(/Knowledge Base/i)).toBeInTheDocument()
     })
     
     // Verify it eventually shows the response

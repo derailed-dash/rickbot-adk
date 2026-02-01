@@ -47,7 +47,18 @@ This file builds the legacy Streamlit interface (and is also used by the ADK web
 *   **Base Image**: `python:3.12-slim`.
 *   **Usage**: Used for the `streamlit_fe` service and CI/CD pipelines (until they are fully migrated to the sidecar pattern).
 
-## Local Development (Docker Compose)
+### 4. Unified Container (`Dockerfile.unified`)
+
+This Dockerfile combines both the Frontend and Backend into a single image.
+
+*   **Rationale**: Simplifies deployment to environments that prefer a single artifact (like simple Cloud Run services) or for easier local testing without orchestration complexity.
+*   **Mechanism**:
+    *   Builds Backend (Python/FastAPI).
+    *   Builds Frontend (Next.js Standalone).
+    *   Combines them into a generic `python:3.12-slim` image.
+    *   Uses `scripts/start-unified.sh` to launch both processes in the background.
+    *   **Proxy**: The Next.js frontend is configured to rewrite `/chat` and `/personas` requests to `http://127.0.0.1:8000`, allowing them to communicate over localhost within the container.
+*   **Security**: Runs as `app-user`.
 
 The `docker-compose.yml` file orchestrates these services for a seamless local development experience that mirrors our production architecture.
 

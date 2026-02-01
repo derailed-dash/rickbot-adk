@@ -28,9 +28,9 @@ const toolMap: Record<string, { label: string; icon: React.ReactNode; color: str
     color: '#34A853',
   },
   'RagAgent': {
-    label: 'RagAgent',
-    icon: <PsychologyIcon fontSize="small" />,
-    color: '#39FF14', // Match portal green for consistency with the screenshot
+    label: 'Knowledge Base',
+    icon: <StorageIcon fontSize="small" />,
+    color: '#39FF14',
   },
   'Responding': {
     label: 'Responding',

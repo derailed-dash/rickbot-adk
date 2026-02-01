@@ -2,6 +2,7 @@ const nextConfig = {
   /* config options here */
   reactStrictMode: true,
   output: 'standalone',
+  compress: false,
   async rewrites() {
     return [
       {

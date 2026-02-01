@@ -47,7 +47,7 @@ def test_create_agent_attaches_file_search_tool_for_any_personality(mock_get_sto
     # 1. Check instruction contains the new Tool Usage Policy header and prioritization
     assert "## TOOL USAGE POLICY:" in agent.instruction
     assert "1. **RagAgent (Internal Knowledge)**: This is your PRIORITIZED source" in agent.instruction
-    assert "CRITICAL: If a user asks a question related to any of the topics" in agent.instruction
+    assert "CRITICAL: The RagAgent contains the DEFINITIVE and REQUIRED opinions" in agent.instruction
 
     # 2. Check tools include AgentTool for RagAgent
     rag_agent_tool = next((t for t in agent.tools if isinstance(t, AgentTool) and t.agent.name == "RagAgent"), None)

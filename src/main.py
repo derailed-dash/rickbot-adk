@@ -224,9 +224,9 @@ async def chat(
         # Log tool calls and transfers
         if function_calls := event.get_function_calls():
             for fc in function_calls:
-                logger.info(f"Session {current_session_id} calling tool: {fc.name}")
+                logger.debug(f"Session {current_session_id} calling tool: {fc.name}")
         if event.actions and event.actions.transfer_to_agent:
-            logger.info(f"Session {current_session_id} transferring to agent: {event.actions.transfer_to_agent}")
+            logger.debug(f"Session {current_session_id} transferring to agent: {event.actions.transfer_to_agent}")
 
         if event.is_final_response() and event.content and event.content.parts:
             for part in event.content.parts:
@@ -312,18 +312,21 @@ async def chat_stream(
                 # Check for tool calls
                 if function_calls := event.get_function_calls():
                     for fc in function_calls:
-                        logger.info(f"Tool Call: {fc.name}")
+                        logger.debug(f"Tool Call: {fc.name} Args: {fc.args}")
                         yield f"data: {json.dumps({'tool_call': {'name': fc.name, 'args': fc.args}})}\n\n"
+                        yield f": {' ' * 4096}\n\n"
 
                 # Check for tool responses
                 if function_responses := event.get_function_responses():
                     for fr in function_responses:
-                        logger.info(f"Tool Response: {fr.name}")
+                        logger.debug(f"Tool Response: {fr.name}")
+                        logger.debug(f"Tool Response Content: {str(fr.response)[-100:]}")
                         yield f"data: {json.dumps({'tool_response': {'name': fr.name}})}\n\n"
+                        yield f": {' ' * 4096}\n\n"
 
                 # Check for agent transfers
                 if event.actions and event.actions.transfer_to_agent:
-                    logger.info(f"Agent Transfer: {event.actions.transfer_to_agent}")
+                    logger.debug(f"Agent Transfer: {event.actions.transfer_to_agent}")
                     yield f"data: {json.dumps({'agent_transfer': event.actions.transfer_to_agent})}\n\n"
 
                 # For model responses, we want to stream the chunks
