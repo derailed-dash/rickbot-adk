@@ -4,11 +4,11 @@
 
 # Get project information to access the project number
 data "google_project" "project" {
-  for_each = local.deploy_project_ids
+  for_each   = local.deploy_project_ids
   project_id = local.deploy_project_ids[each.key]
 }
 
-resource "google_cloud_run_v2_service" "app_staging" {  
+resource "google_cloud_run_v2_service" "app_staging" {
   name                = var.project_name
   location            = var.region
   project             = var.staging_project_id
@@ -27,29 +27,14 @@ resource "google_cloud_run_v2_service" "app_staging" {
         }
         startup_cpu_boost = true
       }
-
-    #   env {
-    #     name  = "DB_HOST"
-    #     value = google_alloydb_instance.session_db_instance["staging"].ip_address
-    #   }
-
-    #   env {
-    #     name = "DB_PASS"
-    #     value_source {
-    #       secret_key_ref {
-    #         secret  = google_secret_manager_secret.db_password["staging"].secret_id
-    #         version = "latest"
-    #       }
-    #     }
-    #   }
     }
 
-    service_account = google_service_account.app_sa["staging"].email
+    service_account                  = google_service_account.app_sa["staging"].email
     max_instance_request_concurrency = 40
 
     scaling {
-      min_instance_count = 0
-      max_instance_count = 1
+      min_instance_count = var.staging_min_instances
+      max_instance_count = var.staging_max_instances
     }
 
     session_affinity = true
@@ -84,7 +69,7 @@ resource "google_cloud_run_domain_mapping" "app_staging_domain_mapping" {
   }
 }
 
-resource "google_cloud_run_v2_service" "app_prod" {  
+resource "google_cloud_run_v2_service" "app_prod" {
   name                = var.project_name
   location            = var.region
   project             = var.prod_project_id
@@ -98,21 +83,20 @@ resource "google_cloud_run_v2_service" "app_prod" {
 
       resources {
         limits = {
-          cpu    = "2"
-          memory = "4Gi"
+          cpu    = "1"
+          memory = "2Gi"
         }
         # cpu_idle = false
         startup_cpu_boost = true
       }
-
     }
 
-    service_account = google_service_account.app_sa["prod"].email
+    service_account                  = google_service_account.app_sa["prod"].email
     max_instance_request_concurrency = 40
 
     scaling {
-      min_instance_count = 0
-      max_instance_count = 1
+      min_instance_count = var.prod_min_instances
+      max_instance_count = var.prod_max_instances
     }
 
     session_affinity = true
@@ -137,7 +121,7 @@ resource "google_cloud_run_v2_service" "app_prod" {
 resource "google_cloud_run_domain_mapping" "app_prod_domain_mapping" {
   for_each = toset(var.prod_app_domain_name)
   name     = each.key
-  project  = var.prod_project_id  
+  project  = var.prod_project_id
   location = google_cloud_run_v2_service.app_prod.location
   metadata {
     namespace = data.google_project.project["prod"].project_id

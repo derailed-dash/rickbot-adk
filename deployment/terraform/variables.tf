@@ -52,27 +52,27 @@ variable "prod_app_domain_name" {
 }
 
 variable "app_name" {
-  description  = "The name of the UI client application"
-  type         = string
-  default      = "rickbot_st_ui"
+  description = "The name of the UI client application"
+  type        = string
+  default     = "rickbot_st_ui"
 }
 
 variable "agent_name" {
-  description  = "The name of the Ricbot agent"
-  type         = string
-  default      = "rickbot_agent"
+  description = "The name of the Ricbot agent"
+  type        = string
+  default     = "rickbot_agent"
 }
 
 variable "google_genai_use_vertexai" {
-  description  = "Whether to use Vertex AI for auth, rather than API Key"
-  type         = bool
-  default      = false
+  description = "Whether to use Vertex AI for auth, rather than API Key"
+  type        = bool
+  default     = false
 }
 
 variable "model" {
-  description  = "The model used by the agent"
-  type         = string
-  default      = "gemini-2.5-flash"
+  description = "The model used by the agent"
+  type        = string
+  default     = "gemini-2.5-flash"
 }
 
 variable "log_level" {
@@ -119,7 +119,7 @@ variable "cicd_roles" {
   default = [
     "roles/run.admin",
     "roles/run.invoker",
-    "roles/iam.serviceAccountAdmin",    
+    "roles/iam.serviceAccountAdmin",
     "roles/storage.admin",
     "roles/aiplatform.user",
     "roles/discoveryengine.editor",
@@ -135,7 +135,7 @@ variable "cicd_sa_deployment_required_roles" {
   description = "List of roles to assign to the CICD runner service account for the Staging and Prod projects."
   type        = list(string)
   default = [
-    "roles/run.admin",    
+    "roles/run.admin",
     "roles/iam.serviceAccountUser",
     "roles/aiplatform.user",
     "roles/storage.admin",
@@ -205,4 +205,28 @@ variable "google_cloud_location" {
   description = "Google Cloud Location for GenAI resources (e.g., 'global')."
   type        = string
   default     = "global"
+}
+
+variable "staging_min_instances" {
+  description = "Minimum number of instances for the Staging Cloud Run service."
+  type        = number
+  default     = 0
+}
+
+variable "staging_max_instances" {
+  description = "Maximum number of instances for the Staging Cloud Run service."
+  type        = number
+  default     = 1
+}
+
+variable "prod_min_instances" {
+  description = "Minimum number of instances for the Prod Cloud Run service."
+  type        = number
+  default     = 0
+}
+
+variable "prod_max_instances" {
+  description = "Maximum number of instances for the Prod Cloud Run service."
+  type        = number
+  default     = 1
 }

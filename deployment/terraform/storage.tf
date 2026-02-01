@@ -1,5 +1,5 @@
 provider "google" {
-  region = var.region
+  region                = var.region
   user_project_override = true
 }
 
@@ -19,7 +19,7 @@ resource "google_storage_bucket" "bucket_load_test_results" {
     }
   }
 
-  depends_on                  = [resource.google_project_service.cicd_services, resource.google_project_service.deploy_project_services]
+  depends_on = [resource.google_project_service.cicd_services, resource.google_project_service.deploy_project_services]
 }
 
 resource "google_storage_bucket" "logs_data_bucket" {

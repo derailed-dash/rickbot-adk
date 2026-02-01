@@ -23,6 +23,7 @@ steps:
       - "--image=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA"
       - "--region=${_REGION}"
       - "--project=${_STAGING_PROJECT_ID}"
+      - '--min-instances=$_MIN_INSTANCES'
       - '--max-instances=$_MAX_INSTANCES'
       - '--cpu-boost'
       - '--set-env-vars=GOOGLE_CLOUD_PROJECT=$_STAGING_PROJECT_ID,GOOGLE_CLOUD_REGION=$_REGION,LOG_LEVEL=$_LOG_LEVEL,APP_NAME=$_APP_NAME,AGENT_NAME=$_AGENT_NAME,GOOGLE_GENAI_USE_VERTEXAI=$_GOOGLE_GENAI_USE_VERTEXAI,MODEL=$_MODEL,AUTH_REQUIRED=$_AUTH_REQUIRED,RATE_LIMIT=$_RATE_LIMIT,GOOGLE_CLOUD_LOCATION=$_GOOGLE_CLOUD_LOCATION'
@@ -49,39 +50,6 @@ steps:
       - "-c"
       - |
         echo $(gcloud auth print-identity-token -q) > id_token.txt
-
-  # Load Testing
-  # - name: "python:3.11-slim"
-  #   id: load_test
-  #   entrypoint: /bin/bash
-  #   args:
-  #     - "-c"
-  #     - |
-  #       export _ID_TOKEN=$(cat id_token.txt)
-  #       export _STAGING_URL=$(cat staging_url.txt)
-  #       pip install locust==2.31.1 --user
-  #       locust -f src/tests/load_test/load_test.py \
-  #       --headless \
-  #       -H $$_STAGING_URL \
-  #       -t 30s -u 10 -r 0.5 \
-  #       --csv=src/tests/load_test/.results/results \
-  #       --html=src/tests/load_test/.results/report.html
-  #   env:
-  #     - 'PATH=/usr/local/bin:/usr/bin:~/.local/bin'
-
-  # Export Load Test Results to GCS
-  # - name: gcr.io/cloud-builders/gcloud
-  #   id: export-results-to-gcs
-  #   entrypoint: /bin/bash
-  #   args:
-  #     - "-c"
-  #     - |
-  #       export _TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-  #       gsutil -m cp -r src/tests/load_test/.results gs://${_BUCKET_NAME_LOAD_TEST_RESULTS}/results-$${_TIMESTAMP}
-  #       echo "_________________________________________________________________________"
-  #       echo "Load test results copied to gs://${_BUCKET_NAME_LOAD_TEST_RESULTS}/results-$${_TIMESTAMP}"
-  #       echo "HTTP link: https://console.cloud.google.com/storage/browser/${_BUCKET_NAME_LOAD_TEST_RESULTS}/results-$${_TIMESTAMP}"
-  #       echo "_________________________________________________________________________"
 
   # Trigger Prod Deployment
   - name: gcr.io/cloud-builders/gcloud
@@ -125,9 +93,10 @@ substitutions:
   _GOOGLE_GENAI_USE_VERTEXAI: "False"
   _MODEL: "gemini-2.5-flash"
   _AUTH_REQUIRED: "False"
-  _RATE_LIMIT: "120"
+  _RATE_LIMIT: "60"
   _GOOGLE_CLOUD_LOCATION: "global"
   _MAX_INSTANCES: "1"
+  _MIN_INSTANCES: "0"
 tags:
   - gcp-cloud-build-deploy-cloud-run
-  - rickbot-adk 
+  - rickbot-adk

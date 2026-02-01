@@ -24,9 +24,9 @@ resource "google_cloudbuild_trigger" "pr_checks" {
   ]
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
   depends_on = [
-    resource.google_project_service.cicd_services, 
-    resource.google_project_service.deploy_project_services, 
-    google_cloudbuildv2_connection.github_connection, 
+    resource.google_project_service.cicd_services,
+    resource.google_project_service.deploy_project_services,
+    google_cloudbuildv2_connection.github_connection,
     google_cloudbuildv2_repository.repo
   ]
 }
@@ -69,16 +69,17 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     _GOOGLE_GENAI_USE_VERTEXAI     = var.google_genai_use_vertexai
     _MODEL                         = var.model
     _LOG_LEVEL                     = "DEBUG"
-    _MAX_INSTANCES                 = "1"
+    _MIN_INSTANCES                 = var.staging_min_instances
+    _MAX_INSTANCES                 = var.staging_max_instances
     _AUTH_REQUIRED                 = var.auth_required
     _RATE_LIMIT                    = var.rate_limit
     _GOOGLE_CLOUD_LOCATION         = var.google_cloud_location
   }
 
   depends_on = [
-    resource.google_project_service.cicd_services, 
-    resource.google_project_service.deploy_project_services, 
-    google_cloudbuildv2_connection.github_connection, 
+    resource.google_project_service.cicd_services,
+    resource.google_project_service.deploy_project_services,
+    google_cloudbuildv2_connection.github_connection,
     google_cloudbuildv2_repository.repo
   ]
 
@@ -94,31 +95,32 @@ resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
   repository_event_config {
     repository = "projects/${var.cicd_runner_project_id}/locations/${var.cb_region}/connections/${var.host_connection_name}/repositories/${var.repository_name}"
   }
-  filename = ".cloudbuild/deploy-to-prod.yaml"
+  filename           = ".cloudbuild/deploy-to-prod.yaml"
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
   approval_config {
     approval_required = true
   }
   substitutions = {
-    _PROD_PROJECT_ID             = var.prod_project_id
+    _PROD_PROJECT_ID = var.prod_project_id
     # Use the region for the Cloud Run service, not the build trigger
-    _REGION                      = var.region
-    _ARTIFACT_REPO_NAME          = var.artifact_repo_name
-    _SERVICE_NAME                = var.service_name
-    _APP_NAME                    = var.app_name
-    _AGENT_NAME                  = var.agent_name
-    _GOOGLE_GENAI_USE_VERTEXAI   = var.google_genai_use_vertexai
-    _MODEL                       = var.model
-    _LOG_LEVEL                   = var.log_level
-    _MAX_INSTANCES               = "1"
-    _AUTH_REQUIRED                 = var.auth_required
-    _RATE_LIMIT                    = var.rate_limit
-    _GOOGLE_CLOUD_LOCATION         = var.google_cloud_location
+    _REGION                    = var.region
+    _ARTIFACT_REPO_NAME        = var.artifact_repo_name
+    _SERVICE_NAME              = var.service_name
+    _APP_NAME                  = var.app_name
+    _AGENT_NAME                = var.agent_name
+    _GOOGLE_GENAI_USE_VERTEXAI = var.google_genai_use_vertexai
+    _MODEL                     = var.model
+    _LOG_LEVEL                 = var.log_level
+    _MIN_INSTANCES             = var.prod_min_instances
+    _MAX_INSTANCES             = var.prod_max_instances
+    _AUTH_REQUIRED             = var.auth_required
+    _RATE_LIMIT                = var.rate_limit
+    _GOOGLE_CLOUD_LOCATION     = var.google_cloud_location
   }
   depends_on = [
-    resource.google_project_service.cicd_services, 
-    resource.google_project_service.deploy_project_services, 
-    google_cloudbuildv2_connection.github_connection, 
+    resource.google_project_service.cicd_services,
+    resource.google_project_service.deploy_project_services,
+    google_cloudbuildv2_connection.github_connection,
     google_cloudbuildv2_repository.repo
   ]
 

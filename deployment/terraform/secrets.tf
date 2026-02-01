@@ -2,8 +2,8 @@
 # Does NOT create any values
 
 resource "google_secret_manager_secret" "dazbo_system_prompt" {
-  for_each      = local.deploy_project_ids
-  project       = each.value
+  for_each  = local.deploy_project_ids
+  project   = each.value
   secret_id = "dazbo-system-prompt"
 
   replication {
@@ -12,8 +12,8 @@ resource "google_secret_manager_secret" "dazbo_system_prompt" {
 }
 
 resource "google_secret_manager_secret" "rickbot-streamlit-secrets-toml" {
-  for_each      = local.deploy_project_ids
-  project       = each.value
+  for_each  = local.deploy_project_ids
+  project   = each.value
   secret_id = "rickbot-streamlit-secrets-toml"
 
   replication {
@@ -25,8 +25,8 @@ resource "google_secret_manager_secret" "rickbot-streamlit-secrets-toml" {
 # We can then populate the secret like this:
 # gcloud secrets versions add gemini-api-key --data="<API_KEY>"
 resource "google_secret_manager_secret" "gemini_api_key" {
-  for_each = local.deploy_project_ids
-  project  = each.value
+  for_each  = local.deploy_project_ids
+  project   = each.value
   secret_id = "gemini-api-key"
 
   replication {

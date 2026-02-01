@@ -4,7 +4,7 @@ provider "github" {
 
 # Try to get existing repo
 data "github_repository" "existing_repo" {
-  count = var.create_repository ? 0 : 1
+  count     = var.create_repository ? 0 : 1
   full_name = "${var.repository_owner}/${var.repository_name}"
 }
 
@@ -24,7 +24,7 @@ resource "github_repository" "repo" {
   allow_merge_commit = true
   allow_squash_merge = true
   allow_rebase_merge = true
-  
+
   auto_init = false
 }
 
@@ -38,10 +38,10 @@ data "google_secret_manager_secret" "github_pat" {
 
 # Create the GitHub connection (fallback for manual Terraform usage)
 resource "google_cloudbuildv2_connection" "github_connection" {
-  count      = var.create_cb_connection ? 0 : 1
-  project    = var.cicd_runner_project_id
-  location   = var.cb_region
-  name       = var.host_connection_name
+  count    = var.create_cb_connection ? 0 : 1
+  project  = var.cicd_runner_project_id
+  location = var.cb_region
+  name     = var.host_connection_name
 
   github_config {
     app_installation_id = var.github_app_installation_id
@@ -57,10 +57,10 @@ resource "google_cloudbuildv2_repository" "repo" {
   project  = var.cicd_runner_project_id
   location = var.cb_region
   name     = var.repository_name
-  
+
   # Use existing connection ID when it exists, otherwise use the created connection
   parent_connection = var.create_cb_connection ? "projects/${var.cicd_runner_project_id}/locations/${var.cb_region}/connections/${var.host_connection_name}" : google_cloudbuildv2_connection.github_connection[0].id
-  remote_uri       = "https://github.com/${var.repository_owner}/${var.repository_name}.git"
+  remote_uri        = "https://github.com/${var.repository_owner}/${var.repository_name}.git"
   depends_on = [
     resource.google_project_service.cicd_services,
     resource.google_project_service.deploy_project_services,

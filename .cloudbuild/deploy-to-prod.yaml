@@ -6,10 +6,10 @@ steps:
       - "run"
       - "deploy"
       - "$_SERVICE_NAME"
-      # Deploy the specific image that was built and tested in the staging pipeline
       - "--image=$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA"
       - "--region=$_REGION"
       - "--project=$_PROD_PROJECT_ID"
+      - '--min-instances=$_MIN_INSTANCES'
       - '--max-instances=$_MAX_INSTANCES'
       - '--cpu-boost'
       - '--set-env-vars=GOOGLE_CLOUD_PROJECT=$_PROD_PROJECT_ID,GOOGLE_CLOUD_REGION=$_REGION,LOG_LEVEL=$_LOG_LEVEL,APP_NAME=$_APP_NAME,AGENT_NAME=$_AGENT_NAME,GOOGLE_GENAI_USE_VERTEXAI=$_GOOGLE_GENAI_USE_VERTEXAI,MODEL=$_MODEL,AUTH_REQUIRED=$_AUTH_REQUIRED,RATE_LIMIT=$_RATE_LIMIT,GOOGLE_CLOUD_LOCATION=$_GOOGLE_CLOUD_LOCATION'
@@ -33,6 +33,7 @@ substitutions:
   _RATE_LIMIT: "60"
   _GOOGLE_CLOUD_LOCATION: "global"
   _MAX_INSTANCES: "1"
+  _MIN_INSTANCES: "1"
 
 logsBucket: gs://${PROJECT_ID}-logs-data/build-logs
 options:
