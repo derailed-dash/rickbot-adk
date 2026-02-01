@@ -46,6 +46,11 @@ from rickbot_utils.rate_limit import limiter
 
 APP_NAME = "rickbot_api"
 
+# SSE (Server-Sent Events) padding constant
+# This forces network buffers to flush immediately, ensuring the UI receives
+# "Thinking..." indicators without delay. 4KB is a common buffer size threshold.
+SSE_FLUSH_PADDING_BYTES = 4096
+
 
 def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
     """Custom handler for rate limit exceeded errors."""
@@ -314,7 +319,7 @@ async def chat_stream(
                     for fc in function_calls:
                         logger.debug(f"Tool Call: {fc.name} Args: {fc.args}")
                         yield f"data: {json.dumps({'tool_call': {'name': fc.name, 'args': fc.args}})}\n\n"
-                        yield f": {' ' * 4096}\n\n"
+                        yield f": {' ' * SSE_FLUSH_PADDING_BYTES}\n\n"
 
                 # Check for tool responses
                 if function_responses := event.get_function_responses():

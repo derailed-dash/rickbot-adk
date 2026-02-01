@@ -13,6 +13,13 @@ RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
     uv sync --locked --no-dev --no-install-project
 
 # Whitelist Copy for API Backend
+# MAINTENANCE NOTE: These explicit COPY instructions optimize layer caching by copying
+# only backend-specific code. If you add new top-level modules under src/ that the backend
+# needs, you MUST add them here. Current backend modules:
+#   - src/main.py (FastAPI entry point)
+#   - src/rickbot_agent/ (agent logic)
+#   - src/rickbot_utils/ (shared utilities)
+# Frontend code (src/nextjs_fe/, src/streamlit_fe/) is intentionally excluded.
 COPY ./src/main.py ./src/main.py
 COPY ./src/rickbot_agent ./src/rickbot_agent
 COPY ./src/rickbot_utils ./src/rickbot_utils
