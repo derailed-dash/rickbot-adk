@@ -10,6 +10,29 @@ Subsequent deployment runs can easily be invoked using `make terraform` from the
 
 ## Deployment Overview
 
+### Unified Container Architecture
+
+The application is deployed as a single, unified container based on `Dockerfile.unified`. This image incorporates:
+*   **React Frontend**: Built using Next.js (Node.js v20), served statically or via SSR.
+*   **FastAPI Backend**: Serving the agent API and ADK-powered chat functionalities.
+*   **Reverse Proxy**: The container manages routing between the UI and API layers.
+
+### Mandatory Environment Variables and Secrets
+
+The following configurations are required for the application to function, particularly for authentication:
+
+| Variable/Secret | Type | Description |
+| :--- | :--- | :--- |
+| `NEXTAUTH_SECRET` | Secret | Random string for signing session cookies. |
+| `GOOGLE_CLIENT_ID` | Variable | OAuth Client ID from Google Cloud Console. |
+| `GOOGLE_CLIENT_SECRET` | Secret | OAuth Client Secret from Google Cloud Console. |
+| `GITHUB_CLIENT_ID` | Variable | OAuth Client ID from GitHub Developer settings. |
+| `GITHUB_CLIENT_SECRET` | Secret | OAuth Client Secret from GitHub Developer settings. |
+| `NEXTAUTH_URL` | Variable | The base URL of the application (e.g., `https://staging.rickbot.co.uk`). |
+
+#### `NEXTAUTH_URL` Management
+In the continuous deployment pipeline, `NEXTAUTH_URL` is automatically derived by Terraform from the `staging_app_domain_name` or `prod_app_domain_name` variables and passed as a Cloud Build substitution.
+
 ### Environment Management: Staging and Production
 
 This project utilizes distinct Google Cloud Projects to manage **staging** and **production** environments. This separation ensures isolation and allows for independent testing and deployment workflows.
