@@ -146,6 +146,7 @@ async def _patched_run_async_impl(self, *, args: dict[str, Any], tool_context: T
     # SAFETY CHECK
     if not last_content.parts:
         logger.warning(f"AgentTool {self.name}: Received content with no parts. Returning empty string.")
+        logger.debug(f"Full content dump: {last_content}")
         return ''
 
     merged_text = '\n'.join(p.text for p in last_content.parts if p.text)
