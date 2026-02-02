@@ -33,3 +33,32 @@ resource "google_secret_manager_secret" "gemini_api_key" {
     auto {}
   }
 }
+resource "google_secret_manager_secret" "nextauth_secret" {
+  for_each  = local.deploy_project_ids
+  project   = each.value
+  secret_id = "nextauth-secret"
+
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret" "google_client_secret" {
+  for_each  = local.deploy_project_ids
+  project   = each.value
+  secret_id = "google-client-secret"
+
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret" "github_client_secret" {
+  for_each  = local.deploy_project_ids
+  project   = each.value
+  secret_id = "github-client-secret"
+
+  replication {
+    auto {}
+  }
+}

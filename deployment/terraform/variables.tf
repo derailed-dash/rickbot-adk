@@ -230,3 +230,23 @@ variable "prod_max_instances" {
   type        = number
   default     = 1
 }
+
+variable "GOOGLE_CLIENT_ID_STAGING" {
+  description = "Google Client ID for Staging environment"
+  type        = string
+}
+
+variable "GOOGLE_CLIENT_ID_PROD" {
+  description = "Google Client ID for Production environment"
+  type        = string
+}
+
+variable "GITHUB_CLIENT_ID_STAGING" {
+  description = "GitHub Client ID for Staging environment"
+  type        = string
+}
+
+variable "GITHUB_CLIENT_ID_PROD" {
+  description = "GitHub Client ID for Production environment"
+  type        = string
+}
