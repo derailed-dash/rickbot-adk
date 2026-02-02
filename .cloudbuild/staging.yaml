@@ -6,7 +6,7 @@ steps:
       - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA"
       - "--destination=$_AR_HOSTNAME/$PROJECT_ID/$_ARTIFACT_REPO_NAME/$_SERVICE_NAME:latest"
       - "--context=."
-      - "--dockerfile=./Dockerfile.streamlit"
+      - "--dockerfile=./Dockerfile.unified"
       - "--cache=true"
       - "--cache-ttl=48h"
       - "--build-arg=COMMIT_SHA=$COMMIT_SHA"
@@ -87,7 +87,7 @@ substitutions:
   _AR_HOSTNAME: europe-west4-docker.pkg.dev
   _ARTIFACT_REPO_NAME: rickbot-adk
   _SERVICE_NAME: rickbot-adk
-  _APP_NAME: rickbot_st_ui
+  _APP_NAME: rickbot_react
   _AGENT_NAME: rickbot_agent
   _LOG_LEVEL: DEBUG
   _GOOGLE_GENAI_USE_VERTEXAI: "False"

@@ -24,7 +24,7 @@ substitutions:
   _REGION: europe-west4
   _ARTIFACT_REPO_NAME: rickbot-adk
   _SERVICE_NAME: rickbot-adk
-  _APP_NAME: rickbot_st_ui
+  _APP_NAME: rickbot_react
   _AGENT_NAME: rickbot_agent
   _LOG_LEVEL: INFO
   _GOOGLE_GENAI_USE_VERTEXAI: "False"
