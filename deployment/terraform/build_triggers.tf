@@ -76,6 +76,7 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     _GOOGLE_CLOUD_LOCATION         = var.google_cloud_location
     _GOOGLE_CLIENT_ID              = var.GOOGLE_CLIENT_ID_STAGING
     _GITHUB_CLIENT_ID              = var.GITHUB_CLIENT_ID_STAGING
+    _NEXTAUTH_URL                  = "https://${var.staging_app_domain_name[0]}"
   }
 
   depends_on = [
@@ -120,6 +121,7 @@ resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
     _GOOGLE_CLOUD_LOCATION     = var.google_cloud_location
     _GOOGLE_CLIENT_ID          = var.GOOGLE_CLIENT_ID_PROD
     _GITHUB_CLIENT_ID          = var.GITHUB_CLIENT_ID_PROD
+    _NEXTAUTH_URL              = "https://${var.prod_app_domain_name[0]}"
   }
   depends_on = [
     resource.google_project_service.cicd_services,

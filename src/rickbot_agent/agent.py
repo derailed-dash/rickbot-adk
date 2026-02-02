@@ -146,6 +146,8 @@ async def _patched_run_async_impl(self, *, args: dict[str, Any], tool_context: T
     # SAFETY CHECK
     if not last_content.parts:
         logger.warning(f"AgentTool {self.name}: Received content with no parts. Returning empty string.")
+        # last_content is likely google.genai.types.Content, which might not expose finish_reason directly here.
+        # dumping it to debug.
         logger.debug(f"Full content dump: {last_content}")
         return ''
 
