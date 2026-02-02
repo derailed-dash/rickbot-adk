@@ -242,7 +242,7 @@ This introduction of the proxy layer revealed two critical issues that were mask
 *   **Symptom**: When the agent attempted to use the `RagAgent` (File Search), the request would simply hang indefinitely in the UI until eventually failing (or timing out), with no response ever received.
 *   **Cause**: RAG operations are time-intensive (initializing the store, uploading files, waiting for indexing). The implicit timeouts in the containerized networking stack (and the `google-genai` client defaults) were shorter than the operation duration, causing the connection to be silently dropped or the client to give up before the result was ready.
 *   **Solution**:
-    *   **Monkey-Patching**: We patched `genai.Client` in `src/rickbot_agent/agent.py` to enforce `http_options={'timeout': 60}` (60 seconds).
+    *   **Monkey-Patching**: We patched `genai.Client` in `src/rickbot_agent/agent.py` to enforce `http_options={'timeout': 60000}` (60 seconds).
     *   **Explicit Timeouts**: This ensured the underlying gRPC transport remained open long enough for the complex RAG operations to complete, eliminating the hangs.
 
 ### A Note on Sidecar Applicability
