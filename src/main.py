@@ -48,7 +48,7 @@ from google.genai.types import Content, Part
 from rickbot_utils.config import logger
 from rickbot_utils.rate_limit import limiter
 
-APP_NAME = "rickbot_api"
+APP_NAME = getenv("APP_NAME", "rickbot_api")
 
 # SSE (Server-Sent Events) padding constant
 # This forces network buffers to flush immediately, ensuring the UI receives
