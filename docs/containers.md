@@ -135,7 +135,7 @@ With this structure:
 *   `Dockerfile.streamlit` uses `uv sync --extra streamlit` (includes them)
 *   Local development uses `make install` which runs `uv sync --extra streamlit` for full feature access
 
-**Result**: The unified container size was reduced by ~50-200MB, and the backend container became significantly leaner.
+**Result**: The unified container size was reduced by around 200MB.
 
 #### Process Management
 
@@ -206,6 +206,64 @@ make docker-frontend
 *   **"Not Authenticated"**: Ensure you are logged in (Mock Login works locally).
 *   **API Connection Failed**: Check if the backend container is running (`docker ps`) and accessible at `http://localhost:8080`. If the frontend cannot reach it, ensure `NEXT_PUBLIC_API_URL` was correctly set during the build (try rebuilding with `--build`).
 *   **Permissions Errors**: If the backend logs show permission errors accessing Google Cloud resources (like Secret Manager), ensure your local Application Default Credentials are set up and that the `GOOGLE_CLOUD_PROJECT` environment variable in `.env` matches the project your credentials have access to.
+
+## Evolution & Troubleshooting: The Unified Container Journey
+
+Transitioning from "Two Separate Containers" to a "Unified Container" introduced unexpected behaviors, primarily because it fundamentally changed how traffic reaches the backend API.
+
+### The Architecture Shift
+
+1.  **Two Separate Containers (Direct Access)**:
+    *   In the original architecture, the browser communicates with two distinct endpoints:
+        *   **Frontend**: `http://localhost:3000` (Next.js)
+        *   **Backend**: `http://localhost:8080` (FastAPI)
+    *   **Traffic Flow**: The browser sends chat requests *directly* to FastAPI. There is no middleman. Streaming responses flow directly to the client.
+
+2.  **Unified Container (Proxied Access)**:
+    *   In the unified container, only **one port** is exposed (e.g., 8080).
+    *   The browser sends all requests to the Next.js server. Next.js then *proxies* API requests to the backend (running on `localhost:8000` inside the container).
+    *   **Traffic Flow**: User -> Next.js (Node server) -> FastAPI.
+    *   **Impact**: This introduces a Node.js proxy layer into the real-time chat stream.
+
+### Compatibility Challenges
+
+This introduction of the proxy layer revealed two critical issues that were masked in the "Separate Containers" setup:
+
+#### 1. The "Silence" Problem (SSE Buffering)
+
+*   **Symptom**: The UI would remain stuck in the "Thinking..." state, failing to show granular updates (like "Searching Google..." or "Using RagAgent..."), even though the backend was generating them.
+*   **Cause**: The Node.js proxy buffered the small Server-Sent Events (SSE) chunks coming from FastAPI. Unlike the browser, which consumes streams immediately, the proxy waited to fill a buffer before flushing data to the client, effectively silencing the real-time feedback loop.
+*   **Solution**: We implemented a robust two-layer fix:
+    1.  **Headers**: Added `X-Accel-Buffering: no` and `Cache-Control: no-cache` to the `src/main.py` response. This explicitly instructs proxies (like Nginx) to disable buffering for the stream.
+    2.  **Protocol Padding**: As a failsafe, we append 4KB of whitespace padding (`SSE_FLUSH_PADDING_BYTES = 4096`) to critical events. This forces any recalcitrant proxy buffers (like Next.js rewrites) to flush immediately, ensuring "Thinking" updates are visible instantly.
+
+#### 2. The "Hang" Problem (RAG Timeouts)
+
+*   **Symptom**: When the agent attempted to use the `RagAgent` (File Search), the request would simply hang indefinitely in the UI until eventually failing (or timing out), with no response ever received.
+*   **Cause**: RAG operations are time-intensive (initializing the store, uploading files, waiting for indexing). The implicit timeouts in the containerized networking stack (and the `google-genai` client defaults) were shorter than the operation duration, causing the connection to be silently dropped or the client to give up before the result was ready.
+*   **Solution**:
+    *   **Monkey-Patching**: We patched `genai.Client` in `src/rickbot_agent/agent.py` to enforce `http_options={'timeout': 60000}` (60 seconds).
+    *   **Explicit Timeouts**: This ensured the underlying gRPC transport remained open long enough for the complex RAG operations to complete, eliminating the hangs.
+
+### A Note on Sidecar Applicability
+
+It is important to note that these challenges are not unique to the Unified Container strategy. If we had chosen the **Sidecar Pattern**, we would likely have encountered the same issues:
+
+*   **Buffering**: A sidecar setup typically proxies traffic via the frontend (ingress) to the backend (localhost sidecar), retaining the Node.js proxy layer that caused the buffering.
+*   **Timeouts**: The RAG timeout is intrinsic to the long-running nature of the operation and the networking defaults in Cloud Run limitations; separating the containers would not automatically resolve the client library's timeout behavior.
+
+Therefore, the fixes implemented (Padding and explicit Timeouts) are robust architectural improvements beneficial for *any* containerized deployment of this stack.
+
+### Validated Patterns
+
+Our solutions align with industry standard workarounds for these specific proxy and gRPC challenges:
+
+*   **SSE Padding**: 
+    *   [Buffer-defeating with padding (Stack Overflow)](https://stackoverflow.com/questions/13386681/streaming-data-with-php-and-nginx-fastcgi-flush-behavior)
+    *   [Nginx Proxy Buffering (ServerFault)](https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-configuration-is-required)
+*   **gRPC Timeouts**:
+    *   [Cloud Run gRPC Timeouts (Google Cloud Docs)](https://cloud.google.com/run/docs/troubleshooting#504)
+    *   [gRPC Client Timeout Best Practices (gRPC.io)](https://grpc.io/docs/guides/deadlines/)
 
 ## Lessons Learned
 

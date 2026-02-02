@@ -73,12 +73,12 @@ docker-unified: docker-clean
 	docker compose up -d --build unified
 
 # Run unit tests
-test:
+test: install
 	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "Error: GOOGLE_CLOUD_PROJECT is not set. Setup environment before running tests" && exit 1)
 	uv run pytest src/tests/unit
 
 # Run unit and integration tests (takes a little longer)
-test-all:
+test-all: install
 	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "Error: GOOGLE_CLOUD_PROJECT is not set. Setup environment before running tests" && exit 1)
 	uv run pytest src/tests/unit && uv run pytest src/tests/integration
 

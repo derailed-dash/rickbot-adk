@@ -29,18 +29,22 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
-from google.adk.runners import Runner
-from google.genai.types import Content, Part
 from pydantic import BaseModel
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
+# IMPORTANT: Import agent first to apply monkey-patches (e.g. genai.Client)
 from rickbot_agent.agent import get_agent
 from rickbot_agent.auth import verify_token
 from rickbot_agent.auth_middleware import AuthMiddleware
 from rickbot_agent.auth_models import AuthUser
 from rickbot_agent.personality import get_personalities
 from rickbot_agent.services import get_artifact_service, get_session_service
+
+# ADK imports MUST happen after agent patch
+from google.adk.runners import Runner
+from google.genai.types import Content, Part
+
 from rickbot_utils.config import logger
 from rickbot_utils.rate_limit import limiter
 
@@ -350,8 +354,18 @@ async def chat_stream(
 
         yield f"data: {json.dumps({'done': True})}\n\n"
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
-
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            # Prevent caching by browsers and proxies
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            # Explicitly tell Nginx/Cloud Proxies NOT to buffer the stream.
+            # Critical fix for "The Silence" problem along with padding.
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 @app.get("/")
 def read_root(request: Request):
