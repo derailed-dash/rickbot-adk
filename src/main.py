@@ -354,8 +354,18 @@ async def chat_stream(
 
         yield f"data: {json.dumps({'done': True})}\n\n"
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
-
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            # Prevent caching by browsers and proxies
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            # Explicitly tell Nginx/Cloud Proxies NOT to buffer the stream.
+            # Critical fix for "The Silence" problem along with padding.
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 @app.get("/")
 def read_root(request: Request):
