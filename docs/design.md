@@ -54,52 +54,86 @@ graph TD
     Vertex -->|Inference| Gemini
 ```
 
-### Container Architecture
+### Container Architecture Strategy
 
-The application adopts a modern containerization strategy designed for security, performance, and scalability.
+We evaluated three potential architectures for deploying the Rickbot Backend (FastAPI) and Frontend (Next.js) to Google Cloud Run.
 
-1.  **Sidecar Pattern (Production)**:
-    -   In production (Google Cloud Run), the React Frontend and FastAPI Backend are deployed as **separate containers within the same service**.
-    -   They share a localhost network namespace, allowing the frontend to communicate with the backend via `http://localhost:8080` with minimal latency and no exposure to the public internet for internal traffic.
-    -   This simplifies deployment management, as the two components scale together as a single unit.
+#### Option 1: Separate Cloud Run Services (Microservices)
 
-2.  **Multi-Stage Builds**:
-    -   Both the API and Frontend Dockerfiles utilize multi-stage builds to minimize the final image size.
+Deploy the API and Frontend as two completely independent Cloud Run services.
+*   **Pros**:
+    *   **Independent Scaling**: Frontend and Backend can scale to zero or up to N instances independently based on their specific utility.
+    *   **Decoupled Lifecycle**: You can deploy a fix to the frontend without redeploying the backend.
+*   **Cons**:
+    *   **Complexity**: Requires managing two separate CI/CD pipelines, two sets of domains, and CORS configuration.
+    *   **Inter-Service Auth**: To secure the backend, the frontend must authenticate its request. This implies managing Service Accounts, granting `run.invoker` IAM roles, and implementing logic in the frontend code to fetch and attach Google ID-tokens to every API request.
+    *   **Cost (TCO)**: Minimum instance counts (if used) apply to both services, doubling the base cost. Network latency is introduced between the two services.
+
+#### Option 2: Sidecar Pattern (Two Containers, One Service)
+
+Deploy both containers within a *single* Cloud Run service using the sidecar pattern.
+*   **Pros**:
+    *   **Localhost Communication**: The frontend talks to the backend over `localhost`, eliminating latency and public internet exposure.
+    *   **Single Domain**: One service handles ingress.
+*   **Cons**:
+    *   **Complexity**: Cloud Run sidecar support is powerful but adds YAML/Terraform complexity.
+    *   **Resource Contention**: Both containers share the instance's CPU/RAM. If one spikes, the other suffers.
+    *   **Cold Starts**: Both containers must initialize before the service is ready, potentially increasing cold start times.
+
+#### Option 3: Unified Container (Selected Strategy)
+
+Merge both applications into a single Docker image (using a multi-stage build that combines Python/FastAPI and Node/Next.js runtimes) and manage them with a lightweight orchestration script.
+*   **Pros**:
+    *   **Simplicity**: It effectively behaves like a "monolith". One Dockerfile, one deploy command, one service to monitor.
+    *   **Cost Efficiency**: Lowest possible TCO. Only one service consumes resources.
+*   **Cons**:
+    *   **Image Size**: The single resulting image is larger (~1.4GB) as it contains both runtimes.
+    *   **Coupled Lifecycle**: A change to a CSS file requires rebuilding and redeploying the entire container stack.
+
+#### Decision
+
+We chose **Option 3: Unified Container**.
+Given that Rickbot is a reference implementation with expectations of relatively low and sporadic usage, the priority was to **minimize Total Cost of Ownership (TCO)** and infrastructure complexity. The Unified Container offers the simplest "Zero to Cloud" path for developers while staying well within the free/low-cost tiers of Cloud Run.
+
+### Container Best Practices
+
+Regardless of the architecture strategy, we apply rigorous best practices to our image builds:
+
+1.  **Multi-Stage Builds**:
     -   **API**: Uses a "builder" stage to compile dependencies with `uv`, then copies only the necessary virtual environment and source code to the final runtime image.
     -   **Frontend**: Uses a "builder" stage to compile the Next.js app, then copies only the standalone production artifacts to the final image.
+    -   **Unified**: Combines the outputs of both builders into a single runtime image.
 
-3.  **Security Best Practices**:
-    -   **Non-Root Execution**: All containers (API, Frontend, Streamlit) are explicitly configured to run as non-root users (`app-user`, `nextjs`). This mitigates the risk of container breakout attacks.
-    -   **Minimal Base Images**: We use `python:slim` and `node:alpine` to reduce the attack surface area.
-    -   **Whitelist Copying**: Dockerfiles explicitly copy only required source directories, preventing accidental inclusion of sensitive files or unnecessary artifacts.
-
-3.  **Unified Container (Development & Simplified Deploy)**:
-    -   To simplify local development and some deployment scenarios, we also support a **Unified Container** strategy (`Dockerfile.unified`).
-    -   This image combines both the FastAPI backend and the Next.js frontend into a single runnable unit.
-    -   **Nginx-less Proxy**: It uses a lightweight `start-unified.sh` script to launch both processes. The Next.js frontend is configured with `rewrites` to proxy API requests (`/chat`, `/personas`) directly to the localhost FastAPI backend, eliminating the need for an external Nginx sidecar or complex networking in this mode.
+2.  **Security**:
+    -   **Non-Root Execution**: All containers are configured to run as non-root users (`app-user`).
+    -   **Minimal Base Images**: We use `python:slim` and `node:alpine` where possible to reduce attack surface.
+    -   **Whitelist Copying**: Dockerfiles explicitly copy only required source code to prevent sensitive file leaks.
 
 ### Implementation Details & Workarounds
 
 #### 1. RAG Stability & File Search (Gemini Developer API)
+
 To support RAG capability using the Gemini Developer API's "File Search" feature (which is distinct from Vertex AI Search), the application implements specific middleware:
 
 *   **Client Monkey-Patching**: The ADK framework defaults to using Vertex AI clients when running in a Google Cloud environment. To force the use of the Gemini Developer API (AI Studio) for File Search, we monkey-patch `google.genai.Client` at runtime in `src/rickbot_agent/agent.py`. This forces `vertexai=False` and ensures correct API Key injection.
-*   **Timeout Handling**: Due to potential gRPC transport ambiguities (unit interpretation of ms vs seconds) in certain containerized environments, the client is configured with a robust timeout (`60000`) to prevent immediate fail-fast errors while allowing sufficient time for RAG retrieval operations to complete.
+*   **Timeout Handling**: Due to gRPC transport issues in certain containerized environments, the client is configured with a robust timeout (`60000 ms`) to allow sufficient time for RAG retrieval operations to complete.
 
 #### 2. Streaming Reliability (SSE Buffering)
+
 To ensure smooth "Typewriter" effects and "Thinking" indicator updates over Server-Sent Events (SSE):
 
 *   **Compression**: Logic is implemented (or compression disabled via `next.config.js`) to prevent Gzip buffering from holding back small status update events.
 *   **Padding**: The backend injects 4KB of whitespace padding after critical `tool_call` events to force network buffers to flush immediately, ensuring the UI receives the "Thinking..." signal without delay.
 
 #### 3. Secrets & Key Management
+
 The application supports a dual-mode configuration for flexibility:
 *   **Google Cloud Project**: If `GOOGLE_CLOUD_PROJECT` is set, the system attempts to auto-discover credentials.
 *   **Gemini API Key**: If `GOOGLE_GENAI_USE_VERTEXAI` is false, a `GEMINI_API_KEY` is required. This is injected securely via Secret Manager (Prod) or `.env` (Dev).
 
 *   **Hosting Services**:
     *   **Google Cloud Run**: Hosts both the generic API backend and the frontend containers.
-        *   **Multi-Container (Sidecar) Deployment**: The production architecture deploys the API Backend and React UI as two containers within the same Cloud Run service (sidecar pattern). This allows them to communicate over `localhost` while sharing the same lifecycle and autoscaling properties.
+        *   **Unified Container Deployment**: The production architecture deploys a single container image that includes both the API Backend and React UI. This simplifies deployment, reduces costs, and eliminates the need for complex networking or sidecar configurations.
     *   Cloud Run provides a serverless, scalable environment. It also offers a native domain name mapping feature to map custom domains to our Cloud Run services. Note that any custom domains used must be added to the OAuth authorised domains and authorised redirect URIs. 
 *   **Agentic Services**:
     *   **Vertex AI Agent Engine**: The core runtime for the agent.
@@ -140,6 +174,7 @@ The application supports a dual-mode configuration for flexibility:
 *   **Rationale**: Streamlit allows for extremely rapid prototyping using only Python. It was the fastest way to validate the ADK integration and multi-personality logic before investing in a more complex React frontend.
 
 ### 4. Runner Re-initialization for Context Isolation (Streamlit vs API)
+
 *   **Decision**: Handle persona switching differently based on the interface's nature.
     *   **Streamlit (Stateful)**: Forces a full re-initialization of the ADK `Runner` instance when the selection changes. This guarantees zero "context leakage" for the stateful UI.
     *   **FastAPI (Stateless)**: 
@@ -148,11 +183,11 @@ The application supports a dual-mode configuration for flexibility:
         *   **Scope**: The agent instance is strictly scoped to the individual request lifecycle (or a short-lived cache), ensuring that a request for "Yoda" never accidentally receives context or behaviors from a previous "Rick" request.
 *   **Rationale**: The Streamlit app simulates a continuous session with a specific character, requiring a hard reset to switch. The API is designed to be flexible and stateless, allowing a client to potentially mix-and-match or switch personalities instantly between calls without backend reconfiguration.
 
-## User Interfaces (UIs)
+### User Interfaces (UIs)
 
 The application supports multiple distinct interfaces, all interacting with the core agent logic.
 
-### Streamlit UI
+#### Streamlit UI
 
 The original user interface for rapid prototyping and demonstration. 
 This UI is defined in `src/streamlit_fe/app.py` and can be launched with `make streamlit`.
@@ -166,7 +201,7 @@ Alternatively, we can launch it in a Docker container using `make docker-streaml
     *   **Authentication**: Integrated OIDC authentication using Google Auth Platform.
     *   **State Management**: Handles session persistence locally within the Streamlit session state.
 
-#### Handling Personality Changes in the Streamlit UI
+##### Handling Personality Changes in the Streamlit UI
 
 The application is designed to ensure a clean and robust separation of context when switching between different chatbot personalities. The process is handled as follows:
 
@@ -178,7 +213,7 @@ The application is designed to ensure a clean and robust separation of context w
 
 This approach ensures that each personality operates in a clean, isolated environment. It is a simple and robust pattern that aligns well with Streamlit's execution model, prioritizing a predictable state over the premature optimization of object re-creation.
 
-### React/Next.js UI
+#### React/Next.js UI
 
 The modern, production-grade interface for Rickbot, located in `src/nextjs_fe`.
 
