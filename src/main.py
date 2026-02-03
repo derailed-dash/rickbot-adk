@@ -366,7 +366,7 @@ async def chat_stream(
                     # Check for tool responses
                     if function_responses := event.get_function_responses():
                         for fr in function_responses:
-                            logger.debug(f"Tool Response: {fr.name} Result: {fr.response}")
+                            logger.debug(f"Tool Response: {fr.name}")
                             yield f"data: {json.dumps({'tool_response': {'name': fr.name}})}\n\n"
 
                     # Check for agent transfers
