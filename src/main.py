@@ -402,7 +402,7 @@ async def chat_stream(
             raise
         except Exception as e:
             logger.error(f"Error in event generator: {e}", exc_info=True)
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            yield f"data: {json.dumps({'error': 'An internal error occurred'})}\n\n"
 
         yield f"data: {json.dumps({'done': True})}\n\n"
 
