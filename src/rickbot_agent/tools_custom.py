@@ -76,7 +76,7 @@ class FileSearchTool(BaseTool):
         or the ADK runner tries to execute it, we log it and return a placeholder.
         """
         logger.warning(f"FileSearchTool.run() was unexpectedly called with args: {args}")
-        return "File Search is a server-side tool. Please checks the citations in the response."
+        return "File Search is a server-side tool. Please check the citations in the response."
 
     async def run_async(self, **args: Any) -> Any:
         """Async version of run."""
