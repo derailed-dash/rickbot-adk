@@ -21,7 +21,7 @@ Why we need it:
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from google.adk.tools import BaseTool, ToolContext
 from google.genai import types
@@ -68,3 +68,17 @@ class FileSearchTool(BaseTool):
         llm_request.config.tools.append(
             types.Tool(file_search=types.FileSearch(file_search_store_names=self.file_search_store_names))
         )
+        logger.debug("FileSearchTool configuration attached successfully.")
+
+    def run(self, **args: Any) -> Any:
+        """
+        This should not be called for server-side tools, but if the model hallucinates a call
+        or the ADK runner tries to execute it, we log it and return a placeholder.
+        """
+        logger.warning(f"FileSearchTool.run() was unexpectedly called with args: {args}")
+        return "File Search is a server-side tool. Please checks the citations in the response."
+
+    async def run_async(self, **args: Any) -> Any:
+        """Async version of run."""
+        logger.warning(f"FileSearchTool.run_async() was unexpectedly called with args: {args}")
+        return "File Search is a server-side tool. Please checks the citations in the response."
