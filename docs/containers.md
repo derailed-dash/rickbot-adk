@@ -254,7 +254,7 @@ This introduction of the proxy layer revealed two critical issues that were mask
 *   **Cause**: ADK's execution loop expects all tools to implement an async execution path. If a tool (like our custom `FileSearchTool`) only modified the LLM request config but didn't provide a `run_async` method, the sub-agent loop could hang while waiting for a response that was never triggered.
 *   **Solution**: Implemented a placeholder `run_async` in `FileSearchTool`. This satisfies the ADK runner's requirements and ensures the execution loop continues even if the tool's primary purpose is injecting configuration metadata into the model's request.
 
-#### 3. The "Loading" Problem (Race Conditions)
+#### 4. The "Loading" Problem (Race Conditions)
 
 *   **Symptom**: When the unified container starts, the Frontend (Next.js) becomes available almost immediately, while the Backend (FastAPI/ADK) takes several seconds longer to initialize (due to loading heavy agent configurations and ML libraries). This resulted in users seeing an empty personality dropdown and needing to manually refresh the page repeatedly.
 *   **Cause**: This is a classic "Race Condition". In the unified container, both processes start simultaneously, but they have drastically different startup times. The frontend would try to fetch the list of personalities from the backend before the backend was ready to serve traffic.
