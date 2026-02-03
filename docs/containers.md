@@ -170,7 +170,7 @@ The `docker-compose.yml` file orchestrates these services for a seamless local d
     *   Exposes port `3000`.
     *   **Critical Configuration**: Passes `NEXT_PUBLIC_API_URL: http://localhost:8080` as a build argument. This ensures the client-side React app knows where to find the API (which is mapped to localhost:8080 by Docker Compose).
     *   **Environment Variables**: Loads secrets (like `NEXTAUTH_SECRET`, OAuth credentials) and configuration directly from `src/nextjs_fe/.env.local` via the `env_file` directive.
-    *   Configured for Mock Auth by default (`NEXT_PUBLIC_ALLOW_MOCK_AUTH=true`).
+    *   **Mock Auth**: By default, the Mock Login provider is disabled in production builds. To enable it (e.g., for local Docker testing), set `NEXT_PUBLIC_ALLOW_MOCK_AUTH=true`. Use `src/nextjs_fe/.env.local` or Docker environment variables to control this.
 
 *   **`streamlit_fe`**:
     *   Legacy interface, also available for testing.
@@ -244,6 +244,14 @@ This introduction of the proxy layer revealed two critical issues that were mask
 *   **Solution**:
     *   **Monkey-Patching**: We patched `genai.Client` in `src/rickbot_agent/agent.py` to enforce `http_options={'timeout': 60000}` (60 seconds).
     *   **Explicit Timeouts**: This ensured the underlying gRPC transport remained open long enough for the complex RAG operations to complete, eliminating the hangs.
+
+#### 3. The "Loading" Problem (Race Conditions)
+
+*   **Symptom**: When the unified container starts, the Frontend (Next.js) becomes available almost immediately, while the Backend (FastAPI/ADK) takes several seconds longer to initialize (due to loading heavy agent configurations and ML libraries). This resulted in users seeing an empty personality dropdown and needing to manually refresh the page repeatedly.
+*   **Cause**: This is a classic "Race Condition". In the unified container, both processes start simultaneously, but they have drastically different startup times. The frontend would try to fetch the list of personalities from the backend before the backend was ready to serve traffic.
+*   **Solution**:
+    *   **Retry Logic**: We implemented a smart exponential backoff/retry mechanism in the frontend (`src/nextjs_fe/components/Chat.tsx`). It attempts to contact the backend and, if it fails, waits and retries automatically.
+    *   **Rickbot Loading Screen**: To provide better user feedback during this wait, we added a custom "Heating up the portal gun..." loading screen. This informs the user that the system is initializing (connecting to the backend) and not broken, maintaining immersion with the Rick & Morty theme.
 
 ### A Note on Sidecar Applicability
 

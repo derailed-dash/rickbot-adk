@@ -84,6 +84,7 @@ export default function Chat() {
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     const [streamingText, setStreamingText] = useState('');
     const [showPortal, setShowPortal] = useState(false);
+    const [backendReady, setBackendReady] = useState(false);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -95,6 +96,8 @@ export default function Chat() {
 
     useEffect(() => {
         let isMounted = true;
+        let retryTimeout: NodeJS.Timeout;
+
         const fetchPersonalities = async () => {
             const token = session?.idToken || session?.accessToken || "";
             try {
@@ -103,18 +106,24 @@ export default function Chat() {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                if (isMounted && response.data && Array.isArray(response.data)) {
-                    setPersonalities(response.data);
-                    const updatedSelected = response.data.find((p: Personality) => p.name === selectedPersonality.name);
-                    if (updatedSelected) {
-                        setSelectedPersonality(updatedSelected);
+                if (isMounted) {
+                    if (response.data && Array.isArray(response.data)) {
+                        setPersonalities(response.data);
+                        const updatedSelected = response.data.find((p: Personality) => p.name === selectedPersonality.name);
+                        if (updatedSelected) {
+                            setSelectedPersonality(updatedSelected);
+                        }
                     }
+                    setBackendReady(true);
                 }
             } catch (error: any) {
                 if (isMounted) {
                     console.error("Failed to fetch personalities:", error);
                     if (error.response?.status === 401 || error.response?.status === 403) {
                         signOut();
+                    } else {
+                        // Retry if not an auth error (e.g. backend starting up)
+                        retryTimeout = setTimeout(fetchPersonalities, 2000);
                     }
                 }
             }
@@ -123,7 +132,10 @@ export default function Chat() {
         if (session) {
             fetchPersonalities();
         }
-        return () => { isMounted = false; };
+        return () => { 
+            isMounted = false; 
+            clearTimeout(retryTimeout);
+        };
     }, [session]);
 
 
@@ -324,6 +336,46 @@ export default function Chat() {
                         Privacy Policy
                     </Typography>
                 </Link>
+            </Box>
+        )
+    }
+
+    if (!backendReady && session) {
+        return (
+            <Box sx={{
+               height: '100vh',
+               display: 'flex',
+               flexDirection: 'column',
+               justifyContent: 'center',
+               alignItems: 'center',
+               bgcolor: '#121212',
+               color: 'primary.main',
+               p: 3,
+               textAlign: 'center',
+               backgroundImage: 'url(/galaxy_bg.png)',
+               backgroundBlendMode: 'darken',
+               backgroundColor: 'rgba(0,0,0,0.95)'
+            }}>
+                <Box 
+                    component="img" 
+                    src="/portal_gun_trans.png" 
+                    sx={{ 
+                        width: 200, 
+                        mb: 4,
+                        animation: 'pulse 2s infinite ease-in-out',
+                        '@keyframes pulse': {
+                            '0%': { transform: 'scale(1)', filter: 'drop-shadow(0 0 10px rgba(57, 255, 20, 0.5))' },
+                            '50%': { transform: 'scale(1.1)', filter: 'drop-shadow(0 0 30px rgba(57, 255, 20, 0.8))' },
+                            '100%': { transform: 'scale(1)', filter: 'drop-shadow(0 0 10px rgba(57, 255, 20, 0.5))' },
+                        }
+                    }} 
+                />
+                <Typography variant="h4" sx={{ mb: 2, fontWeight: 'bold' }}>
+                    Heating up the portal gun...
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                    Talking to the backend. Please wait while we calibrate the interdimensional fluid.
+                </Typography>
             </Box>
         )
     }

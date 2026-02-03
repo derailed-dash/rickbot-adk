@@ -3,8 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import GitHubProvider from "next-auth/providers/github"
 import CredentialsProvider from "next-auth/providers/credentials"
 
-export const authOptions: NextAuthOptions = {
-  providers: [
+const providers: any[] = [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
@@ -13,7 +12,11 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GITHUB_CLIENT_ID || "",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
     }),
-    // Mock provider for local development
+];
+
+// Conditionally add Mock Provider
+if (process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ALLOW_MOCK_AUTH === "true") {
+  providers.push(
     CredentialsProvider({
       id: "mock",
       name: "Mock Login",
@@ -21,8 +24,6 @@ export const authOptions: NextAuthOptions = {
         username: { label: "Username", type: "text", placeholder: "mockuser" },
       },
       async authorize(credentials, req) {
-        // In dev mode, we allow a mock user
-        if (process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ALLOW_MOCK_AUTH === "true") {
            const mockEmail = process.env.MOCK_AUTH_USER || "mock@example.com";
            return {
              id: "mock-123",
@@ -30,11 +31,13 @@ export const authOptions: NextAuthOptions = {
              email: mockEmail,
              image: "/avatars/dazbo.png"
            }
-        }
-        return null
       }
     })
-  ],
+  )
+}
+
+export const authOptions: NextAuthOptions = {
+  providers,
   callbacks: {
     async jwt({ token, account, user }) {
       // Persist the OAuth access_token to the token right after signin
