@@ -81,4 +81,4 @@ class FileSearchTool(BaseTool):
     async def run_async(self, **args: Any) -> Any:
         """Async version of run."""
         logger.warning(f"FileSearchTool.run_async() was unexpectedly called with args: {args}")
-        return "File Search is a server-side tool. Please checks the citations in the response."
+        return "File Search is a server-side tool. Please check the citations in the response."
