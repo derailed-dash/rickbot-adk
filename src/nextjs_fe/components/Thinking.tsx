@@ -28,7 +28,7 @@ const toolMap: Record<string, { label: string; icon: React.ReactNode; color: str
     color: '#34A853',
   },
   'RagAgent': {
-    label: 'Knowledge Base',
+    label: 'Searching my Knowledge Base',
     icon: <StorageIcon fontSize="small" />,
     color: '#39FF14',
   },
@@ -38,6 +38,24 @@ const toolMap: Record<string, { label: string; icon: React.ReactNode; color: str
     color: '#39FF14', // Portal Green
   }
 };
+
+const LoadingDots = () => (
+  <Box component="span" sx={{
+    display: 'inline-block',
+    width: '12px',
+    textAlign: 'left',
+    '&:after': {
+      content: '""',
+      animation: 'dots 1.5s steps(5, end) infinite',
+    },
+    '@keyframes dots': {
+      '0%, 20%': { content: '""' },
+      '40%': { content: '"."' },
+      '60%': { content: '".."' },
+      '80%, 100%': { content: '"..."' }
+    }
+  }} />
+);
 
 const Thinking: React.FC<ThinkingProps> = ({ action, activeTool }) => {
   if (!action && !activeTool) return null;
@@ -78,14 +96,13 @@ const Thinking: React.FC<ThinkingProps> = ({ action, activeTool }) => {
           fontWeight: 'bold',
           display: 'flex',
           alignItems: 'center',
-          gap: 0.5,
+          gap: 0, // Gap handled by LoadingDots width
           textShadow: `0 0 5px ${color}44`
         }}
       >
         {displayName}
-        {activeTool?.status === 'running' && '...'}
+        {isRunning ? <LoadingDots /> : null}
         {activeTool?.status === 'completed' && ' (Done)'}
-        {(!activeTool && action === 'Thinking...') && '...'}
       </Typography>
     </Box>
   );
