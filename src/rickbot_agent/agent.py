@@ -2,15 +2,6 @@
 This module defines the main agent for the Rickbot-ADK application.
 It initializes a set of Google Gemini-powered agent, each loaded from a specific personality.
 We then cache these agents for fast retrieval.
-
-IMPORTANT ARCHITECTURAL NOTE:
- This module performs critical monkey-patching of the `google.genai.Client` and `google.adk.tools.AgentTool`.
- Because the Google ADK library instantiates its own internal clients without accepting configuration arguments,
- we must apply these patches BEFORE any ADK modules are imported or used.
-
- Therefore, you will see `google.adk` imports placed further down in the file, *after* the patching logic.
- Attempting to move these imports to the top of the file will break the application (causing timeouts and hangs).
- Please do not "fix" the import order.
 """
 
 import functools
@@ -19,157 +10,14 @@ from textwrap import dedent
 from typing import Any
 
 from google import genai
+from google.adk.agents import Agent
+from google.adk.tools import AgentTool, google_search
+from google.genai.types import GenerateContentConfig
 
 from rickbot_utils.config import config, logger
 
-# Monkey-patch genai.Client to force non-Vertex use if configured
-# This is necessary because ADK Agents instantiate their own client and don't accept one as an argument
-if not config.genai_use_vertexai:
-    # Protect against multiple patching (e.g. reloads)
-    if not getattr(genai.Client, "_is_patched", False):
-        logger.info("Monkey-patching google.genai.Client to force vertexai=False")
-        _OriginalClient = genai.Client
-
-        class _PatchedClient(_OriginalClient):
-            _is_patched = True
-            def __init__(self, *args, **kwargs):
-                kwargs['vertexai'] = False  # Force vertexai=False
-                if 'api_key' not in kwargs or kwargs['api_key'] is None:
-                     kwargs['api_key'] = os.getenv("GEMINI_API_KEY")
-
-                # Set timeout for HTTP operations (in milliseconds)
-                # 60000ms = 60 seconds, which provides sufficient time for:
-                # - RAG store initialization and retrieval operations
-                # - Network latency in containerized environments
-                # - Complex agent reasoning and tool execution
-                # This prevents premature timeouts while still failing eventually on genuine errors.
-                if 'http_options' not in kwargs or kwargs['http_options'] is None:
-                    kwargs['http_options'] = {'timeout': 60000}
-                elif isinstance(kwargs['http_options'], dict):
-                    kwargs['http_options']['timeout'] = 60000
-                else:
-                    # Assume it's an HttpOptions object (pydantic model or similar)
-                    try:
-                        kwargs['http_options'].timeout = 60000
-                    except AttributeError:
-                        # Fallback if it doesn't have timeout attribute, though it should
-                        logger.warning("Could not set timeout on http_options object.")
-
-                super().__init__(*args, **kwargs)
-
-        # Apply the monkey-patch to the class
-        # This ensures that ANY instantiation of genai.Client within the application (e.g. by ADK agents)
-        # automatically uses the configured behavior (AI Studio backend, API Key injection, and Timeout safety).
-        genai.Client = _PatchedClient
-    else:
-        logger.debug("google.genai.Client is already monkey-patched.")
-
-# Monkey-patch google.adk.tools.AgentTool.run_async to handle empty responses
-# This fixes a crash where the RAG Agent returns a content object with parts=None
-# See: https://github.com/google/adk/issues/xxxx (Internal tracking if applicable)
-
-from google.adk.memory.in_memory_memory_service import InMemoryMemoryService
-from google.adk.runners import Runner
-from google.adk.sessions.in_memory_session_service import InMemorySessionService
-from google.adk.tools import AgentTool, ToolContext
-from google.adk.tools._forwarding_artifact_service import ForwardingArtifactService
-from google.adk.utils.context_utils import Aclosing
-
-# Actually applying the patch
-# Note: The original _patched_run_async implementation above defines _safe_run
-# but we need an async implementation that can be directly assigned to AgentTool.run_async.
-# The following _patched_run_async_impl is the actual async method we use.
-
-async def _patched_run_async_impl(self, *, args: dict[str, Any], tool_context: ToolContext) -> Any:
-    from google.adk.agents.llm_agent import LlmAgent
-    from google.genai import types
-
-    if self.skip_summarization:
-      tool_context.actions.skip_summarization = True
-
-    if isinstance(self.agent, LlmAgent) and self.agent.input_schema:
-      input_value = self.agent.input_schema.model_validate(args)
-      content = types.Content(
-          role='user',
-          parts=[
-              types.Part.from_text(
-                  text=input_value.model_dump_json(exclude_none=True)
-              )
-          ],
-      )
-    else:
-      content = types.Content(
-          role='user',
-          parts=[types.Part.from_text(text=args['request'])],
-      )
-    invocation_context = tool_context._invocation_context
-    parent_app_name = (
-        invocation_context.app_name if invocation_context else None
-    )
-    child_app_name = parent_app_name or self.agent.name
-    runner = Runner(
-        app_name=child_app_name,
-        agent=self.agent,
-        artifact_service=ForwardingArtifactService(tool_context),
-        session_service=InMemorySessionService(),
-        memory_service=InMemoryMemoryService(),
-        credential_service=tool_context._invocation_context.credential_service,
-        plugins=list(tool_context._invocation_context.plugin_manager.plugins),
-    )
-
-    state_dict = {
-        k: v
-        for k, v in tool_context.state.to_dict().items()
-        if not k.startswith('_adk')
-    }
-    session = await runner.session_service.create_session(
-        app_name=child_app_name,
-        user_id=tool_context._invocation_context.user_id,
-        state=state_dict,
-    )
-
-    last_content = None
-    async with Aclosing(
-        runner.run_async(
-            user_id=session.user_id, session_id=session.id, new_message=content
-        )
-    ) as agen:
-      async for event in agen:
-        if event.actions.state_delta:
-          tool_context.state.update(event.actions.state_delta)
-        if event.content:
-          last_content = event.content
-
-    if not last_content:
-      return ''
-
-    # SAFETY CHECK
-    if not last_content.parts:
-        logger.warning(f"AgentTool {self.name}: Received content with no parts. Returning empty string.")
-        # last_content is likely google.genai.types.Content, which might not expose finish_reason directly here.
-        # dumping it to debug.
-        logger.debug(f"Full content dump: {last_content}")
-        return ''
-
-    merged_text = '\n'.join(p.text for p in last_content.parts if p.text)
-    if isinstance(self.agent, LlmAgent) and self.agent.output_schema:
-      tool_result = self.agent.output_schema.model_validate_json(
-          merged_text
-      ).model_dump(exclude_none=True)
-    else:
-      tool_result = merged_text  # type: ignore[assignment]
-    return tool_result
-
-# Apply the patch
-AgentTool.run_async = _patched_run_async_impl  # type: ignore[method-assign]
-logger.info("Monkey-patched google.adk.tools.AgentTool.run_async to handle empty responses.")
-
-from google.adk.agents import Agent  # noqa: E402
-from google.adk.tools import AgentTool, google_search  # noqa: E402
-from google.genai.types import GenerateContentConfig  # noqa: E402
-
-from .personality import Personality, get_personalities  # noqa: E402
-from .tools_custom import FileSearchTool  # noqa: E402
+from .personality import Personality, get_personalities
+from .tools_custom import FileSearchTool
 
 client = genai.Client(
     vertexai=config.genai_use_vertexai,
@@ -232,6 +80,8 @@ def create_rag_agent(file_store_name: str, personality_name: str, kb_description
             Do not add preamble, greetings, or analysis. Be extremely brief.
             If the information is not in the knowledge base, state: "NOT_FOUND"
         """)
+
+        logger.debug(f"RagAgent instructions: {instruction}")
 
         return Agent(
             model=config.model,
