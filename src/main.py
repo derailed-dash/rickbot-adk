@@ -20,11 +20,13 @@ Notes:
     or multipart/form-data, if files are included.
 """
 
+import asyncio
 import json
 import uuid
 from collections.abc import AsyncGenerator
+from datetime import datetime
 from os import getenv
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -308,46 +310,96 @@ async def chat_stream(
         yield f"data: {json.dumps({'session_id': current_session_id})}\n\n"
 
         try:
-            async for event in runner.run_async(
-                user_id=user_id,
-                session_id=current_session_id,
-                new_message=new_message,
-            ):
-                # logger.debug(f"Event received: {event}") # Too verbose
+            # Create a queue for the events and the heartbeat
+            queue: asyncio.Queue[Any] = asyncio.Queue()
 
-                if hasattr(event, "finish_reason") and event.finish_reason:
-                    logger.debug(f"Event finish reason: {event.finish_reason}")
+            async def push_events():
+                try:
+                    async for event in runner.run_async(
+                        user_id=user_id,
+                        session_id=current_session_id,
+                        new_message=new_message,
+                    ):
+                        await queue.put(event)
+                    await queue.put(None)  # Signal completion
+                except Exception as e:
+                    logger.error(f"Error in runner.run_async: {e}", exc_info=True)
+                    await queue.put(e)
 
-                # Check for tool calls
-                if function_calls := event.get_function_calls():
-                    for fc in function_calls:
-                        logger.debug(f"Tool Call: {fc.name} Args: {fc.args}")
-                        yield f"data: {json.dumps({'tool_call': {'name': fc.name, 'args': fc.args}})}\n\n"
-                        yield f": {' ' * SSE_FLUSH_PADDING_BYTES}\n\n"
+            async def heartbeat():
+                while True:
+                    await asyncio.sleep(15)
+                    await queue.put("heartbeat")
 
-                # Check for tool responses
-                if function_responses := event.get_function_responses():
-                    for fr in function_responses:
-                        logger.debug(f"Tool Response: {fr.name}")
-                        # logger.debug(f"Tool Response Content: {str(fr.response)[-100:]}")
-                        yield f"data: {json.dumps({'tool_response': {'name': fr.name}})}\n\n"
-                        yield f": {' ' * SSE_FLUSH_PADDING_BYTES}\n\n"
+            # Start background tasks
+            event_task = asyncio.create_task(push_events())
+            heartbeat_task = asyncio.create_task(heartbeat())
 
-                # Check for agent transfers
-                if event.actions and event.actions.transfer_to_agent:
-                    logger.debug(f"Agent Transfer: {event.actions.transfer_to_agent}")
-                    yield f"data: {json.dumps({'agent_transfer': event.actions.transfer_to_agent})}\n\n"
+            try:
+                while True:
+                    item = await queue.get()
+                    if item is None:  # Done
+                        break
+                    if isinstance(item, Exception):
+                        raise item
+                    if item == "heartbeat":
+                        # Send a comment as a heartbeat to keep the connection alive
+                        logger.debug(f"[{datetime.now().isoformat()}] Sending SSE heartbeat")
+                        yield ": heartbeat\n\n"
+                        continue
 
-                # For model responses, we want to stream the chunks
-                if event.content and event.content.parts:
-                    for part in event.content.parts:
-                        if part.text:
-                            yield f"data: {json.dumps({'chunk': part.text})}\n\n"
-                        elif not (part.function_call or part.function_response):
-                            logger.debug("Received part with no text data.")
-                else:
-                    logger.debug("Event contained no content parts.")
+                    event = item
+                    timestamp = datetime.now().isoformat()
+                    # Debug logging for event type
+                    logger.debug(f"[{timestamp}] Received ADK event: {type(event).__name__}")
+                    yield f"data: {json.dumps({'debug': {'event_type': type(event).__name__, 'ts': timestamp}})}\n\n"
 
+                    if hasattr(event, "finish_reason") and event.finish_reason:
+                        logger.debug(f"Event finish reason: {event.finish_reason}")
+
+                    # Check for tool calls
+                    if function_calls := event.get_function_calls():
+                        for fc in function_calls:
+                            logger.debug(f"Tool Call: {fc.name} Args: {fc.args}")
+                            yield f"data: {json.dumps({'tool_call': {'name': fc.name, 'args': fc.args}})}\n\n"
+
+                    # Check for tool responses
+                    if function_responses := event.get_function_responses():
+                        for fr in function_responses:
+                            logger.debug(f"Tool Response: {fr.name} Result: {fr.response}")
+                            yield f"data: {json.dumps({'tool_response': {'name': fr.name}})}\n\n"
+
+                    # Check for agent transfers
+                    if event.actions and event.actions.transfer_to_agent:
+                        logger.debug(f"Agent Transfer: {event.actions.transfer_to_agent}")
+                        yield f"data: {json.dumps({'agent_transfer': event.actions.transfer_to_agent})}\n\n"
+
+                    # For model responses, we want to stream the chunks
+                    if event.content and event.content.parts:
+                        for part in event.content.parts:
+                            if part.text:
+                                yield f"data: {json.dumps({'chunk': part.text})}\n\n"
+                            elif not (part.function_call or part.function_response):
+                                logger.debug("Received part with no text data.")
+                    else:
+                        logger.debug("Event contained no content parts.")
+
+            finally:
+                heartbeat_task.cancel()
+                try:
+                    await heartbeat_task
+                except asyncio.CancelledError:
+                    pass
+                if not event_task.done():
+                    event_task.cancel()
+                    try:
+                        await event_task
+                    except asyncio.CancelledError:
+                        pass
+
+        except asyncio.CancelledError:
+            logger.info(f"Client disconnected or request cancelled for session: {current_session_id}")
+            raise
         except Exception as e:
             logger.error(f"Error in event generator: {e}", exc_info=True)
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
@@ -362,7 +414,7 @@ async def chat_stream(
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
             # Explicitly tell Nginx/Cloud Proxies NOT to buffer the stream.
-            # Critical fix for "The Silence" problem along with padding.
+            # Critical fix for "The Silence" problem.
             "X-Accel-Buffering": "no",
         },
     )

@@ -93,10 +93,13 @@ The unified container avoids the need for Nginx or complex networking:
     async rewrites() {
       return [
         {
-          source: '/chat',
-          destination: 'http://127.0.0.1:8000/chat',
+          source: '/api/:path((?!auth/).*)',
+          destination: 'http://127.0.0.1:8000/:path',
         },
-        // ...
+        {
+          source: '/api',
+          destination: 'http://127.0.0.1:8000/',
+        }
       ];
     }
     ```
@@ -233,17 +236,23 @@ This introduction of the proxy layer revealed two critical issues that were mask
 
 *   **Symptom**: The UI would remain stuck in the "Thinking..." state, failing to show granular updates (like "Searching Google..." or "Using RagAgent..."), even though the backend was generating them.
 *   **Cause**: The Node.js proxy buffered the small Server-Sent Events (SSE) chunks coming from FastAPI. Unlike the browser, which consumes streams immediately, the proxy waited to fill a buffer before flushing data to the client, effectively silencing the real-time feedback loop.
-*   **Solution**: We implemented a robust two-layer fix:
-    1.  **Headers**: Added `X-Accel-Buffering: no` and `Cache-Control: no-cache` to the `src/main.py` response. This explicitly instructs proxies (like Nginx) to disable buffering for the stream.
-    2.  **Protocol Padding**: As a failsafe, we append 4KB of whitespace padding (`SSE_FLUSH_PADDING_BYTES = 4096`) to critical events. This forces any recalcitrant proxy buffers (like Next.js rewrites) to flush immediately, ensuring "Thinking" updates are visible instantly.
-
-#### 2. The "Hang" Problem (RAG Timeouts)
-
-*   **Symptom**: When the agent attempted to use the `RagAgent` (File Search), the request would simply hang indefinitely in the UI until eventually failing (or timing out), with no response ever received.
-*   **Cause**: RAG operations are time-intensive (initializing the store, uploading files, waiting for indexing). The implicit timeouts in the containerized networking stack (and the `google-genai` client defaults) were shorter than the operation duration, causing the connection to be silently dropped or the client to give up before the result was ready.
 *   **Solution**:
-    *   **Monkey-Patching**: We patched `genai.Client` in `src/rickbot_agent/agent.py` to enforce `http_options={'timeout': 60000}` (60 seconds).
-    *   **Explicit Timeouts**: This ensured the underlying gRPC transport remained open long enough for the complex RAG operations to complete, eliminating the hangs.
+    *  **Headers**: Added `X-Accel-Buffering: no` and `Cache-Control: no-cache` to the `src/main.py` response. This explicitly instructs proxies to disable buffering for the stream.
+
+#### 2. The "Hang" Problem (RAG Latency)
+
+*   **Symptom**: When the agent attempted to use the `RagAgent` (File Search), the request would simply hang for ~30 seconds and then silently drop or fail in the UI.
+*   **Cause**: RAG operations are time-intensive (retrieval, ranking, indexing). Our logs captured successful executions taking upwards of **47 seconds**. However, the Next.js proxy rewriter and standard HTTP clients often have a default timeout of 30 seconds. If the backend is "silent" while processing, the middleman assumes the connection is dead and closes it.
+*   **Solution (SSE Heartbeat)**: Instead of arbitrarily increasing timeouts (which we tried and found insufficient in a complex proxied environment), we implemented an **SSE Heartbeat**.
+    *   **Async Queue**: The `main.py` event generator now uses an `asyncio.Queue` to manage ADK events and heartbeats concurrently.
+    *   **Keep-Alive Signals**: A background task sends a `: heartbeat` SSE comment every 15 seconds.
+    *   **Impact**: These tiny packets of data keep the proxy connection "warm" and prevent it from timing out, even during long-running sub-agent operations.
+
+#### 3. The "Loop" Problem (Sub-Agent Deadlocks)
+
+*   **Symptom**: The agent would sometimes stall internally without ever reaching the model, particularly when using `AgentTool` (like `RagAgent`).
+*   **Cause**: ADK's execution loop expects all tools to implement an async execution path. If a tool (like our custom `FileSearchTool`) only modified the LLM request config but didn't provide a `run_async` method, the sub-agent loop could hang while waiting for a response that was never triggered.
+*   **Solution**: Implemented a placeholder `run_async` in `FileSearchTool`. This satisfies the ADK runner's requirements and ensures the execution loop continues even if the tool's primary purpose is injecting configuration metadata into the model's request.
 
 #### 3. The "Loading" Problem (Race Conditions)
 
@@ -257,21 +266,18 @@ This introduction of the proxy layer revealed two critical issues that were mask
 
 It is important to note that these challenges are not unique to the Unified Container strategy. If we had chosen the **Sidecar Pattern**, we would likely have encountered the same issues:
 
-*   **Buffering**: A sidecar setup typically proxies traffic via the frontend (ingress) to the backend (localhost sidecar), retaining the Node.js proxy layer that caused the buffering.
-*   **Timeouts**: The RAG timeout is intrinsic to the long-running nature of the operation and the networking defaults in Cloud Run limitations; separating the containers would not automatically resolve the client library's timeout behavior.
+*   **Buffering**: A sidecar setup typically proxies traffic via a frontend (ingress) to the backend, retaining the proxy layer that causes buffering.
+*   **Timeouts**: The RAG latency is intrinsic to the nature of the operation. Heartbeats are a more robust solution than increasing timeouts, as they work across various proxy configurations.
 
-Therefore, the fixes implemented (Padding and explicit Timeouts) are robust architectural improvements beneficial for *any* containerized deployment of this stack.
+Therefore, the fixes implemented (Heartbeats and ADK sub-agent fixes) are robust architectural improvements beneficial for *any* containerized deployment of this stack.
 
 ### Validated Patterns
 
 Our solutions align with industry standard workarounds for these specific proxy and gRPC challenges:
 
-*   **SSE Padding**: 
-    *   [Buffer-defeating with padding (Stack Overflow)](https://stackoverflow.com/questions/13386681/streaming-data-with-php-and-nginx-fastcgi-flush-behavior)
-    *   [Nginx Proxy Buffering (ServerFault)](https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-configuration-is-required)
-*   **gRPC Timeouts**:
-    *   [Cloud Run gRPC Timeouts (Google Cloud Docs)](https://cloud.google.com/run/docs/troubleshooting#504)
-    *   [gRPC Client Timeout Best Practices (gRPC.io)](https://grpc.io/docs/guides/deadlines/)
+*   **SSE Heartbeats**:
+    *   [HTML5Rocks: Stream Updates with Server-Sent Events](https://web.dev/articles/eventsource-basics#control-connection-timeout)
+    *   [StackOverflow: SSE Heartbeats for Proxies](https://stackoverflow.com/questions/5643447/is-there-a-standard-way-to-keep-an-sse-connection-alive)
 
 ## Lessons Learned
 

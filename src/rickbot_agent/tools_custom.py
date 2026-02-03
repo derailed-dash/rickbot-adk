@@ -65,20 +65,22 @@ class FileSearchTool(BaseTool):
         llm_request.config.tools = llm_request.config.tools or []
 
         # Append the native tool configuration for File Search
+        logger.debug(f"Adding types.Tool(file_search=...) for stores: {self.file_search_store_names}")
         llm_request.config.tools.append(
             types.Tool(file_search=types.FileSearch(file_search_store_names=self.file_search_store_names))
         )
-        logger.debug("FileSearchTool configuration attached successfully.")
+        logger.debug(f"FileSearchTool configuration attached successfully: {llm_request.config.tools[-1]}")
 
-    def run(self, **args: Any) -> Any:
+    async def run_async(
+        self,
+        *,
+        args: dict[str, Any],
+        tool_context: ToolContext,
+    ) -> str:
         """
-        This should not be called for server-side tools, but if the model hallucinates a call
-        or the ADK runner tries to execute it, we log it and return a placeholder.
+        This tool is handled server-side by Gemini, but ADK might still try to call it
+        if the model returns a function call with this name.
         """
-        logger.warning(f"FileSearchTool.run() was unexpectedly called with args: {args}")
-        return "File Search is a server-side tool. Please check the citations in the response."
+        logger.debug(f"FileSearchTool.run_async called with args: {args}")
+        return "File search retrieval handled by the model."
 
-    async def run_async(self, **args: Any) -> Any:
-        """Async version of run."""
-        logger.warning(f"FileSearchTool.run_async() was unexpectedly called with args: {args}")
-        return "File Search is a server-side tool. Please check the citations in the response."
