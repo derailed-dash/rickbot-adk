@@ -170,7 +170,6 @@ The `docker-compose.yml` file orchestrates these services for a seamless local d
     *   Exposes port `3000`.
     *   **Critical Configuration**: Passes `NEXT_PUBLIC_API_URL: http://localhost:8080` as a build argument. This ensures the client-side React app knows where to find the API (which is mapped to localhost:8080 by Docker Compose).
     *   **Environment Variables**: Loads secrets (like `NEXTAUTH_SECRET`, OAuth credentials) and configuration directly from `src/nextjs_fe/.env.local` via the `env_file` directive.
-    *   **Environment Variables**: Loads secrets (like `NEXTAUTH_SECRET`, OAuth credentials) and configuration directly from `src/nextjs_fe/.env.local` via the `env_file` directive.
     *   **Mock Auth**: By default, the Mock Login provider is disabled in production builds. To enable it (e.g., for local Docker testing), set `NEXT_PUBLIC_ALLOW_MOCK_AUTH=true`. Use `src/nextjs_fe/.env.local` or Docker environment variables to control this.
 
 *   **`streamlit_fe`**:
