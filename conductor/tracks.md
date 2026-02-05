@@ -55,3 +55,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 ## [x] **Track: Create separate Dockerfiles for React UI and API Backend, update docker-compose, and update documentation.**
 
 *Link: [./conductor/tracks/containerize_ui_api_20260130/](./conductor/tracks/containerize_ui_api_20260130/)*
+
+---
+
+- [ ] **Track: Identity-Based Persona Access Control**
+*Link: [./conductor/tracks/identity_persona_access_20260205/](./conductor/tracks/identity_persona_access_20260205/)*

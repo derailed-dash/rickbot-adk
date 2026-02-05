@@ -1,0 +1,8 @@
+{
+  "track_id": "identity_persona_access_20260205",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-05T12:00:00Z",
+  "updated_at": "2026-02-05T12:00:00Z",
+  "description": "Add the ability to limit access to certain personas, based on logged on user. Investigate and propose options for implementing this identity-based access. Consider Google Firestore as a potential database for this purpose. Consider that in the future, I may want to monetise this access. I need options for how I might do this."
+}
