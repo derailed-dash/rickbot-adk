@@ -326,15 +326,20 @@ The system leverages **ADK Artifacts** for robust handling of user-uploaded file
 To restrict access to certain personas based on user identity, the application implements a Role-Based Access Control (RBAC) system.
 
 *   **Source of Truth**: **Google Firestore**.
+*   **Authentication & Identity**: 
+    *   The system uses **ASGI Middleware** (`AuthMiddleware`) to passively authenticate users by verifying Bearer tokens (Google ID Tokens, GitHub Access Tokens, or Mock Tokens).
+    *   Verified identity is stored in the ASGI `scope["user"]`, making it accessible to subsequent middleware and dependencies.
+*   **Access Enforcement**:
+    *   Enforcement is handled by `PersonaAccessMiddleware`.
+    *   **Body Buffering**: Since the middleware needs to read the request body (to identify the requested `personality` in form data) and still allow the final handler to read it, it implements a **buffer-and-replay** strategy. It captures the ASGI stream, parses the form, performs the access check, and then provides a custom `receive` callable to the application that replays the captured body.
 *   **Schema**:
     *   **`users` Collection**: Maps a unique User ID (e.g., GitHub handle or Google email) to a specific role.
         *   Example: `users/derailed-dash -> { "role": "supporter" }`
     *   **`persona_tiers` Collection**: Maps a persona ID to the minimum role required to access it.
         *   Example: `persona_tiers/dazbo -> { "required_role": "supporter" }`
-*   **Enforcement**:
-    *   Access is enforced at the **FastAPI Middleware** level.
-    *   Before processing a chat request, the middleware retrieves the user's role and the persona's required tier from Firestore.
-    *   If the user's role is insufficient (e.g., a 'standard' user attempting to access a 'supporter' persona), the API returns a structured `403 Forbidden` response with an "Upgrade Required" hint.
+*   **Local Development & Testing**:
+    *   **`BACKEND_ALLOW_MOCK_AUTH`**: This environment variable enables the verification of mock tokens (format: `mock:id:email:name`). When set to `true`, the backend will accept these tokens, allowing developers to simulate different user roles without real OAuth providers.
+    *   This is typically enabled in the `Makefile`'s `api` target and `docker-compose.yml` for a seamless local development experience.
 *   **Initial Seeding**:
     *   A seeding script (`scripts/seed_firestore.py`) is used to initialize these collections with default values.
 

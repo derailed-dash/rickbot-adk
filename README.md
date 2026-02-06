@@ -282,7 +282,7 @@ This file configures the FastAPI server. Use `source scripts/setup-env.sh` to lo
 | :--- | :--- |
 | `GOOGLE_CLIENT_ID` | Required to verify Google ID Tokens sent by the frontend. |
 | `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to accept mock tokens. |
-| `BACKEND_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to *verify* mock tokens. Must be kept out of prod. |
+| `BACKEND_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to *verify* mock tokens. This bypasses real OAuth verification by accepting tokens in the format `mock:id:email:name`, which is essential for local development and testing different RBAC roles without real identity providers. **Must be kept out of prod.** |
 | `GOOGLE_CLOUD_PROJECT` | Used for ADK and Secret Manager access. |
 
 ##### `src/nextjs_fe/.env.local` (Next.js Frontend)

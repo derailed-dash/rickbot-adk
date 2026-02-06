@@ -64,6 +64,8 @@ The following table summarizes the existing backend tests, their category, and t
 | `test_api_auth.py` | Unit | Tests authentication endpoints and logic within the API. |
 | `test_api_fastapi.py` | Unit | Tests core FastAPI application configuration and middleware. |
 | `test_api_personas.py` | Unit | Detailed unit tests for the `/personas` endpoint logic. |
+| `test_access_control_services.py` | Unit | Tests the retrieval of user roles and persona requirements from Firestore (mocked). |
+| `test_access_control_middleware.py` | Unit | Verifies that the `PersonaAccessMiddleware` correctly enforces RBAC and returns structured errors. |
 | `test_artifacts.py` | Integration | Verifies that file uploads are saved as ADK Artifacts and can be retrieved via the `/artifacts` endpoint. |
 | `test_tool_status.py` | Integration | Verifies that tool call events are correctly emitted by the `/chat_stream` endpoint. |
 | `test_api.py` | Integration | Contains tests for the FastAPI `/chat` endpoint. Includes a mocked test for basic success and a true integration test for multi-turn conversation memory. |
@@ -202,3 +204,29 @@ curl -X GET "http://localhost:8000/artifacts/<FILENAME>" \
 ```
 
 **Note**: You can find artifact filenames in the JSON response or stream data from the `/chat` or `/chat_stream` endpoints.
+
+### Access Control (RBAC) Verification
+
+To manually verify that persona access restrictions are working correctly, use the following `curl` commands with different mock users.
+
+#### 1. Verify Restricted Access (Standard User)
+Attempt to access a 'supporter'-tier persona (e.g., Yasmin) with a 'standard' mock user.
+
+```bash
+curl -v -X POST http://localhost:8000/chat \
+  -F "personality=Yasmin" \
+  -F "prompt=hi" \
+  -H "Authorization: Bearer mock:1:user@example.com:User"
+```
+**Expected Outcome**: `403 Forbidden` with a JSON body containing `"error_code": "UPGRADE_REQUIRED"`.
+
+#### 2. Verify Allowed Access (Supporter User)
+Access a 'supporter'-tier persona (e.g., Dazbo) with a mock user who has the 'supporter' role seeded in Firestore.
+
+```bash
+curl -v -X POST http://localhost:8000/chat \
+  -F "personality=Dazbo" \
+  -F "prompt=hi" \
+  -H "Authorization: Bearer mock:derailed-dash:derailed.dash@gmail.com:Dazbo"
+```
+**Expected Outcome**: `200 OK` with a valid agent response.
