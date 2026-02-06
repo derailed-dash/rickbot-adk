@@ -88,7 +88,7 @@ async def verify_token(request: Request, creds: HTTPAuthorizationCredentials = D
     """
     Dependency that enforces authentication.
     """
-    # Check scope set by AuthMiddleware
+    # Check request.scope set by AuthMiddleware (ASGI style)
     user = request.scope.get("user")
     if user:
         return user

@@ -58,5 +58,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Identity-Based Persona Access Control**
+- [~] **Track: Identity-Based Persona Access Control**
 *Link: [./conductor/tracks/identity_persona_access_20260205/](./conductor/tracks/identity_persona_access_20260205/)*

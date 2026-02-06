@@ -7,15 +7,11 @@ from unittest.mock import MagicMock, patch
 
 # Import after implementing or mock it
 from rickbot_agent.auth_middleware import PersonaAccessMiddleware
-from rickbot_agent.auth_models import AuthUser, PersonaAccessDeniedException
+from rickbot_agent.auth_models import AuthUser
 
 @pytest.fixture
 def mock_app():
     app = FastAPI()
-
-    # Add the handler to the mock app to test it
-    from src.main import persona_access_denied_handler
-    app.add_exception_handler(PersonaAccessDeniedException, persona_access_denied_handler)
 
     class MockAuthMiddleware:
         def __init__(self, app: ASGIApp):

@@ -4,7 +4,7 @@ from functools import cache
 
 from google.adk.artifacts import GcsArtifactService, InMemoryArtifactService
 from google.adk.sessions import BaseSessionService, InMemorySessionService
-from google.cloud import firestore
+from google.cloud import firestore  # type: ignore[attr-defined]
 
 from rickbot_utils.config import config
 from rickbot_utils.logging_utils import setup_logger

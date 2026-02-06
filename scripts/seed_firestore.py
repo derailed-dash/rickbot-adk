@@ -1,7 +1,9 @@
-import os
 import argparse
-from google.cloud import firestore
+import os
+
 import google.auth
+from google.cloud import firestore
+
 
 def seed_firestore(project_id):
     db = firestore.Client(project=project_id)

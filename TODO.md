@@ -68,5 +68,5 @@
 - [x] Ensure Gemini model references are updated
 - [x] Move frontend to Cloud Run service, in unified container
 - [x] Ensure React UI works on mobile.
-- [ ] Restrict access to certain personalities based on user identity
+- [~] Restrict access to certain personalities based on user identity
 - [ ] Add voice / live.
