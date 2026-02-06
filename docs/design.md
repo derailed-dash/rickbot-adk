@@ -31,6 +31,7 @@ graph TD
         
         subgraph "Data & State"
             FileStore[(File Search\nStore (RAG))]
+            Firestore[(Google Firestore\nAccess Control)]
             GCS[Cloud Storage\nArtifacts/Logs]
             SecretMgr[Secret Manager\nOAuth Creds / API Keys]
         end
@@ -49,6 +50,7 @@ graph TD
     
     API -->|ADK Framework| Vertex
     API -->|Retrieve Context| FileStore
+    API -->|Check Roles| Firestore
     API -->|Fetch Secrets| SecretMgr
     
     Vertex -->|Inference| Gemini
@@ -318,3 +320,21 @@ The system leverages **ADK Artifacts** for robust handling of user-uploaded file
     -   **Inline Display**: The frontend (Next.js) renders the user's uploaded files immediately from its local state (what the user just dropped).
     -   **History Display**: For historical messages (reloaded sessions), the frontend relies on the message content.
     -   **Future Enhancement**: A dedicated `GET /artifacts/{filename}` endpoint will be exposed to allow secure retrieval of historical artifacts by authorized users.
+
+### Access Control (RBAC)
+
+To restrict access to certain personas based on user identity, the application implements a Role-Based Access Control (RBAC) system.
+
+*   **Source of Truth**: **Google Firestore**.
+*   **Schema**:
+    *   **`users` Collection**: Maps a unique User ID (e.g., GitHub handle or Google email) to a specific role.
+        *   Example: `users/derailed-dash -> { "role": "supporter" }`
+    *   **`persona_tiers` Collection**: Maps a persona ID to the minimum role required to access it.
+        *   Example: `persona_tiers/dazbo -> { "required_role": "supporter" }`
+*   **Enforcement**:
+    *   Access is enforced at the **FastAPI Middleware** level.
+    *   Before processing a chat request, the middleware retrieves the user's role and the persona's required tier from Firestore.
+    *   If the user's role is insufficient (e.g., a 'standard' user attempting to access a 'supporter' persona), the API returns a structured `403 Forbidden` response with an "Upgrade Required" hint.
+*   **Initial Seeding**:
+    *   A seeding script (`scripts/seed_firestore.py`) is used to initialize these collections with default values.
+

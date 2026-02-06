@@ -17,6 +17,20 @@ The application is deployed as a single, unified container based on `Dockerfile.
 *   **FastAPI Backend**: Serving the agent API and ADK-powered chat functionalities.
 *   **Reverse Proxy**: The container manages routing between the UI and API layers.
 
+### Data & Persistence
+
+The application uses several Google Cloud services for data storage and state management:
+*   **Google Cloud Storage (GCS)**: Used for storing user-uploaded artifacts and session logs.
+*   **Google Firestore**: Serves as the source of truth for Role-Based Access Control (RBAC). It stores user roles and persona access requirements.
+
+#### Seeding Firestore
+
+For development and initial setup, a seeding script is provided to populate Firestore with default roles and tiers:
+
+```bash
+uv run python scripts/seed_firestore.py
+```
+
 ### Mandatory Environment Variables and Secrets
 
 The following configurations are required for the application to function, particularly for authentication:
