@@ -121,4 +121,4 @@ api:
 	@echo "| 📄 See docs at /docs                                                          |"
 	@echo "================================================================================="
 	# Using 'fastapi dev' for development with auto-reloading. For production, 'uvicorn' would be used directly.
-	uv run fastapi dev src/main.py
+	BACKEND_ALLOW_MOCK_AUTH=true uv run fastapi dev src/main.py
