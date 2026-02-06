@@ -1,14 +1,13 @@
-from unittest.mock import patch
-
 import pytest
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.testclient import TestClient
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.types import ASGIApp, Receive, Scope, Send
+from unittest.mock import MagicMock, patch
 
 # Import after implementing or mock it
 from rickbot_agent.auth_middleware import PersonaAccessMiddleware
 from rickbot_agent.auth_models import AuthUser, PersonaAccessDeniedException
-
 
 @pytest.fixture
 def mock_app():
@@ -18,19 +17,28 @@ def mock_app():
     from src.main import persona_access_denied_handler
     app.add_exception_handler(PersonaAccessDeniedException, persona_access_denied_handler)
 
-    class MockAuthMiddleware(BaseHTTPMiddleware):
-        async def dispatch(self, request: Request, call_next):
+    class MockAuthMiddleware:
+        def __init__(self, app: ASGIApp):
+            self.app = app
+
+        async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] != "http":
+                await self.app(scope, receive, send)
+                return
+
+            request = Request(scope)
             user_id = request.headers.get("X-Test-User")
             if user_id:
-                request.state.user = AuthUser(
+                scope["user"] = AuthUser(
                     id=user_id,
                     email=user_id,
                     name=user_id,
                     provider="google"
                 )
             else:
-                request.state.user = None
-            return await call_next(request)
+                scope["user"] = None
+            
+            await self.app(scope, receive, send)
 
     app.add_middleware(PersonaAccessMiddleware)
     app.add_middleware(MockAuthMiddleware)

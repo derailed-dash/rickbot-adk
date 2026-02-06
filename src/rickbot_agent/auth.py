@@ -15,10 +15,6 @@ security = HTTPBearer()
 def verify_credentials(token: str) -> AuthUser | None:
     """
     Verifies the authentication token and returns an AuthUser object or None if invalid.
-    Supports:
-    - Mock tokens (format: "mock:id:email:name") - Development only
-    - Google ID Tokens
-    - GitHub Access Tokens
     """
     if not token or token == "undefined":
         return None
@@ -27,9 +23,7 @@ def verify_credentials(token: str) -> AuthUser | None:
 
     # 1. Check for Mock Token (Development Only)
     if token.startswith("mock:"):
-        # In a real app, you'd check an environment variable to ensure this is only enabled in dev
         allow_mock = os.getenv("BACKEND_ALLOW_MOCK_AUTH")
-
         if allow_mock != "true":
             logger.warning(f"Mock auth failed. ALLOW_MOCK={allow_mock}")
             return None
@@ -49,19 +43,15 @@ def verify_credentials(token: str) -> AuthUser | None:
     # 2. Try Google ID Token Verification
     if not user:
         try:
-            # We need the client ID to verify the token
             google_client_id = os.getenv("GOOGLE_CLIENT_ID")
             if google_client_id:
-                # Add clock skew to handle minor time differences
                 idinfo = id_token.verify_oauth2_token(
                     token, google_requests.Request(), google_client_id, clock_skew_in_seconds=10
                 )
-
                 user = AuthUser(
                     id=idinfo["sub"], email=idinfo["email"], name=idinfo.get("name", idinfo["email"]), provider="google"
                 )
         except ValueError:
-            # Not a valid Google token or verification failed, continue to next provider
             pass
         except Exception as e:
             logger.error(f"Error verifying Google token: {e}")
@@ -69,20 +59,16 @@ def verify_credentials(token: str) -> AuthUser | None:
     # 3. Try GitHub Access Token Verification
     if not user:
         try:
-            # GitHub tokens are opaque, we must call their API
             github_response = requests.get("https://api.github.com/user", headers={"Authorization": f"token {token}"}, timeout=5)
             if github_response.status_code == 200:
                 user_data = github_response.json()
-                # GitHub email might be private, so we might need another call if email is null
                 email = user_data.get("email")
                 if not email:
-                    # Try to get emails
                     emails_resp = requests.get(
                         "https://api.github.com/user/emails", headers={"Authorization": f"token {token}"}, timeout=5
                     )
                     if emails_resp.status_code == 200:
                         emails = emails_resp.json()
-                        # Find primary or first
                         primary_email = next((e["email"] for e in emails if e["primary"]), emails[0]["email"] if emails else None)
                         email = primary_email
 
@@ -101,11 +87,10 @@ def verify_credentials(token: str) -> AuthUser | None:
 async def verify_token(request: Request, creds: HTTPAuthorizationCredentials = Depends(security)) -> AuthUser:
     """
     Dependency that enforces authentication.
-    It expects the user to have been authenticated by the AuthMiddleware.
     """
-    if hasattr(request.state, "user") and request.state.user:
-        return request.state.user
+    # Check scope set by AuthMiddleware
+    user = request.scope.get("user")
+    if user:
+        return user
 
-    # If the middleware has not populated the user state (e.g., invalid token or no token),
-    # we raise a 401 error.
     raise HTTPException(status_code=401, detail="Invalid authentication credentials")
