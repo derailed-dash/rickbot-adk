@@ -47,19 +47,23 @@ class PersonaAccessMiddleware:
             await self.app(scope, receive, send)
             return
 
-        # 1. Capture the body so we can read it and still pass it along
+        # 1. Capture the body
         body = b""
         more_body = True
-        while more_body:
-            message = await receive()
-            body += message.get("body", b"")
-            more_body = message.get("more_body", False)
+        try:
+            while more_body:
+                message = await receive()
+                body += message.get("body", b"")
+                more_body = message.get("more_body", False)
+        except Exception as e:
+            logger.error(f"PersonaAccessMiddleware: Failed to read body: {e}")
+            await self.app(scope, receive, send)
+            return
 
-        # 2. Define custom receive to replay the captured body
         async def cached_receive() -> dict:
             return {"type": "http.request", "body": body, "more_body": False}
 
-        # 3. Extract personality from body
+        # 2. Extract personality and check access
         request = Request(scope, receive=cached_receive)
         try:
             form_data = await request.form()
@@ -78,7 +82,7 @@ class PersonaAccessMiddleware:
                 await response(scope, receive, send)
                 return
         except Exception as e:
-            logger.error(f"Error in PersonaAccessMiddleware: {e}")
+            logger.error(f"PersonaAccessMiddleware: Error checking access: {e}")
 
-        # 4. Continue with cached receive
+        # 3. Continue with cached receive
         await self.app(scope, cached_receive, send)
