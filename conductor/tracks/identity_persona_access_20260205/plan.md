@@ -16,7 +16,7 @@ This plan implements a Role-Based Access Control (RBAC) system for restricting p
     - [x] Write tests for Firestore role and tier retrieval. 572e6b3
     - [x] Implement `get_user_role(user_id)` in `src/rickbot_agent/services.py`. 572e6b3
     - [x] Implement `get_required_role(persona_id)` in `src/rickbot_agent/services.py`. 572e6b3
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Infrastructure and Data Modeling' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Infrastructure and Data Modeling' (Protocol in workflow.md) [checkpoint: e9c5a7d]
 
 ## Phase 2: Backend Access Enforcement
 - [ ] Task: Implement Access Control Middleware in FastAPI.
