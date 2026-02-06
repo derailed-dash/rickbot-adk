@@ -1,7 +1,5 @@
-from starlette.types import ASGIApp, Receive, Scope, Send
 from starlette.requests import Request
-from starlette.responses import JSONResponse
-import json
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from rickbot_agent.auth import verify_credentials
 from rickbot_agent.auth_models import PersonaAccessDeniedException
@@ -32,7 +30,7 @@ class AuthMiddleware:
                     scope["user"] = user
             except Exception:
                 pass
-        
+
         await self.app(scope, receive, send)
 
 
@@ -57,21 +55,20 @@ class PersonaAccessMiddleware:
             body += message.get("body", b"")
             more_body = message.get("more_body", False)
 
-        # 2. Extract personality from body
-        # Since it's multipart/form-data or urlencoded, we can use Request.form()
-        # but we need a custom receive that returns the body we just read.
-        
+        # 2. Define custom receive to replay the captured body
         async def cached_receive() -> dict:
             return {"type": "http.request", "body": body, "more_body": False}
 
+        # 3. Extract personality from body
         request = Request(scope, receive=cached_receive)
         try:
             form_data = await request.form()
             personality = form_data.get("personality", "Rick")
-            
+
             required_role = get_required_role(personality)
             user_role = "standard"
             user = scope.get("user")
+
             if user:
                 user_role = get_user_role(user.id)
 
@@ -83,5 +80,5 @@ class PersonaAccessMiddleware:
         except Exception as e:
             logger.error(f"Error in PersonaAccessMiddleware: {e}")
 
-        # 3. Continue with cached receive
+        # 4. Continue with cached receive
         await self.app(scope, cached_receive, send)
