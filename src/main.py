@@ -35,11 +35,10 @@ from pydantic import BaseModel
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-# IMPORTANT: Import agent first to apply monkey-patches (e.g. genai.Client)
 from rickbot_agent.agent import get_agent
 from rickbot_agent.auth import verify_token
 from rickbot_agent.auth_middleware import AuthMiddleware, PersonaAccessMiddleware
-from rickbot_agent.auth_models import AuthUser
+from rickbot_agent.auth_models import AuthUser, PersonaAccessDeniedException
 from rickbot_agent.personality import get_personalities
 from rickbot_agent.services import get_artifact_service, get_session_service
 
@@ -67,6 +66,20 @@ def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSO
     # Add Retry-After header (defaulting to 60s)
     response.headers["Retry-After"] = "60"
     return response
+
+
+def persona_access_denied_handler(request: Request, exc: PersonaAccessDeniedException) -> JSONResponse:
+    """Custom handler for persona access denied errors."""
+    return JSONResponse(
+        status_code=403,
+        content={
+            "error_code": "UPGRADE_REQUIRED",
+            "detail": exc.detail,
+            "required_role": exc.required_role,
+            "personality": exc.personality,
+        },
+    )
+
 
 # Override the default slowapi exception handler so that the middleware uses our custom response
 limiter._exception_handler = rate_limit_exceeded_handler
@@ -98,6 +111,7 @@ app = FastAPI()
 # Add Rate Limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)  # type: ignore
+app.add_exception_handler(PersonaAccessDeniedException, persona_access_denied_handler)  # type: ignore
 app.add_middleware(SlowAPIMiddleware)
 # Note on Middleware Order:
 # FastAPI/Starlette middlewares are executed LIFO (Last Added = First Executed).

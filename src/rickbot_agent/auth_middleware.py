@@ -1,9 +1,9 @@
-from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
 from rickbot_agent.auth import verify_credentials
+from rickbot_agent.auth_models import PersonaAccessDeniedException
 from rickbot_agent.services import get_required_role, get_user_role
 
 
@@ -60,11 +60,15 @@ class PersonaAccessMiddleware(BaseHTTPMiddleware):
             # 4. Check access
             # Simple hierarchy: supporter > standard
             if required_role == "supporter" and user_role != "supporter":
-                return JSONResponse(
-                    status_code=403,
-                    content={
-                        "detail": f"Upgrade Required: Access to the '{personality}' persona is restricted to Supporters."
-                    },
-                )
+                # We raise the exception, which will be caught by the FastAPI exception handler
+                # However, Starlette's BaseHTTPMiddleware has issues with exception handlers.
+                # See: https://github.com/fastapi/fastapi/issues/4518
+                # To be safe, we'll use the handler manually or return the response.
+                # Actually, raising inside dispatch() of BaseHTTPMiddleware DOES NOT trigger app exception handlers.
+                # So we must return the JSONResponse directly or use a different middleware style.
+
+                # Manual invocation of the handler logic for consistency
+                from src.main import persona_access_denied_handler
+                return persona_access_denied_handler(request, PersonaAccessDeniedException(personality, required_role))
 
         return await call_next(request)
