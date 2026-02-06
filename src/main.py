@@ -38,7 +38,7 @@ from slowapi.middleware import SlowAPIMiddleware
 # IMPORTANT: Import agent first to apply monkey-patches (e.g. genai.Client)
 from rickbot_agent.agent import get_agent
 from rickbot_agent.auth import verify_token
-from rickbot_agent.auth_middleware import AuthMiddleware
+from rickbot_agent.auth_middleware import AuthMiddleware, PersonaAccessMiddleware
 from rickbot_agent.auth_models import AuthUser
 from rickbot_agent.personality import get_personalities
 from rickbot_agent.services import get_artifact_service, get_session_service
@@ -101,8 +101,14 @@ app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)  # typ
 app.add_middleware(SlowAPIMiddleware)
 # Note on Middleware Order:
 # FastAPI/Starlette middlewares are executed LIFO (Last Added = First Executed).
-# We add AuthMiddleware LAST so that it executes FIRST on the request path.
-# Request -> AuthMiddleware -> SlowAPIMiddleware -> ...
+# AuthMiddleware must execute FIRST to set request.state.user.
+# PersonaAccessMiddleware must execute AFTER AuthMiddleware but BEFORE the handler.
+# Order of adding (LIFO):
+# 1. PersonaAccessMiddleware
+# 2. AuthMiddleware
+# Execution Order:
+# Request -> AuthMiddleware -> PersonaAccessMiddleware -> SlowAPIMiddleware -> ...
+app.add_middleware(PersonaAccessMiddleware)
 app.add_middleware(AuthMiddleware)
 
 # Add CORS middleware

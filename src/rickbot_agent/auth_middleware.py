@@ -1,8 +1,10 @@
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
 from rickbot_agent.auth import verify_credentials
+from rickbot_agent.services import get_required_role, get_user_role
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
@@ -25,3 +27,44 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 pass
         response = await call_next(request)
         return response
+
+
+class PersonaAccessMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware to enforce Role-Based Access Control (RBAC) for personas.
+    It checks if the requesting user has the required role for the selected persona.
+    """
+
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        # We only care about /chat and /chat_stream endpoints
+        if request.url.path in ["/chat", "/chat_stream"]:
+            # 1. Get requested personality
+            # Since these endpoints use Form data, we need to peek at the form
+            personality = "Rick"  # Default
+            try:
+                form_data = await request.form()
+                personality = form_data.get("personality", "Rick")
+            except Exception:
+                # If we can't read the form (e.g. not multipart), just proceed
+                pass
+
+            # 2. Get required role for persona
+            required_role = get_required_role(personality)
+
+            # 3. Get user role
+            user_role = "standard"
+            user = getattr(request.state, "user", None)
+            if user:
+                user_role = get_user_role(user.email)
+
+            # 4. Check access
+            # Simple hierarchy: supporter > standard
+            if required_role == "supporter" and user_role != "supporter":
+                return JSONResponse(
+                    status_code=403,
+                    content={
+                        "detail": f"Upgrade Required: Access to the '{personality}' persona is restricted to Supporters."
+                    },
+                )
+
+        return await call_next(request)
