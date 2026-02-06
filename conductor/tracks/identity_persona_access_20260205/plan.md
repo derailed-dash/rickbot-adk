@@ -19,10 +19,10 @@ This plan implements a Role-Based Access Control (RBAC) system for restricting p
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Infrastructure and Data Modeling' (Protocol in workflow.md) [checkpoint: e9c5a7d]
 
 ## Phase 2: Backend Access Enforcement
-- [ ] Task: Implement Access Control Middleware in FastAPI.
-    - [ ] Write failing tests for middleware (unauthorised access to restricted persona).
-    - [ ] Implement `PersonaAccessMiddleware` in `src/rickbot_agent/auth_middleware.py`.
-    - [ ] Integrate middleware into the FastAPI app.
+- [x] Task: Implement Access Control Middleware in FastAPI. 492f420
+    - [x] Write failing tests for middleware (unauthorised access to restricted persona). 492f420
+    - [x] Implement `PersonaAccessMiddleware` in `src/rickbot_agent/auth_middleware.py`. 492f420
+    - [x] Integrate middleware into the FastAPI app. 492f420
 - [ ] Task: Refine "Upgrade Required" Response.
     - [ ] Write tests for the specific "Upgrade Required" error response structure.
     - [ ] Implement a custom exception and handler for persona access denial.
