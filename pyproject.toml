@@ -33,6 +33,7 @@ dev = [
     "pytest-asyncio",
     "nest-asyncio",
     "tenacity",
+    "pytest-cov>=7.0.0",
 ]
 
 [project.optional-dependencies]
