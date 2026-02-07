@@ -25,9 +25,10 @@ if (process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ALLOW_MOCK
       },
       async authorize(credentials, req) {
            const mockEmail = process.env.MOCK_AUTH_USER || "mock@example.com";
+           const mockId = credentials?.username || "mock-123";
            return {
-             id: "mock-123",
-             name: "Mock User",
+             id: mockId.startsWith("mock-") ? mockId : `mock-${mockId}`,
+             name: credentials?.username || "Mock User",
              email: mockEmail,
              image: "/avatars/dazbo.png"
            }
@@ -43,14 +44,14 @@ export const authOptions: NextAuthOptions = {
       // Persist the OAuth access_token to the token right after signin
       if (account) {
         token.accessToken = account.access_token
-        token.idToken = account.id_token
         token.provider = account.provider
         
-        // Handle Mock Provider specifically when account is present
+        // Handle Mock Provider specifically
         if (account.provider === 'mock' && user) {
              const cleanId = user.id.replace('mock-', '');
              token.idToken = `mock:${cleanId}:${user.email}:${user.name}`;
-             token.provider = 'mock';
+        } else {
+             token.idToken = account.id_token
         }
       }
       

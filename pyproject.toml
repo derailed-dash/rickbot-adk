@@ -22,6 +22,7 @@ dependencies = [
     "limits",
     "slowapi>=0.1.9",
     "google-genai",
+    "google-cloud-firestore>=2.23.0",
 ]
 
 requires-python = ">=3.12"
@@ -32,6 +33,7 @@ dev = [
     "pytest-asyncio",
     "nest-asyncio",
     "tenacity",
+    "pytest-cov>=7.0.0",
 ]
 
 [project.optional-dependencies]

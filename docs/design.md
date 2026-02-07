@@ -31,6 +31,7 @@ graph TD
         
         subgraph "Data & State"
             FileStore[(File Search\nStore (RAG))]
+            Firestore[(Google Firestore\nAccess Control)]
             GCS[Cloud Storage\nArtifacts/Logs]
             SecretMgr[Secret Manager\nOAuth Creds / API Keys]
         end
@@ -49,6 +50,7 @@ graph TD
     
     API -->|ADK Framework| Vertex
     API -->|Retrieve Context| FileStore
+    API -->|Check Roles| Firestore
     API -->|Fetch Secrets| SecretMgr
     
     Vertex -->|Inference| Gemini
@@ -318,3 +320,39 @@ The system leverages **ADK Artifacts** for robust handling of user-uploaded file
     -   **Inline Display**: The frontend (Next.js) renders the user's uploaded files immediately from its local state (what the user just dropped).
     -   **History Display**: For historical messages (reloaded sessions), the frontend relies on the message content.
     -   **Future Enhancement**: A dedicated `GET /artifacts/{filename}` endpoint will be exposed to allow secure retrieval of historical artifacts by authorized users.
+
+### Access Control (RBAC)
+
+To restrict access to certain personas based on user identity, the application implements a Role-Based Access Control (RBAC) system.
+
+*   **Source of Truth**: **Google Firestore**.
+*   **Authentication & Identity**: 
+    *   The system uses **ASGI Middleware** (`AuthMiddleware`) to passively authenticate users by verifying Bearer tokens (Google ID Tokens, GitHub Access Tokens, or Mock Tokens).
+    *   Verified identity is stored in the ASGI `scope["user"]`, making it accessible to subsequent dependencies.
+*   **Access Enforcement**:
+    *   Enforcement is handled by a FastAPI dependency (`check_persona_access`) applied to the `/chat` and `/chat_stream` endpoints.
+    *   This dependency checks the user's role against the required role for the requested persona stored in Firestore.
+    *   **Graceful Upsell**: If access is denied, the API returns a `403 Forbidden` response with a structured JSON body (`error_code: "UPGRADE_REQUIRED"`), triggering an upgrade modal in the frontend.
+*   **Automated User Provisioning (Metadata Sync)**:
+    *   The system automatically creates and updates user records in Firestore to simplify administration.
+    *   **Synchronization Trigger**: Occurs when the frontend calls `/personas` immediately after a user signs in.
+    *   **Fields**:
+        *   `id`: The unique provider ID (e.g., Google `sub` or GitHub ID).
+        *   `provider`: The identity provider (e.g., `google`, `github`, `mock`).
+        *   `name`: Display name from the identity provider.
+        *   `email`: User's email address.
+        *   `role`: Defaults to `standard` for new users.
+        *   `last_logged_in`: A Firestore server timestamp for housekeeping.
+*   **Schema**:
+    *   **`users` Collection**: 
+        *   **Document ID**: Readable format `{name}:{provider}:{id}` (e.g., `DarrenLester:google:108579206256958314052`).
+        *   **Querying**: The backend queries by the indexed `id` AND `provider` fields to find the document, ensuring complete account isolation and preventing cross-provider ID collisions.
+    *   **`persona_tiers` Collection**: 
+        *   **Document ID**: The lowercase persona ID (e.g., `dazbo`, `yasmin`).
+        *   **Fields**: `required_role` (e.g., `standard`, `supporter`).
+*   **Local Development & Testing**:
+    *   **`BACKEND_ALLOW_MOCK_AUTH`**: This environment variable enables the verification of mock tokens (format: `mock:id:email:name`). When set to `true`, the backend will accept these tokens, allowing developers to simulate different user roles without real OAuth providers.
+    *   The **Mock Login** in the UI allows entering a custom username which is mapped to the `id` field, enabling easy testing of different role assignments.
+*   **Initial Seeding**:
+    *   A seeding script (`scripts/seed_firestore.py`) is used to initialize these collections with default values.
+

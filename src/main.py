@@ -35,13 +35,12 @@ from pydantic import BaseModel
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-# IMPORTANT: Import agent first to apply monkey-patches (e.g. genai.Client)
 from rickbot_agent.agent import get_agent
 from rickbot_agent.auth import verify_token
 from rickbot_agent.auth_middleware import AuthMiddleware
-from rickbot_agent.auth_models import AuthUser
+from rickbot_agent.auth_models import AuthUser, PersonaAccessDeniedException
 from rickbot_agent.personality import get_personalities
-from rickbot_agent.services import get_artifact_service, get_session_service
+from rickbot_agent.services import get_artifact_service, get_session_service, get_required_role, get_user_role
 
 # ADK imports MUST happen after agent patch
 from google.adk.runners import Runner
@@ -67,6 +66,20 @@ def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSO
     # Add Retry-After header (defaulting to 60s)
     response.headers["Retry-After"] = "60"
     return response
+
+
+def persona_access_denied_handler(request: Request, exc: PersonaAccessDeniedException) -> JSONResponse:
+    """Custom handler for persona access denial."""
+    return JSONResponse(
+        status_code=403,
+        content={
+            "error_code": "UPGRADE_REQUIRED",
+            "detail": exc.detail,
+            "required_role": exc.required_role,
+            "personality": exc.personality,
+        },
+    )
+
 
 # Override the default slowapi exception handler so that the middleware uses our custom response
 limiter._exception_handler = rate_limit_exceeded_handler
@@ -97,11 +110,15 @@ app = FastAPI()
 
 # Add Rate Limiting
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)  # type: ignore
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)  # type: ignore[arg-type]
+app.add_exception_handler(PersonaAccessDeniedException, persona_access_denied_handler)
 app.add_middleware(SlowAPIMiddleware)
 # Note on Middleware Order:
 # FastAPI/Starlette middlewares are executed LIFO (Last Added = First Executed).
-# We add AuthMiddleware LAST so that it executes FIRST on the request path.
+# AuthMiddleware must execute FIRST to set request.state.user.
+# Order of adding (LIFO):
+# 1. AuthMiddleware
+# Execution Order:
 # Request -> AuthMiddleware -> SlowAPIMiddleware -> ...
 app.add_middleware(AuthMiddleware)
 
@@ -115,9 +132,35 @@ app.add_middleware(
 )
 
 
+async def check_persona_access(
+    personality: Annotated[str, Form()] = "Rick",
+    user: AuthUser = Depends(verify_token),
+) -> None:
+    """Dependency to check if the user has access to the requested persona."""
+    required_role = get_required_role(personality)
+    user_role = "standard"
+    if user:
+        user_role = get_user_role(user.id, user.provider)
+        logger.info(
+            f"RBAC Check: user_id='{user.id}', provider='{user.provider}', "
+            f"role='{user_role}', persona='{personality}', required='{required_role}'"
+        )
+
+    if required_role == "supporter" and user_role != "supporter":
+        logger.warning(
+            f"RBAC DENIED: user_id='{user.id}', provider='{user.provider}', "
+            f"role='{user_role}' lacks required role '{required_role}' for '{personality}'"
+        )
+        raise PersonaAccessDeniedException(personality, required_role)
+
+
 @app.get("/personas")
 def get_personas(request: Request, user: AuthUser = Depends(verify_token)) -> list[Persona]:
     """Returns a list of available chatbot personalities."""
+    # Sync user metadata on persona list load (usually happens right after login)
+    from rickbot_agent.services import sync_user_metadata
+    sync_user_metadata(user.id, user.provider, user.email, user.name)
+
     personalities = get_personalities()
     return [
         Persona(
@@ -174,7 +217,7 @@ async def _process_files(
     return parts
 
 
-@app.post("/chat")
+@app.post("/chat", dependencies=[Depends(check_persona_access)])
 @limiter.limit("5 per minute")
 async def chat(
     request: Request,
@@ -256,7 +299,7 @@ async def chat(
     )
 
 
-@app.post("/chat_stream")
+@app.post("/chat_stream", dependencies=[Depends(check_persona_access)])
 @limiter.limit("5 per minute")
 async def chat_stream(
     request: Request,
@@ -267,6 +310,7 @@ async def chat_stream(
     files: list[UploadFile] = File(default=[]),
 ) -> StreamingResponse:
     """Streaming chat endpoint to interact with the Rickbot agent."""
+    logger.debug(f"DEBUG: chat_stream ENTERED. user={user.id}, personality={personality}")
     user_id = user.email  # Use email as user_id for ADK sessions
     logger.debug(
         f"Received chat stream request - "

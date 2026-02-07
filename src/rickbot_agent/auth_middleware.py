@@ -1,27 +1,33 @@
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from rickbot_agent.auth import verify_credentials
+from rickbot_utils.config import logger
 
 
-class AuthMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        # Passive authentication: Attempt to verify, but don't fail if we can't.
-        # This allows endpoints that don't need auth to proceed,
-        # and allows endpoints that DO need auth to check request.state.user later.
-        # 1. Extract token from header
+class AuthMiddleware:
+    """
+    Passive authentication middleware using ASGI interface.
+    Sets 'user' in scope if token is valid.
+    """
+    def __init__(self, app: ASGIApp):
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        request = Request(scope)
         auth_header = request.headers.get("Authorization")
+
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header.split(" ")[1]
             try:
-                # 2. Verify credentials
                 user = verify_credentials(token)
                 if user:
-                    request.state.user = user
-            except Exception:
-                # Swallow exceptions to allow non-authenticated requests to proceed.
-                # Invalid tokens will result in request.state.user being None.
-                pass
-        response = await call_next(request)
-        return response
+                    scope["user"] = user
+            except Exception as e:
+                logger.error(f"AuthMiddleware: Token verification failed: {e}")
+
+        await self.app(scope, receive, send)

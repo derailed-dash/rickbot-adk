@@ -24,7 +24,8 @@ locals {
     "compute.googleapis.com",
     "servicenetworking.googleapis.com",
     "secretmanager.googleapis.com",
-    "dns.googleapis.com"
+    "dns.googleapis.com",
+    "firestore.googleapis.com"
   ]
 
   deploy_project_ids = {

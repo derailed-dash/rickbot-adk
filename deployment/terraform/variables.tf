@@ -110,6 +110,7 @@ variable "app_sa_roles" {
     "roles/cloudtrace.agent",
     "roles/storage.admin",
     "roles/serviceusage.serviceUsageConsumer",
+    "roles/datastore.user",
   ]
 }
 
@@ -127,7 +128,8 @@ variable "cicd_roles" {
     "roles/cloudtrace.agent",
     "roles/artifactregistry.writer",
     "roles/cloudbuild.builds.builder",
-    "roles/iap.admin"
+    "roles/iap.admin",
+    "roles/datastore.user",
   ]
 }
 
@@ -140,7 +142,8 @@ variable "cicd_sa_deployment_required_roles" {
     "roles/aiplatform.user",
     "roles/storage.admin",
     "roles/iap.admin",
-    "roles/iam.serviceAccountAdmin"
+    "roles/iam.serviceAccountAdmin",
+    "roles/datastore.user",
   ]
 }
 

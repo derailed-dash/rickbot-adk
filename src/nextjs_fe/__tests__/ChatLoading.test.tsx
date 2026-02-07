@@ -18,7 +18,13 @@ describe('Chat Loading State', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        (useSession as jest.Mock).mockReturnValue(mockSession)
+        (useSession as jest.Mock).mockReturnValue(mockSession);
+        // Silence expected console errors during loading/retry tests
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+    })
+
+    afterEach(() => {
+        (console.error as jest.Mock).mockRestore();
     })
 
     it('shows custom loading waiting for backend and retries until successful', async () => {

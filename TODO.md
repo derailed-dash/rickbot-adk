@@ -64,9 +64,13 @@
 - [x] Optimise container build times and image sizes
 - [x] Robust handling if RagAgent not created
 - [x] Populate file search store with reference material in Prod
-- [ ] Review env var changes and update Deployment / TF accordingly
+- [x] Review env var changes and update Deployment / TF accordingly
 - [x] Ensure Gemini model references are updated
-- [ ] Move frontend to Cloud Run service - use sidecar, check prod and staging sizing
+- [x] Move frontend to Cloud Run service, in unified container
 - [x] Ensure React UI works on mobile.
-- [ ] Restrict access to certain personalities based on user identity
+- [x] Restrict access to certain personalities based on user identity
+- [ ] Remove IAP from staging
+- [ ] Enable PITR for Firestore
+- [ ] Add housekeeping for old user data in Firestore (non supporters)
+- [ ] Add upgrade / payment flow
 - [ ] Add voice / live.
