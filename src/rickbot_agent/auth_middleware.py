@@ -1,6 +1,5 @@
-from starlette.types import ASGIApp, Receive, Scope, Send, Message
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from rickbot_agent.auth import verify_credentials
 from rickbot_utils.config import logger
@@ -21,7 +20,7 @@ class AuthMiddleware:
 
         request = Request(scope)
         auth_header = request.headers.get("Authorization")
-        
+
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header.split(" ")[1]
             try:
@@ -30,5 +29,5 @@ class AuthMiddleware:
                     scope["user"] = user
             except Exception as e:
                 logger.error(f"AuthMiddleware: Token verification failed: {e}")
-        
+
         await self.app(scope, receive, send)

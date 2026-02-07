@@ -17,7 +17,7 @@ def test_get_user_role_found(mock_db):
     mock_doc = MagicMock()
     mock_doc.id = "ReadableName:mock:test-user"
     mock_doc.to_dict.return_value = {"role": "supporter"}
-    
+
     # Mock chain: collection().where().where().limit().get()
     mock_coll = mock_db.collection.return_value
     mock_where1 = mock_coll.where.return_value

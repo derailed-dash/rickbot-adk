@@ -56,7 +56,7 @@ def get_user_role(user_id: str, provider: str) -> str:
             .limit(1)
             .get()
         )
-        
+
         if docs:
             role = docs[0].to_dict().get("role", "standard")
             logger.debug(f"Retrieved role '{role}' for user_id '{user_id}' ({provider}) from doc '{docs[0].id}'")

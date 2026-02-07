@@ -29,9 +29,27 @@ def seed_firestore(project_id):
     # 2. Seed users (for testing)
     # Using readable document ID format: {name}:{provider}:{id}
     users = [
-        {"id": "derailed-dash", "provider": "github", "name": "Dazbo", "role": "supporter", "email": "dazbo@example.com"},
-        {"id": "108579206256958314052", "provider": "google", "name": "Darren Lester", "role": "supporter", "email": "dazbo@google.com"},
-        {"id": "test-standard-user", "provider": "mock", "name": "StandardUser", "role": "standard", "email": "standard@example.com"}
+        {
+            "id": "derailed-dash",
+            "provider": "github",
+            "name": "Dazbo",
+            "role": "supporter",
+            "email": "dazbo@example.com"
+        },
+        {
+            "id": "108579206256958314052",
+            "provider": "google",
+            "name": "Darren Lester",
+            "role": "supporter",
+            "email": "dazbo@google.com"
+        },
+        {
+            "id": "test-standard-user",
+            "provider": "mock",
+            "name": "StandardUser",
+            "role": "standard",
+            "email": "standard@example.com"
+        }
     ]
 
     print("\nSeeding users collection...")

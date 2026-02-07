@@ -36,7 +36,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
 from rickbot_agent.agent import get_agent
-from rickbot_agent.auth import verify_token, verify_credentials
+from rickbot_agent.auth import verify_token
 from rickbot_agent.auth_middleware import AuthMiddleware
 from rickbot_agent.auth_models import AuthUser, PersonaAccessDeniedException
 from rickbot_agent.personality import get_personalities
@@ -141,10 +141,16 @@ async def check_persona_access(
     user_role = "standard"
     if user:
         user_role = get_user_role(user.id, user.provider)
-        logger.info(f"RBAC Check: user_id='{user.id}', provider='{user.provider}', role='{user_role}', persona='{personality}', required='{required_role}'")
+        logger.info(
+            f"RBAC Check: user_id='{user.id}', provider='{user.provider}', "
+            f"role='{user_role}', persona='{personality}', required='{required_role}'"
+        )
 
     if required_role == "supporter" and user_role != "supporter":
-        logger.warning(f"RBAC DENIED: user_id='{user.id}', role='{user_role}' lacks required role '{required_role}' for '{personality}'")
+        logger.warning(
+            f"RBAC DENIED: user_id='{user.id}', provider='{user.provider}', "
+            f"role='{user_role}' lacks required role '{required_role}' for '{personality}'"
+        )
         raise PersonaAccessDeniedException(personality, required_role)
 
 

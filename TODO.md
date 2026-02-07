@@ -69,6 +69,10 @@
 - [x] Move frontend to Cloud Run service, in unified container
 - [x] Ensure React UI works on mobile.
 - [x] Restrict access to certain personalities based on user identity
+- [x] **Track: Implement Identity-Based Persona Access Control (RBAC)** [2026-02-05]
+    - [x] Phase 1: Infrastructure and Data Modeling.
+    - [x] Phase 2: Backend Access Enforcement.
+    - [x] Phase 3: Frontend Integration and Verification.
 - [ ] Remove IAP from staging
 - [ ] Enable PITR for Firestore
 - [ ] Add housekeeping for old user data in Firestore (non supporters)

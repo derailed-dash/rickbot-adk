@@ -7,7 +7,6 @@ import os
 import subprocess
 import threading
 import time
-from collections.abc import Iterator
 from typing import Any
 
 import pytest
@@ -40,7 +39,7 @@ def start_server() -> subprocess.Popen[str]:
     env = os.environ.copy()
     env["RICKBOT_TEST_MODE"] = "true"
     env["BACKEND_ALLOW_MOCK_AUTH"] = "true"
-    
+
     process = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
@@ -101,7 +100,7 @@ def test_standard_user_cannot_access_supporter_persona(rbac_server):
     data = {"prompt": "Hello", "personality": "Yasmin"}
 
     response = requests.post(STREAM_URL, data=data, headers=headers)
-    
+
     assert response.status_code == 403
     json_resp = response.json()
     assert json_resp["error_code"] == "UPGRADE_REQUIRED"
@@ -126,7 +125,7 @@ def test_supporter_user_can_access_supporter_persona(rbac_server):
     data = {"prompt": "Hello", "personality": "Yasmin"}
 
     response = requests.post(STREAM_URL, data=data, headers=headers)
-    
+
     # Yasmin is a supporter persona, should return 200
     assert response.status_code == 200
 
@@ -138,7 +137,7 @@ def test_standard_user_can_access_standard_persona(rbac_server):
     data = {"prompt": "Hello", "personality": "Rick"}
 
     response = requests.post(STREAM_URL, data=data, headers=headers)
-    
+
     assert response.status_code == 200
 
 def test_dynamic_tier_update(rbac_server):
@@ -149,21 +148,21 @@ def test_dynamic_tier_update(rbac_server):
     from google.cloud import firestore
     db = firestore.Client(project=os.environ.get("GOOGLE_CLOUD_PROJECT"))
     doc_ref = db.collection("persona_tiers").document("rick")
-    
+
     try:
         # 1. Initially Rick is standard (verified in previous test)
-        
+
         # 2. Change Rick to supporter
         doc_ref.update({"required_role": "supporter"})
         time.sleep(1) # Small delay for Firestore consistency
-        
+
         headers = {"Authorization": "Bearer mock:test-standard-user:standard@example.com:StandardUser"}
         data = {"prompt": "Hello", "personality": "Rick"}
-        
+
         response = requests.post(STREAM_URL, data=data, headers=headers)
         assert response.status_code == 403
         assert response.json()["error_code"] == "UPGRADE_REQUIRED"
-        
+
     finally:
         # 3. Restore Rick to standard
         doc_ref.update({"required_role": "standard"})

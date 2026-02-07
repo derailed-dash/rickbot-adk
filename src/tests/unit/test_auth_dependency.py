@@ -48,7 +48,7 @@ async def test_verify_token_dependency_failure():
     # Create mock request WITHOUT user in scope
     request = MagicMock(spec=Request)
     request.scope = {}
-    
+
     with pytest.raises(HTTPException) as excinfo:
         await verify_token(request)
     assert excinfo.value.status_code == 401

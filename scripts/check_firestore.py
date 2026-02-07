@@ -1,6 +1,8 @@
-from google.cloud import firestore
-import google.auth
 import os
+
+import google.auth
+from google.cloud import firestore
+
 
 def check_firestore():
     _, project_id = google.auth.default()
@@ -8,7 +10,7 @@ def check_firestore():
     db = firestore.Client(project=project_id)
 
     print(f"Checking project: {project_id}")
-    
+
     print("\nPersona Tiers:")
     docs = db.collection("persona_tiers").stream()
     for doc in docs:
