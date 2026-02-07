@@ -335,19 +335,18 @@ To restrict access to certain personas based on user identity, the application i
     *   **Graceful Upsell**: If access is denied, the API returns a `403 Forbidden` response with a structured JSON body (`error_code: "UPGRADE_REQUIRED"`), triggering an upgrade modal in the frontend.
 *   **Automated User Provisioning (Metadata Sync)**:
     *   The system automatically creates and updates user records in Firestore to simplify administration.
-    *   **Synchronization Triggers**: 
-        1.  **Immediate Login**: Triggered when the frontend calls `/personas` right after a user signs in.
-        2.  **Every Interaction**: Triggered on every call to `/chat` or `/chat_stream`.
+    *   **Synchronization Trigger**: Occurs when the frontend calls `/personas` immediately after a user signs in.
     *   **Fields**:
         *   `id`: The unique provider ID (e.g., Google `sub` or GitHub ID).
+        *   `provider`: The identity provider (e.g., `google`, `github`, `mock`).
         *   `name`: Display name from the identity provider.
         *   `email`: User's email address.
         *   `role`: Defaults to `standard` for new users.
         *   `last_logged_in`: A Firestore server timestamp for housekeeping.
 *   **Schema**:
     *   **`users` Collection**: 
-        *   **Document ID**: Readable format `{name}:{id}` (e.g., `DarrenLester:108579206256958314052`).
-        *   **Querying**: The backend queries by the indexed `id` field to find the document, ensuring stable lookups even if a user's display name changes.
+        *   **Document ID**: Readable format `{name}:{provider}:{id}` (e.g., `DarrenLester:google:108579206256958314052`).
+        *   **Querying**: The backend queries by the indexed `id` AND `provider` fields to find the document, ensuring complete account isolation and preventing cross-provider ID collisions.
     *   **`persona_tiers` Collection**: 
         *   **Document ID**: The lowercase persona ID (e.g., `dazbo`, `yasmin`).
         *   **Fields**: `required_role` (e.g., `standard`, `supporter`).
