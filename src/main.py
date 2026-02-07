@@ -145,9 +145,11 @@ async def check_persona_access(
         sync_user_metadata(user.id, user.email, user.name)
         
         user_role = get_user_role(user.id)
-        logger.info(f"RBAC Check: user_id='{user.id}', role='{user_role}', persona='{personality}', required='{required_role}'")
+        logger.info(f"RBAC Check: user_id='{user.id}', provider='{user.provider}', role='{user_role}', persona='{personality}', required='{required_role}'")
 
     if required_role == "supporter" and user_role != "supporter":
+        logger.warning(f"RBAC DENIED: user_id='{user.id}', role='{user_role}' lacks required role '{required_role}' for '{personality}'")
+        raise PersonaAccessDeniedException(personality, required_role)
         logger.info(f"Access Denied: user={user.id if user else 'anonymous'} to {personality}")
         raise PersonaAccessDeniedException(personality, required_role)
 

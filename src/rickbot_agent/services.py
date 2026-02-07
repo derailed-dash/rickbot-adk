@@ -47,12 +47,16 @@ def get_user_role(user_id: str) -> str:
     try:
         db = _get_firestore_client()
         # Query by the stable 'id' field
-        docs = db.collection("users").where("id", "==", user_id).limit(1).get()
+        logger.debug(f"Firestore Query: collection='users', where id == '{user_id}'")
+        from google.cloud.firestore_v1.base_query import FieldFilter
+        docs = db.collection("users").where(filter=FieldFilter("id", "==", user_id)).limit(1).get()
         
         if docs:
             role = docs[0].to_dict().get("role", "standard")
-            logger.debug(f"Retrieved role '{role}' for user_id '{user_id}'")
+            logger.debug(f"Retrieved role '{role}' for user_id '{user_id}' from doc '{docs[0].id}'")
             return role
+        else:
+            logger.debug(f"No Firestore document found for user_id '{user_id}'")
     except Exception as e:
         logger.error(f"Error retrieving role for user_id '{user_id}': {e}")
 
@@ -86,7 +90,8 @@ def sync_user_metadata(user_id: str, email: str, name: str) -> None:
     """
     try:
         db = _get_firestore_client()
-        docs = db.collection("users").where("id", "==", user_id).limit(1).get()
+        from google.cloud.firestore_v1.base_query import FieldFilter
+        docs = db.collection("users").where(filter=FieldFilter("id", "==", user_id)).limit(1).get()
 
         data = {
             "id": user_id,
