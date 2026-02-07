@@ -27,19 +27,21 @@ def seed_firestore(project_id):
         print(f"  Set {persona_id} -> {required_role}")
 
     # 2. Seed users (for testing)
-    # Using readable document ID format: {id}_{safe_name}
+    # Using readable document ID format: {name}:{provider}:{id}
     users = [
-        {"id": "derailed-dash", "name": "Dazbo", "role": "supporter", "email": "dazbo@example.com"},
-        {"id": "test-standard-user", "name": "StandardUser", "role": "standard", "email": "standard@example.com"}
+        {"id": "derailed-dash", "provider": "github", "name": "Dazbo", "role": "supporter", "email": "dazbo@example.com"},
+        {"id": "108579206256958314052", "provider": "google", "name": "Darren Lester", "role": "supporter", "email": "dazbo@google.com"},
+        {"id": "test-standard-user", "provider": "mock", "name": "StandardUser", "role": "standard", "email": "standard@example.com"}
     ]
 
     print("\nSeeding users collection...")
     for user in users:
         safe_name = "".join(c for c in user["name"] if c.isalnum())
-        doc_id = f"{user['id']}_{safe_name}"
+        doc_id = f"{safe_name}:{user['provider']}:{user['id']}"
         doc_ref = db.collection("users").document(doc_id)
         doc_ref.set({
             "id": user["id"],
+            "provider": user["provider"],
             "name": user["name"],
             "email": user["email"],
             "role": user["role"],
