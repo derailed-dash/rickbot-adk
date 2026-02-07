@@ -41,18 +41,20 @@ def _get_firestore_client() -> firestore.Client:
 def get_user_role(user_id: str) -> str:
     """
     Retrieve the role for a given user from Firestore.
+    Queries the 'users' collection for a document where the 'id' field matches.
     Defaults to 'standard' if the user is not found.
     """
     try:
         db = _get_firestore_client()
-        doc_ref = db.collection("users").document(user_id)
-        doc = doc_ref.get()
-        if doc.exists:
-            role = doc.to_dict().get("role", "standard")
-            logger.debug(f"Retrieved role '{role}' for user '{user_id}'")
+        # Query by the stable 'id' field
+        docs = db.collection("users").where("id", "==", user_id).limit(1).get()
+        
+        if docs:
+            role = docs[0].to_dict().get("role", "standard")
+            logger.debug(f"Retrieved role '{role}' for user_id '{user_id}'")
             return role
     except Exception as e:
-        logger.error(f"Error retrieving role for user '{user_id}': {e}")
+        logger.error(f"Error retrieving role for user_id '{user_id}': {e}")
 
     return "standard"
 
@@ -74,3 +76,37 @@ def get_required_role(persona_id: str) -> str:
         logger.error(f"Error retrieving required role for persona '{persona_id}': {e}")
 
     return "standard"
+
+
+def sync_user_metadata(user_id: str, email: str, name: str) -> None:
+    """
+    Ensures user metadata is up to date in Firestore.
+    If the user doesn't exist (queried by 'id' field), creates a new document 
+    with ID format: {id}_{name} for readability.
+    """
+    try:
+        db = _get_firestore_client()
+        docs = db.collection("users").where("id", "==", user_id).limit(1).get()
+
+        data = {
+            "id": user_id,
+            "email": email,
+            "name": name,
+            "last_logged_in": firestore.SERVER_TIMESTAMP
+        }
+
+        if docs:
+            # Update existing document
+            doc_ref = docs[0].reference
+            doc_ref.update(data)
+            logger.debug(f"Updated metadata for user {user_id}")
+        else:
+            # Create new document with readable ID
+            # Clean name for ID use (alphanumeric only)
+            safe_name = "".join(c for c in name if c.isalnum())
+            doc_id = f"{user_id}_{safe_name}"
+            data["role"] = "standard"
+            db.collection("users").document(doc_id).set(data)
+            logger.info(f"Created new user record: {doc_id}")
+    except Exception as e:
+        logger.error(f"Error syncing metadata for user {user_id}: {e}")

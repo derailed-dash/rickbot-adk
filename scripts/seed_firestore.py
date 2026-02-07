@@ -27,18 +27,25 @@ def seed_firestore(project_id):
         print(f"  Set {persona_id} -> {required_role}")
 
     # 2. Seed users (for testing)
-    # We'll seed the current user as a supporter for testing
-    # In a real app, users would be created during signup/login
+    # Using readable document ID format: {id}_{safe_name}
     users = [
-        {"id": "derailed-dash", "role": "supporter"}, # GitHub handle from GEMINI.md
-        {"id": "test-standard-user", "role": "standard"}
+        {"id": "derailed-dash", "name": "Dazbo", "role": "supporter", "email": "dazbo@example.com"},
+        {"id": "test-standard-user", "name": "StandardUser", "role": "standard", "email": "standard@example.com"}
     ]
 
     print("\nSeeding users collection...")
     for user in users:
-        doc_ref = db.collection("users").document(user["id"])
-        doc_ref.set({"role": user["role"]})
-        print(f"  Set user {user['id']} -> {user['role']}")
+        safe_name = "".join(c for c in user["name"] if c.isalnum())
+        doc_id = f"{user['id']}_{safe_name}"
+        doc_ref = db.collection("users").document(doc_id)
+        doc_ref.set({
+            "id": user["id"],
+            "name": user["name"],
+            "email": user["email"],
+            "role": user["role"],
+            "last_logged_in": firestore.SERVER_TIMESTAMP
+        })
+        print(f"  Set user doc {doc_id} -> {user['role']}")
 
     print("\nFirestore seeding complete.")
 
