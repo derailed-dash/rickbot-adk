@@ -35,7 +35,8 @@ This plan implements a Role-Based Access Control (RBAC) system for restricting p
     - [x] Fix Mock Login to support variable user IDs for testing. b220002
 - [x] Task: Implement User Metadata Sync. 293ea83
     - [x] Automatically create/update user records in Firestore.
-    - [x] Use readable document IDs ({id}_{name}).
+    - [x] Use readable document IDs ({name}:{id}). 989b5cd
+    - [x] Trigger sync immediately on login (via /personas). 989b5cd
     - [x] Track last_logged_in for housekeeping.
 - [x] Task: End-to-End Verification. 4f24750
     - [x] Verify a 'standard' user cannot access a 'supporter' persona.
