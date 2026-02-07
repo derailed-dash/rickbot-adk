@@ -328,18 +328,32 @@ To restrict access to certain personas based on user identity, the application i
 *   **Source of Truth**: **Google Firestore**.
 *   **Authentication & Identity**: 
     *   The system uses **ASGI Middleware** (`AuthMiddleware`) to passively authenticate users by verifying Bearer tokens (Google ID Tokens, GitHub Access Tokens, or Mock Tokens).
-    *   Verified identity is stored in the ASGI `scope["user"]`, making it accessible to subsequent middleware and dependencies.
+    *   Verified identity is stored in the ASGI `scope["user"]`, making it accessible to subsequent dependencies.
 *   **Access Enforcement**:
-    *   Enforcement is handled by `PersonaAccessMiddleware`.
-    *   **Body Buffering**: Since the middleware needs to read the request body (to identify the requested `personality` in form data) and still allow the final handler to read it, it implements a **buffer-and-replay** strategy. It captures the ASGI stream, parses the form, performs the access check, and then provides a custom `receive` callable to the application that replays the captured body.
+    *   Enforcement is handled by a FastAPI dependency (`check_persona_access`) applied to the `/chat` and `/chat_stream` endpoints.
+    *   This dependency checks the user's role against the required role for the requested persona stored in Firestore.
+    *   **Graceful Upsell**: If access is denied, the API returns a `403 Forbidden` response with a structured JSON body (`error_code: "UPGRADE_REQUIRED"`), triggering an upgrade modal in the frontend.
+*   **Automated User Provisioning (Metadata Sync)**:
+    *   The system automatically creates and updates user records in Firestore to simplify administration.
+    *   **Synchronization Triggers**: 
+        1.  **Immediate Login**: Triggered when the frontend calls `/personas` right after a user signs in.
+        2.  **Every Interaction**: Triggered on every call to `/chat` or `/chat_stream`.
+    *   **Fields**:
+        *   `id`: The unique provider ID (e.g., Google `sub` or GitHub ID).
+        *   `name`: Display name from the identity provider.
+        *   `email`: User's email address.
+        *   `role`: Defaults to `standard` for new users.
+        *   `last_logged_in`: A Firestore server timestamp for housekeeping.
 *   **Schema**:
-    *   **`users` Collection**: Maps a unique User ID (e.g., GitHub handle or Google email) to a specific role.
-        *   Example: `users/derailed-dash -> { "role": "supporter" }`
-    *   **`persona_tiers` Collection**: Maps a persona ID to the minimum role required to access it.
-        *   Example: `persona_tiers/dazbo -> { "required_role": "supporter" }`
+    *   **`users` Collection**: 
+        *   **Document ID**: Readable format `{name}:{id}` (e.g., `DarrenLester:108579206256958314052`).
+        *   **Querying**: The backend queries by the indexed `id` field to find the document, ensuring stable lookups even if a user's display name changes.
+    *   **`persona_tiers` Collection**: 
+        *   **Document ID**: The lowercase persona ID (e.g., `dazbo`, `yasmin`).
+        *   **Fields**: `required_role` (e.g., `standard`, `supporter`).
 *   **Local Development & Testing**:
     *   **`BACKEND_ALLOW_MOCK_AUTH`**: This environment variable enables the verification of mock tokens (format: `mock:id:email:name`). When set to `true`, the backend will accept these tokens, allowing developers to simulate different user roles without real OAuth providers.
-    *   This is typically enabled in the `Makefile`'s `api` target and `docker-compose.yml` for a seamless local development experience.
+    *   The **Mock Login** in the UI allows entering a custom username which is mapped to the `id` field, enabling easy testing of different role assignments.
 *   **Initial Seeding**:
     *   A seeding script (`scripts/seed_firestore.py`) is used to initialize these collections with default values.
 

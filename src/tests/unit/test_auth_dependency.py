@@ -34,14 +34,10 @@ def test_verify_credentials_malformed():
 
 @pytest.mark.asyncio
 async def test_verify_token_dependency_success():
-    # Create mock request with user in state
+    # Create mock request with user in scope (ASGI style used in our AuthMiddleware)
     request = MagicMock(spec=Request)
-    request.state = MagicMock()
     user = AuthUser(id="123", email="test@example.com", name="Test", provider="mock")
-    request.state.user = user
-
-    # Mock the request state to include an authenticated user
-    # This simulates the state after AuthMiddleware has run
+    request.scope = {"user": user}
 
     result = await verify_token(request)
     assert result == user
@@ -49,14 +45,10 @@ async def test_verify_token_dependency_success():
 
 @pytest.mark.asyncio
 async def test_verify_token_dependency_failure():
-    # Create mock request WITHOUT user in state
+    # Create mock request WITHOUT user in scope
     request = MagicMock(spec=Request)
-    # Ensure the request state does not have a user attribute
-    # This simulates a request where AuthMiddleware failed or wasn't run
-    class State:
-        pass
-    request.state = State()
+    request.scope = {}
+    
     with pytest.raises(HTTPException) as excinfo:
         await verify_token(request)
     assert excinfo.value.status_code == 401
-

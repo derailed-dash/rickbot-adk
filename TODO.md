@@ -68,5 +68,7 @@
 - [x] Ensure Gemini model references are updated
 - [x] Move frontend to Cloud Run service, in unified container
 - [x] Ensure React UI works on mobile.
-- [~] Restrict access to certain personalities based on user identity
+- [x] Restrict access to certain personalities based on user identity
+- [ ] Add housekeeping for old user data in Firestore (non supporters)
+- [ ] Add upgrade / payment flow
 - [ ] Add voice / live.

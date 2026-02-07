@@ -13,29 +13,29 @@ def mock_db():
         yield db
 
 def test_get_user_role_found(mock_db):
-    # Setup mock
+    # Setup mock for .where("id", "==", user_id).limit(1).get()
     mock_doc = MagicMock()
-    mock_doc.exists = True
+    mock_doc.id = "ReadableName:test-user"
     mock_doc.to_dict.return_value = {"role": "supporter"}
-    mock_db.collection.return_value.document.return_value.get.return_value = mock_doc
+    
+    mock_query = mock_db.collection.return_value.where.return_value.limit.return_value
+    mock_query.get.return_value = [mock_doc]
 
     role = get_user_role("test-user")
     assert role == "supporter"
     mock_db.collection.assert_called_with("users")
-    mock_db.collection.return_value.document.assert_called_with("test-user")
 
 def test_get_user_role_not_found(mock_db):
-    # Setup mock
-    mock_doc = MagicMock()
-    mock_doc.exists = False
-    mock_db.collection.return_value.document.return_value.get.return_value = mock_doc
+    # Setup mock for empty result
+    mock_query = mock_db.collection.return_value.where.return_value.limit.return_value
+    mock_query.get.return_value = []
 
     # Should default to 'standard'
     role = get_user_role("unknown-user")
     assert role == "standard"
 
 def test_get_required_role_found(mock_db):
-    # Setup mock
+    # Setup mock for persona_tiers
     mock_doc = MagicMock()
     mock_doc.exists = True
     mock_doc.to_dict.return_value = {"required_role": "supporter"}
@@ -46,7 +46,7 @@ def test_get_required_role_found(mock_db):
     mock_db.collection.assert_called_with("persona_tiers")
 
 def test_get_required_role_not_found(mock_db):
-    # Setup mock
+    # Setup mock for missing persona
     mock_doc = MagicMock()
     mock_doc.exists = False
     mock_db.collection.return_value.document.return_value.get.return_value = mock_doc

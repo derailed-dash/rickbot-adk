@@ -84,6 +84,17 @@ def test_standard_user_cannot_access_supporter_persona(rbac_server):
     Verify that a 'standard' user (id: test-standard-user) 
     cannot access a 'supporter' persona (id: yasmin).
     """
+    from google.cloud import firestore
+    db = firestore.Client(project=os.environ.get("GOOGLE_CLOUD_PROJECT"))
+    # Seed required data for the test
+    db.collection("persona_tiers").document("yasmin").set({"required_role": "supporter"})
+    db.collection("users").document("StandardUser:test-standard-user").set({
+        "id": "test-standard-user",
+        "name": "StandardUser",
+        "role": "standard",
+        "email": "standard@example.com"
+    })
+
     # Note: verify_credentials in mock mode parses id from token: mock:<id>:<email>:<name>
     headers = {"Authorization": "Bearer mock:test-standard-user:standard@example.com:StandardUser"}
     data = {"prompt": "Hello", "personality": "Yasmin"}
@@ -100,6 +111,15 @@ def test_supporter_user_can_access_supporter_persona(rbac_server):
     Verify that a 'supporter' user (id: derailed-dash)
     can access a 'supporter' persona (id: yasmin).
     """
+    from google.cloud import firestore
+    db = firestore.Client(project=os.environ.get("GOOGLE_CLOUD_PROJECT"))
+    db.collection("users").document("Dazbo:derailed-dash").set({
+        "id": "derailed-dash",
+        "name": "Dazbo",
+        "role": "supporter",
+        "email": "dazbo@example.com"
+    })
+
     headers = {"Authorization": "Bearer mock:derailed-dash:dazbo@example.com:Dazbo"}
     data = {"prompt": "Hello", "personality": "Yasmin"}
 
