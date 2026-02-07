@@ -54,7 +54,7 @@ def seed_firestore(project_id):
 
     print("\nSeeding users collection...")
     for user in users:
-        safe_name = "".join(c for c in user["name"] if c.isalnum())
+        safe_name = "".join(c for c in user["name"] if c.isalnum()) or f"user-{user['id'][:8]}"
         doc_id = f"{safe_name}:{user['provider']}:{user['id']}"
         doc_ref = db.collection("users").document(doc_id)
         doc_ref.set({
