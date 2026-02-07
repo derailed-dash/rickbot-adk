@@ -11,6 +11,7 @@ from typing import Any
 
 import pytest
 import requests
+from google.cloud import firestore  # type: ignore[attr-defined]
 from requests.exceptions import RequestException
 
 from rickbot_utils.logging_utils import setup_logger
@@ -83,7 +84,6 @@ def test_standard_user_cannot_access_supporter_persona(rbac_server):
     Verify that a 'standard' user (id: test-standard-user) 
     cannot access a 'supporter' persona (id: yasmin).
     """
-    from google.cloud import firestore
     db = firestore.Client(project=os.environ.get("GOOGLE_CLOUD_PROJECT"))
     # Seed required data for the test
     db.collection("persona_tiers").document("yasmin").set({"required_role": "supporter"})
@@ -111,7 +111,6 @@ def test_supporter_user_can_access_supporter_persona(rbac_server):
     Verify that a 'supporter' user (id: derailed-dash)
     can access a 'supporter' persona (id: yasmin).
     """
-    from google.cloud import firestore
     db = firestore.Client(project=os.environ.get("GOOGLE_CLOUD_PROJECT"))
     db.collection("users").document("Dazbo:mock:derailed-dash").set({
         "id": "derailed-dash",
@@ -145,7 +144,6 @@ def test_dynamic_tier_update(rbac_server):
     Verify that changing a persona's required role in Firestore 
     is reflected immediately without server restart.
     """
-    from google.cloud import firestore
     db = firestore.Client(project=os.environ.get("GOOGLE_CLOUD_PROJECT"))
     doc_ref = db.collection("persona_tiers").document("rick")
 

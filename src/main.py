@@ -110,8 +110,8 @@ app = FastAPI()
 
 # Add Rate Limiting
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)  # type: ignore
-app.add_exception_handler(PersonaAccessDeniedException, persona_access_denied_handler)  # type: ignore
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)  # type: ignore[arg-type]
+app.add_exception_handler(PersonaAccessDeniedException, persona_access_denied_handler)
 app.add_middleware(SlowAPIMiddleware)
 # Note on Middleware Order:
 # FastAPI/Starlette middlewares are executed LIFO (Last Added = First Executed).
