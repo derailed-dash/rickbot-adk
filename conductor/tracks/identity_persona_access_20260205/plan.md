@@ -32,6 +32,7 @@ This plan implements a Role-Based Access Control (RBAC) system for restricting p
 - [x] Task: Handle "Upgrade Required" in the frontend. d3222d6
     - [x] Update frontend API client to recognise the upgrade response.
     - [x] Implement a basic "Access Restricted" modal/message in the UI.
+    - [x] Fix Mock Login to support variable user IDs for testing. b220002
 - [x] Task: End-to-End Verification. 4f24750
     - [x] Verify a 'standard' user cannot access a 'supporter' persona.
     - [x] Verify a 'supporter' user can access all personas.
