@@ -125,6 +125,5 @@ def sync_user_metadata(user_id: str, provider: str, email: str, name: str) -> No
             doc_id = f"{safe_name}:{provider}:{user_id}"
             data["role"] = "standard"
             db.collection("users").document(doc_id).set(data)
-            logger.info(f"Created new user record: {doc_id}")
     except Exception as e:
         logger.error(f"Error syncing metadata for user {user_id} ({provider}): {e}")
