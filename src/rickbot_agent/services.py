@@ -38,25 +38,31 @@ def _get_firestore_client() -> firestore.Client:
     return firestore.Client(project=config.project_id)
 
 
-def get_user_role(user_id: str) -> str:
+def get_user_role(user_id: str, provider: str) -> str:
     """
     Retrieve the role for a given user from Firestore.
-    Queries the 'users' collection for a document where the 'id' field matches.
+    Queries the 'users' collection for a document where both 'id' and 'provider' match.
     Defaults to 'standard' if the user is not found.
     """
     try:
         db = _get_firestore_client()
-        # Query by the stable 'id' field
-        logger.debug(f"Firestore Query: collection='users', where id == '{user_id}'")
+        # Query by the stable 'id' and 'provider' fields to prevent collisions
+        logger.debug(f"Firestore Query: collection='users', where id == '{user_id}' AND provider == '{provider}'")
         from google.cloud.firestore_v1.base_query import FieldFilter
-        docs = db.collection("users").where(filter=FieldFilter("id", "==", user_id)).limit(1).get()
+        docs = (
+            db.collection("users")
+            .where(filter=FieldFilter("id", "==", user_id))
+            .where(filter=FieldFilter("provider", "==", provider))
+            .limit(1)
+            .get()
+        )
         
         if docs:
             role = docs[0].to_dict().get("role", "standard")
-            logger.debug(f"Retrieved role '{role}' for user_id '{user_id}' from doc '{docs[0].id}'")
+            logger.debug(f"Retrieved role '{role}' for user_id '{user_id}' ({provider}) from doc '{docs[0].id}'")
             return role
         else:
-            logger.debug(f"No Firestore document found for user_id '{user_id}'")
+            logger.debug(f"No Firestore document found for user_id '{user_id}' ({provider})")
     except Exception as e:
         logger.error(f"Error retrieving role for user_id '{user_id}': {e}")
 
@@ -82,19 +88,26 @@ def get_required_role(persona_id: str) -> str:
     return "standard"
 
 
-def sync_user_metadata(user_id: str, email: str, name: str) -> None:
+def sync_user_metadata(user_id: str, provider: str, email: str, name: str) -> None:
     """
     Ensures user metadata is up to date in Firestore.
-    If the user doesn't exist (queried by 'id' field), creates a new document 
-    with ID format: {name}:{id} for readability.
+    If the user doesn't exist (queried by 'id' and 'provider' fields), 
+    creates a new document with ID format: {name}:{provider}:{id} for readability.
     """
     try:
         db = _get_firestore_client()
         from google.cloud.firestore_v1.base_query import FieldFilter
-        docs = db.collection("users").where(filter=FieldFilter("id", "==", user_id)).limit(1).get()
+        docs = (
+            db.collection("users")
+            .where(filter=FieldFilter("id", "==", user_id))
+            .where(filter=FieldFilter("provider", "==", provider))
+            .limit(1)
+            .get()
+        )
 
         data = {
             "id": user_id,
+            "provider": provider,
             "email": email,
             "name": name,
             "last_logged_in": firestore.SERVER_TIMESTAMP
@@ -104,14 +117,14 @@ def sync_user_metadata(user_id: str, email: str, name: str) -> None:
             # Update existing document
             doc_ref = docs[0].reference
             doc_ref.update(data)
-            logger.debug(f"Updated metadata for user {user_id}")
+            logger.debug(f"Updated metadata for user {user_id} ({provider})")
         else:
             # Create new document with readable ID
             # Clean name for ID use (alphanumeric only)
             safe_name = "".join(c for c in name if c.isalnum())
-            doc_id = f"{safe_name}:{user_id}"
+            doc_id = f"{safe_name}:{provider}:{user_id}"
             data["role"] = "standard"
             db.collection("users").document(doc_id).set(data)
             logger.info(f"Created new user record: {doc_id}")
     except Exception as e:
-        logger.error(f"Error syncing metadata for user {user_id}: {e}")
+        logger.error(f"Error syncing metadata for user {user_id} ({provider}): {e}")

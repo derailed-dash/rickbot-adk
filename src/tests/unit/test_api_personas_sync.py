@@ -20,7 +20,7 @@ def test_get_personas_syncs_metadata():
             response = client.get("/personas", headers={"Authorization": "Bearer any-token"})
             
             assert response.status_code == 200
-            mock_sync.assert_called_once_with("sync-user", "sync@example.com", "Sync User")
+            mock_sync.assert_called_once_with("sync-user", "mock", "sync@example.com", "Sync User")
     finally:
         # Clean up overrides
         app.dependency_overrides.clear()

@@ -140,7 +140,7 @@ async def check_persona_access(
     required_role = get_required_role(personality)
     user_role = "standard"
     if user:
-        user_role = get_user_role(user.id)
+        user_role = get_user_role(user.id, user.provider)
         logger.info(f"RBAC Check: user_id='{user.id}', provider='{user.provider}', role='{user_role}', persona='{personality}', required='{required_role}'")
 
     if required_role == "supporter" and user_role != "supporter":
@@ -153,7 +153,7 @@ def get_personas(request: Request, user: AuthUser = Depends(verify_token)) -> li
     """Returns a list of available chatbot personalities."""
     # Sync user metadata on persona list load (usually happens right after login)
     from rickbot_agent.services import sync_user_metadata
-    sync_user_metadata(user.id, user.email, user.name)
+    sync_user_metadata(user.id, user.provider, user.email, user.name)
 
     personalities = get_personalities()
     return [

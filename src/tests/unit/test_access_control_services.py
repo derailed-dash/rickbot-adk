@@ -13,25 +13,32 @@ def mock_db():
         yield db
 
 def test_get_user_role_found(mock_db):
-    # Setup mock for .where("id", "==", user_id).limit(1).get()
+    # Setup mock for .where("id", "==", user_id).where("provider", "==", provider).limit(1).get()
     mock_doc = MagicMock()
-    mock_doc.id = "ReadableName:test-user"
+    mock_doc.id = "ReadableName:mock:test-user"
     mock_doc.to_dict.return_value = {"role": "supporter"}
     
-    mock_query = mock_db.collection.return_value.where.return_value.limit.return_value
-    mock_query.get.return_value = [mock_doc]
+    # Mock chain: collection().where().where().limit().get()
+    mock_coll = mock_db.collection.return_value
+    mock_where1 = mock_coll.where.return_value
+    mock_where2 = mock_where1.where.return_value
+    mock_limit = mock_where2.limit.return_value
+    mock_limit.get.return_value = [mock_doc]
 
-    role = get_user_role("test-user")
+    role = get_user_role("test-user", "mock")
     assert role == "supporter"
     mock_db.collection.assert_called_with("users")
 
 def test_get_user_role_not_found(mock_db):
     # Setup mock for empty result
-    mock_query = mock_db.collection.return_value.where.return_value.limit.return_value
-    mock_query.get.return_value = []
+    mock_coll = mock_db.collection.return_value
+    mock_where1 = mock_coll.where.return_value
+    mock_where2 = mock_where1.where.return_value
+    mock_limit = mock_where2.limit.return_value
+    mock_limit.get.return_value = []
 
     # Should default to 'standard'
-    role = get_user_role("unknown-user")
+    role = get_user_role("unknown-user", "google")
     assert role == "standard"
 
 def test_get_required_role_found(mock_db):

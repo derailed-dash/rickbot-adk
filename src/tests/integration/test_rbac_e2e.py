@@ -88,8 +88,9 @@ def test_standard_user_cannot_access_supporter_persona(rbac_server):
     db = firestore.Client(project=os.environ.get("GOOGLE_CLOUD_PROJECT"))
     # Seed required data for the test
     db.collection("persona_tiers").document("yasmin").set({"required_role": "supporter"})
-    db.collection("users").document("StandardUser:test-standard-user").set({
+    db.collection("users").document("StandardUser:mock:test-standard-user").set({
         "id": "test-standard-user",
+        "provider": "mock",
         "name": "StandardUser",
         "role": "standard",
         "email": "standard@example.com"
@@ -113,8 +114,9 @@ def test_supporter_user_can_access_supporter_persona(rbac_server):
     """
     from google.cloud import firestore
     db = firestore.Client(project=os.environ.get("GOOGLE_CLOUD_PROJECT"))
-    db.collection("users").document("Dazbo:derailed-dash").set({
+    db.collection("users").document("Dazbo:mock:derailed-dash").set({
         "id": "derailed-dash",
+        "provider": "mock",
         "name": "Dazbo",
         "role": "supporter",
         "email": "dazbo@example.com"
