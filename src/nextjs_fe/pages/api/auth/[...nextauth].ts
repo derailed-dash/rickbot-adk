@@ -25,9 +25,10 @@ if (process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ALLOW_MOCK
       },
       async authorize(credentials, req) {
            const mockEmail = process.env.MOCK_AUTH_USER || "mock@example.com";
+           const mockId = credentials?.username || "mock-123";
            return {
-             id: "mock-123",
-             name: "Mock User",
+             id: mockId.startsWith("mock-") ? mockId : `mock-${mockId}`,
+             name: credentials?.username || "Mock User",
              email: mockEmail,
              image: "/avatars/dazbo.png"
            }
