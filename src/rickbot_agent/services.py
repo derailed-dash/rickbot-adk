@@ -121,7 +121,7 @@ def sync_user_metadata(user_id: str, provider: str, email: str, name: str) -> No
         else:
             # Create new document with readable ID
             # Clean name for ID use (alphanumeric only)
-            safe_name = "".join(c for c in name if c.isalnum())
+            safe_name = "".join(c for c in name if c.isalnum()) or f"user-{user_id[:8]}"
             doc_id = f"{safe_name}:{provider}:{user_id}"
             data["role"] = "standard"
             db.collection("users").document(doc_id).set(data)
