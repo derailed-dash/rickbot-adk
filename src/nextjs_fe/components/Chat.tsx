@@ -12,7 +12,11 @@ import {
     Typography,
     Paper,
     IconButton,
-    LinearProgress
+    LinearProgress,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -85,6 +89,8 @@ export default function Chat() {
     const [streamingText, setStreamingText] = useState('');
     const [showPortal, setShowPortal] = useState(false);
     const [backendReady, setBackendReady] = useState(false);
+    const [upgradeRequired, setUpgradeRequired] = useState(false);
+    const [upgradeInfo, setUpgradeInfo] = useState<{detail: string, personality: string, required_role: string} | null>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -175,7 +181,6 @@ export default function Chat() {
                 });
             }
 
-            // Streaming implementation
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/chat_stream`, {
                 method: 'POST',
                 headers: {
@@ -185,6 +190,20 @@ export default function Chat() {
             });
 
             if (response.status === 401 || response.status === 403) {
+                if (response.status === 403) {
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.error_code === 'UPGRADE_REQUIRED') {
+                            setUpgradeInfo(errorData);
+                            setUpgradeRequired(true);
+                            setLoading(false);
+                            setBotAction(null);
+                            return;
+                        }
+                    } catch (e) {
+                        console.error("Failed to parse 403 error response", e);
+                    }
+                }
                 console.warn("Auth failure detected in handleSendMessage. Signing out.");
                 signOut();
                 return;
@@ -579,6 +598,54 @@ export default function Chat() {
                     </Typography>
                 </Link>
             </Box>
+
+            {/* Upgrade Required Modal */}
+            <Dialog 
+                open={upgradeRequired} 
+                onClose={() => setUpgradeRequired(false)}
+                PaperProps={{
+                    sx: {
+                        bgcolor: '#1a1a1a',
+                        color: 'white',
+                        border: '2px solid',
+                        borderColor: 'primary.main',
+                        borderRadius: 2
+                    }
+                }}
+            >
+                <DialogTitle sx={{ color: 'primary.main', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box component="img" src="/portal_gun_trans.png" sx={{ height: 32 }} />
+                    Upgrade Required
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                        {upgradeInfo?.detail || "This persona is restricted to Supporters."}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Become a Supporter to unlock all interdimensional personalities and help keep Rickbot alive!
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button 
+                        onClick={() => setUpgradeRequired(false)} 
+                        variant="outlined" 
+                        color="secondary"
+                    >
+                        Close
+                    </Button>
+                    <Button 
+                        variant="contained" 
+                        color="primary"
+                        onClick={() => {
+                            // In a real app, this would redirect to a checkout page
+                            window.alert("One-time purchase flow coming soon! Wubba Lubba Dub Dub!");
+                            setUpgradeRequired(false);
+                        }}
+                    >
+                        Upgrade Now
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
