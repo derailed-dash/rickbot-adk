@@ -36,11 +36,11 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
 from rickbot_agent.agent import get_agent
-from rickbot_agent.auth import verify_token
-from rickbot_agent.auth_middleware import AuthMiddleware, PersonaAccessMiddleware
-from rickbot_agent.auth_models import AuthUser
+from rickbot_agent.auth import verify_token, verify_credentials
+from rickbot_agent.auth_middleware import AuthMiddleware
+from rickbot_agent.auth_models import AuthUser, PersonaAccessDeniedException
 from rickbot_agent.personality import get_personalities
-from rickbot_agent.services import get_artifact_service, get_session_service
+from rickbot_agent.services import get_artifact_service, get_session_service, get_required_role, get_user_role
 
 # ADK imports MUST happen after agent patch
 from google.adk.runners import Runner
@@ -66,6 +66,19 @@ def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSO
     # Add Retry-After header (defaulting to 60s)
     response.headers["Retry-After"] = "60"
     return response
+
+
+def persona_access_denied_handler(request: Request, exc: PersonaAccessDeniedException) -> JSONResponse:
+    """Custom handler for persona access denial."""
+    return JSONResponse(
+        status_code=403,
+        content={
+            "error_code": "UPGRADE_REQUIRED",
+            "detail": exc.detail,
+            "required_role": exc.required_role,
+            "personality": exc.personality,
+        },
+    )
 
 
 # Override the default slowapi exception handler so that the middleware uses our custom response
@@ -98,17 +111,15 @@ app = FastAPI()
 # Add Rate Limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)  # type: ignore
+app.add_exception_handler(PersonaAccessDeniedException, persona_access_denied_handler)  # type: ignore
 app.add_middleware(SlowAPIMiddleware)
 # Note on Middleware Order:
 # FastAPI/Starlette middlewares are executed LIFO (Last Added = First Executed).
 # AuthMiddleware must execute FIRST to set request.state.user.
-# PersonaAccessMiddleware must execute AFTER AuthMiddleware but BEFORE the handler.
 # Order of adding (LIFO):
-# 1. PersonaAccessMiddleware
-# 2. AuthMiddleware
+# 1. AuthMiddleware
 # Execution Order:
-# Request -> AuthMiddleware -> PersonaAccessMiddleware -> SlowAPIMiddleware -> ...
-app.add_middleware(PersonaAccessMiddleware)
+# Request -> AuthMiddleware -> SlowAPIMiddleware -> ...
 app.add_middleware(AuthMiddleware)
 
 # Add CORS middleware
@@ -119,6 +130,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+async def check_persona_access(
+    personality: Annotated[str, Form()] = "Rick",
+    user: AuthUser = Depends(verify_token),
+) -> None:
+    """Dependency to check if the user has access to the requested persona."""
+    required_role = get_required_role(personality)
+    user_role = "standard"
+    if user:
+        user_role = get_user_role(user.id)
+
+    if required_role == "supporter" and user_role != "supporter":
+        logger.info(f"Access Denied: user={user.id if user else 'anonymous'} to {personality}")
+        raise PersonaAccessDeniedException(personality, required_role)
 
 
 @app.get("/personas")
@@ -180,7 +206,7 @@ async def _process_files(
     return parts
 
 
-@app.post("/chat")
+@app.post("/chat", dependencies=[Depends(check_persona_access)])
 @limiter.limit("5 per minute")
 async def chat(
     request: Request,
@@ -262,7 +288,7 @@ async def chat(
     )
 
 
-@app.post("/chat_stream")
+@app.post("/chat_stream", dependencies=[Depends(check_persona_access)])
 @limiter.limit("5 per minute")
 async def chat_stream(
     request: Request,
@@ -273,6 +299,7 @@ async def chat_stream(
     files: list[UploadFile] = File(default=[]),
 ) -> StreamingResponse:
     """Streaming chat endpoint to interact with the Rickbot agent."""
+    logger.debug(f"DEBUG: chat_stream ENTERED. user={user.id}, personality={personality}")
     user_id = user.email  # Use email as user_id for ADK sessions
     logger.debug(
         f"Received chat stream request - "
