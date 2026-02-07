@@ -29,9 +29,9 @@ This plan implements a Role-Based Access Control (RBAC) system for restricting p
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Backend Access Enforcement' (Protocol in workflow.md) [checkpoint: 0d9193f]
 
 ## Phase 3: Frontend Integration and Verification
-- [ ] Task: Handle "Upgrade Required" in the frontend.
-    - [ ] Update frontend API client to recognise the upgrade response.
-    - [ ] Implement a basic "Access Restricted" modal/message in the UI.
+- [x] Task: Handle "Upgrade Required" in the frontend. d3222d6
+    - [x] Update frontend API client to recognise the upgrade response.
+    - [x] Implement a basic "Access Restricted" modal/message in the UI.
 - [ ] Task: End-to-End Verification.
     - [ ] Verify a 'standard' user cannot access a 'supporter' persona.
     - [ ] Verify a 'supporter' user can access all personas.
