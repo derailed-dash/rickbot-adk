@@ -140,10 +140,6 @@ async def check_persona_access(
     required_role = get_required_role(personality)
     user_role = "standard"
     if user:
-        # Sync user metadata (ID, email, name, last_logged_in)
-        from rickbot_agent.services import sync_user_metadata
-        sync_user_metadata(user.id, user.email, user.name)
-        
         user_role = get_user_role(user.id)
         logger.info(f"RBAC Check: user_id='{user.id}', provider='{user.provider}', role='{user_role}', persona='{personality}', required='{required_role}'")
 
