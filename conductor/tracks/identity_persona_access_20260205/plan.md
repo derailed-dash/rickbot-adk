@@ -32,8 +32,8 @@ This plan implements a Role-Based Access Control (RBAC) system for restricting p
 - [x] Task: Handle "Upgrade Required" in the frontend. d3222d6
     - [x] Update frontend API client to recognise the upgrade response.
     - [x] Implement a basic "Access Restricted" modal/message in the UI.
-- [ ] Task: End-to-End Verification.
-    - [ ] Verify a 'standard' user cannot access a 'supporter' persona.
-    - [ ] Verify a 'supporter' user can access all personas.
-    - [ ] Verify dynamic updates to persona tiers in Firestore are reflected without restart.
+- [x] Task: End-to-End Verification. 4f24750
+    - [x] Verify a 'standard' user cannot access a 'supporter' persona.
+    - [x] Verify a 'supporter' user can access all personas.
+    - [x] Verify dynamic updates to persona tiers in Firestore are reflected without restart.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Frontend Integration and Verification' (Protocol in workflow.md)
