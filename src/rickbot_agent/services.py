@@ -86,7 +86,7 @@ def sync_user_metadata(user_id: str, email: str, name: str) -> None:
     """
     Ensures user metadata is up to date in Firestore.
     If the user doesn't exist (queried by 'id' field), creates a new document 
-    with ID format: {id}_{name} for readability.
+    with ID format: {name}:{id} for readability.
     """
     try:
         db = _get_firestore_client()
@@ -109,7 +109,7 @@ def sync_user_metadata(user_id: str, email: str, name: str) -> None:
             # Create new document with readable ID
             # Clean name for ID use (alphanumeric only)
             safe_name = "".join(c for c in name if c.isalnum())
-            doc_id = f"{user_id}_{safe_name}"
+            doc_id = f"{safe_name}:{user_id}"
             data["role"] = "standard"
             db.collection("users").document(doc_id).set(data)
             logger.info(f"Created new user record: {doc_id}")

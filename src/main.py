@@ -150,13 +150,15 @@ async def check_persona_access(
     if required_role == "supporter" and user_role != "supporter":
         logger.warning(f"RBAC DENIED: user_id='{user.id}', role='{user_role}' lacks required role '{required_role}' for '{personality}'")
         raise PersonaAccessDeniedException(personality, required_role)
-        logger.info(f"Access Denied: user={user.id if user else 'anonymous'} to {personality}")
-        raise PersonaAccessDeniedException(personality, required_role)
 
 
 @app.get("/personas")
 def get_personas(request: Request, user: AuthUser = Depends(verify_token)) -> list[Persona]:
     """Returns a list of available chatbot personalities."""
+    # Sync user metadata on persona list load (usually happens right after login)
+    from rickbot_agent.services import sync_user_metadata
+    sync_user_metadata(user.id, user.email, user.name)
+
     personalities = get_personalities()
     return [
         Persona(
