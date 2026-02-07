@@ -192,7 +192,8 @@ export default function Chat() {
             if (response.status === 401 || response.status === 403) {
                 if (response.status === 403) {
                     try {
-                        const errorData = await response.json();
+                        const errorResponse = response.clone();
+                        const errorData = await errorResponse.json();
                         if (errorData.error_code === 'UPGRADE_REQUIRED') {
                             setUpgradeInfo(errorData);
                             setUpgradeRequired(true);

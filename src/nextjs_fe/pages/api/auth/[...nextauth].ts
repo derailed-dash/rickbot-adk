@@ -44,14 +44,14 @@ export const authOptions: NextAuthOptions = {
       // Persist the OAuth access_token to the token right after signin
       if (account) {
         token.accessToken = account.access_token
-        token.idToken = account.id_token
         token.provider = account.provider
         
-        // Handle Mock Provider specifically when account is present
+        // Handle Mock Provider specifically
         if (account.provider === 'mock' && user) {
              const cleanId = user.id.replace('mock-', '');
              token.idToken = `mock:${cleanId}:${user.email}:${user.name}`;
-             token.provider = 'mock';
+        } else {
+             token.idToken = account.id_token
         }
       }
       
