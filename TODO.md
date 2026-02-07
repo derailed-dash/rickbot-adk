@@ -69,6 +69,8 @@
 - [x] Move frontend to Cloud Run service, in unified container
 - [x] Ensure React UI works on mobile.
 - [x] Restrict access to certain personalities based on user identity
+- [ ] Remove IAP from staging
+- [ ] Enable PITR for Firestore
 - [ ] Add housekeeping for old user data in Firestore (non supporters)
 - [ ] Add upgrade / payment flow
 - [ ] Add voice / live.
