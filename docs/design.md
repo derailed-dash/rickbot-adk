@@ -133,9 +133,13 @@ The application supports a dual-mode configuration for flexibility:
 *   **Google Cloud Project**: If `GOOGLE_CLOUD_PROJECT` is set, the system attempts to auto-discover credentials.
 *   **Gemini API Key**: If `GOOGLE_GENAI_USE_VERTEXAI` is false, a `GEMINI_API_KEY` is required. This is injected securely via Secret Manager (Prod) or `.env` (Dev).
 
+- **GCS Artifacts**: Lifecycle policies are configured to manage storage costs.
+- **Firestore PITR**: Point-in-Time Recovery (PITR) is enabled for Firestore databases, providing a 7-day retention window for data recovery and point-in-time reads.
+
 *   **Hosting Services**:
     *   **Google Cloud Run**: Hosts both the generic API backend and the frontend containers.
         *   **Unified Container Deployment**: The production architecture deploys a single container image that includes both the API Backend and React UI. This simplifies deployment, reduces costs, and eliminates the need for complex networking or sidecar configurations.
+        *   **Authentication (IAP)**: Identity-Aware Proxy (IAP) was utilized in the staging environment during the early development stages as a temporary measure before full OAuth integration was complete. Now that OAuth is fully functional, IAP has been disabled.
     *   Cloud Run provides a serverless, scalable environment. It also offers a native domain name mapping feature to map custom domains to our Cloud Run services. Note that any custom domains used must be added to the OAuth authorised domains and authorised redirect URIs. 
 *   **Agentic Services**:
     *   **Vertex AI Agent Engine**: The core runtime for the agent.
@@ -150,7 +154,7 @@ The application supports a dual-mode configuration for flexibility:
     *   **Google Auth Platform**: Handles OAuth 2.0 authentication for users.
 *   **Data, Infrastructure & Tools**:
     *   **Google Cloud Storage (GCS)**: Stores unstructured data, logs, and generated artifacts.
-    *   **File Search Store (Gemini Developer API)**: Acts as the knowledge base for RAG (Retrieval Augmented Generation), allowing specific personas to reference uploaded documents.
+    *   **File Search Store (Gemini Developer API)**: Acts as the knowledge base for RAG (Retrieval Augmented Generation), allowing specific personalities to reference uploaded documents.
         > Note: This uses the Gemini Developer API and is managed via `notebooks/file_search_store.ipynb`.
     *   **Secret Manager**: Securely stores sensitive configuration like OAuth client IDs and API keys.
         *   **Production**: Cloud Run services are configured to mount these secrets directly as environment variables at runtime.

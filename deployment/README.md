@@ -21,7 +21,8 @@ The application is deployed as a single, unified container based on `Dockerfile.
 
 The application uses several Google Cloud services for data storage and state management:
 *   **Google Cloud Storage (GCS)**: Used for storing user-uploaded artifacts and session logs.
-*   **Google Firestore**: Serves as the source of truth for Role-Based Access Control (RBAC). It stores user roles and persona access requirements.
+*   **Google Firestore**: Serves as the source of truth for Role-Based Access Control (RBAC). It stores user roles and persona access requirements. 
+    *   **PITR**: Point-in-Time Recovery is enabled, providing 7 days of data retention.
 
 #### Seeding Firestore
 

@@ -6,6 +6,8 @@ resource "google_firestore_database" "database" {
   location_id = var.region
   type        = "FIRESTORE_NATIVE"
 
+  point_in_time_recovery_enablement = "POINT_IN_TIME_RECOVERY_ENABLED"
+
   # Wait for the Firestore API to be enabled
   depends_on = [google_project_service.deploy_project_services]
 }
