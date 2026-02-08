@@ -28,8 +28,8 @@ steps:
       - '--cpu-boost'
       - '--set-env-vars=GOOGLE_CLOUD_PROJECT=$_STAGING_PROJECT_ID,GOOGLE_CLOUD_REGION=$_REGION,LOG_LEVEL=$_LOG_LEVEL,APP_NAME=$_APP_NAME,AGENT_NAME=$_AGENT_NAME,GOOGLE_GENAI_USE_VERTEXAI=$_GOOGLE_GENAI_USE_VERTEXAI,MODEL=$_MODEL,AUTH_REQUIRED=$_AUTH_REQUIRED,RATE_LIMIT=$_RATE_LIMIT,GOOGLE_CLOUD_LOCATION=$_GOOGLE_CLOUD_LOCATION,GOOGLE_CLIENT_ID=$_GOOGLE_CLIENT_ID,GITHUB_CLIENT_ID=$_GITHUB_CLIENT_ID,NEXTAUTH_URL=$_NEXTAUTH_URL'
       - '--service-account=$_SERVICE_NAME-app-sa@$_STAGING_PROJECT_ID.iam.gserviceaccount.com'
-      - '--allow-unauthenticated' # Allow unauthenticated invocations - end user needs IAP-secured Web App User role (roles/iap.httpsResourceAccessor)
-      # - '--iap' # Enable direct IAP
+      - '--allow-unauthenticated' # Allow unauthenticated invocations - we secure with OAuth
+      - '--iap' # Enable IAP in Staging only
       - '--set-secrets=GOOGLE_API_KEY=gemini-api-key:latest,NEXTAUTH_SECRET=nextauth-secret:latest,GOOGLE_CLIENT_SECRET=google-client-secret:latest,GITHUB_CLIENT_SECRET=github-client-secret:latest'
 
   # Fetch Staging Service URL
