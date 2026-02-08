@@ -16,7 +16,7 @@ def seed_firestore(project_id):
         "yoda": "standard",
         "donald": "standard",
         "jack": "standard",
-        "yasmin": "supporter",
+        "yasmin": "standard",
         "dazbo": "supporter"
     }
 
@@ -37,7 +37,7 @@ def seed_firestore(project_id):
             "email": "dazbo@example.com"
         },
         {
-            "id": "108579206256958314052",
+            "id": "837482910475839201847",
             "provider": "google",
             "name": "Darren Lester",
             "role": "supporter",
