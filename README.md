@@ -237,6 +237,9 @@ The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to t
 
 See [docs/design.md](docs/design.md).
 
+> [!NOTE]
+> During early development, the staging environment was protected using Identity-Aware Proxy (IAP) as an interim security measure. With the successful implementation and verification of the OAuth 2.0 flow, IAP is no longer required for staging and has been disabled.
+
 ### OAuth Configuration
 
 Rickbot uses OAuth for securing the application. You must configure OAuth credentials for both Google and GitHub providers. It is recommended to create separate OAuth applications for Development (Dev) and Production (Prod) environments.
