@@ -1,0 +1,403 @@
+manifest:
+  version: "0.1.3"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: derailed-dash/rickbot-adk
+    source: https://github.com/derailed-dash/rickbot-adk
+    branch: main
+    commit: "1ed361d5"
+    scope: [src/rickbot_agent/agent.py, src/rickbot_agent/personality.py, src/rickbot_agent/tools_custom.py]
+  issued:
+    by: A2AS.org
+    at: '2026-02-11T16:38:22Z'
+    url: https://a2as.org/certified/agents/derailed-dash/rickbot-adk
+  signatures:
+    digest: sha256:LiYHDiT7jFyYbxqM_97qWRqJch-GI_wroikLqXmhNBg
+    key: ed25519:qaYKrRscNe_2W-siblabbUe6lmxQhDmYxgJfM0OZy-o
+    sig: ed25519:6-5h7awKUC_aSTp3Z0DWmdBrWQ3u_VxHyWzaOM-AwVC6jjNXjMMW9eDOC-OZ20p-0Tm6CdJjA3Dj-A9aqpxtCw
+
+agents:
+  agent.create_agent:
+    type: factory
+    models: [config.model]
+    params:
+      name: '{config.agent_name}_{personality.name}'
+      description: 'A chatbot with the personality of {personality.menu_name} with access to two specialist agents: a RagAgent
+        for its knowledge base and SearchAgent for Google Search.'
+      instruction: instruction
+      generate_content_config:
+        class: GenerateContentConfig
+        temperature: personality.temperature
+        top_p: "1"
+        max_output_tokens: "8192"
+      function: create_agent
+  rag_agent:
+    type: instance
+    models: [config.model]
+    tools: [FileSearchTool]
+    params:
+      name: RagAgent
+      description: 'Specialist knowledge base for {personality_name}, containing: {description_text}. CRITICAL: MUST be used
+        as the primary source for all relevant queries before any other tool.'
+      instruction: instruction
+      function: create_rag_agent
+  search_agent:
+    type: instance
+    models: [config.model]
+    tools: [google_search]
+    params:
+      name: SearchAgent
+      description: Fallback agent to perform Google Search when internal knowledge base (RagAgent) is insufficient.
+      instruction: [You are a fallback agent. Only use Google Search if the request cannot be answered by the RagAgent.]
+
+models:
+  config.model:
+    type: literal
+    agents: [search_agent, rag_agent, agent.create_agent]
+
+tools:
+  google_search:
+    type: module
+    agents: [search_agent]
+
+imports:
+  Agent: google.adk.agents.Agent
+  AgentTool: google.adk.tools.AgentTool
+  AlreadyExistsError: google.adk.errors.already_exists_error.AlreadyExistsError
+  Annotated: typing.Annotated
+  annotations: __future__.annotations
+  Any: typing.Any
+  AsyncGenerator: collections.abc.AsyncGenerator
+  asyncio: asyncio
+  AuthMiddleware: rickbot_agent.auth_middleware.AuthMiddleware
+  AuthUser: rickbot_agent.auth_models.AuthUser
+  BaseModel: pydantic.BaseModel
+  BaseTool: google.adk.tools.BaseTool
+  Blob: google.genai.types.Blob
+  config: streamlit_fe.st_config.config
+  Content: google.genai.types.Content
+  CORSMiddleware: fastapi.middleware.cors.CORSMiddleware
+  create_secrets_toml: streamlit_fe.create_auth_secrets.create_secrets_toml
+  dataclass: dataclasses.dataclass
+  datetime: datetime.datetime
+  dedent: textwrap.dedent
+  Depends: fastapi.Depends
+  FastAPI: fastapi.FastAPI
+  field: dataclasses.field
+  File: fastapi.File
+  FileSearchTool: tools_custom.FileSearchTool
+  Form: fastapi.Form
+  functools: functools
+  genai: google.genai
+  GenerateContentConfig: google.genai.types.GenerateContentConfig
+  get_agent: rickbot_agent.agent.get_agent
+  get_artifact_service: rickbot_agent.services.get_artifact_service
+  get_avatar: rickbot_agent.personality.get_avatar
+  get_personalities: rickbot_agent.personality.get_personalities
+  get_required_role: rickbot_agent.services.get_required_role
+  get_script_run_ctx: streamlit.runtime.scriptrunner.get_script_run_ctx
+  get_session_service: rickbot_agent.services.get_session_service
+  get_user_role: rickbot_agent.services.get_user_role
+  getenv: os.getenv
+  google_search: google.adk.tools.google_search
+  HTTPException: fastapi.HTTPException
+  initialize_adk_runner: streamlit_fe.st_utils.initialize_adk_runner
+  json: json
+  JSONResponse: fastapi.responses.JSONResponse
+  limiter: rickbot_utils.rate_limit.limiter
+  LlmRequest: google.adk.models.LlmRequest
+  logger: streamlit_fe.st_config.logger
+  logging: logging
+  lru_cache: functools.lru_cache
+  MovingWindowRateLimiter: limits.strategies.MovingWindowRateLimiter
+  os: os
+  parse: limits.parse
+  Part: google.genai.types.Part
+  Path: pathlib.Path
+  PersonaAccessDeniedException: rickbot_agent.auth_models.PersonaAccessDeniedException
+  Personality: rickbot_agent.personality.Personality
+  RateLimiter: streamlit_fe.st_utils.RateLimiter
+  RateLimitExceeded: slowapi.errors.RateLimitExceeded
+  render_chat: streamlit_fe.chat.render_chat
+  Request: fastapi.Request
+  Response: fastapi.Response
+  retrieve_secret: rickbot_utils.secret_utils.retrieve_secret
+  Runner: google.adk.runners.Runner
+  SlowAPIMiddleware: slowapi.middleware.SlowAPIMiddleware
+  st: streamlit
+  storage: limits.storage
+  StreamingResponse: fastapi.responses.StreamingResponse
+  StreamlitAPIException: streamlit.errors.StreamlitAPIException
+  sync_user_metadata: rickbot_agent.services.sync_user_metadata
+  ToolContext: google.adk.tools.ToolContext
+  TYPE_CHECKING: typing.TYPE_CHECKING
+  types: google.genai.types
+  UploadFile: fastapi.UploadFile
+  uuid: uuid
+  verify_token: rickbot_agent.auth.verify_token
+  yaml: yaml
+
+functions:
+  __init__:
+    type: sync
+    module: src.rickbot_agent.tools_custom
+    args: [self, file_search_store_names]
+  __post_init__:
+    type: sync
+    module: src.rickbot_agent.personality
+    args: [self]
+    params:
+      returns: None
+  __repr__:
+    type: sync
+    module: src.rickbot_agent.personality
+    args: [self]
+    params:
+      returns: str
+  __str__:
+    type: sync
+    module: src.rickbot_agent.personality
+    args: [self]
+    params:
+      returns: str
+  _get_cached_agent_for_personality:
+    type: sync
+    module: src.rickbot_agent.agent
+    args: [personality]
+    params:
+      returns: Agent
+  _load_personalities:
+    type: sync
+    module: src.rickbot_agent.personality
+    args: [yaml_file]
+    params:
+      returns: dict
+  _process_files:
+    type: async
+    module: src.main
+    args: [files, user_id, session_id, artifact_service]
+    params:
+      returns: list[Part]
+  authenticated_flow:
+    type: sync
+    module: src.streamlit_fe.app
+  chat:
+    type: async
+    module: src.main
+    args: [request, prompt, session_id, personality, user, files]
+    params:
+      returns: ChatResponse
+  chat_stream:
+    type: async
+    module: src.main
+    args: [request, prompt, session_id, personality, user, files]
+    params:
+      returns: StreamingResponse
+  check_persona_access:
+    type: async
+    module: src.main
+    args: [personality, user]
+    params:
+      returns: None
+  create_agent:
+    type: sync
+    module: src.rickbot_agent.agent
+    args: [personality]
+    params:
+      returns: Agent
+  create_rag_agent:
+    type: sync
+    module: src.rickbot_agent.agent
+    args: [file_store_name, personality_name, kb_description]
+  custom_logout:
+    type: sync
+    module: src.streamlit_fe.chat
+    params:
+      returns: None
+  event_generator:
+    type: async
+    module: src.main
+    params:
+      returns: AsyncGenerator
+  get_agent:
+    type: sync
+    module: src.rickbot_agent.agent
+    args: [personality_name]
+    params:
+      returns: Agent
+  get_agent_response:
+    type: async
+    module: src.streamlit_fe.chat
+    args: [runner, prompt, uploaded_files, rate_limiter]
+    params:
+      returns: None
+  get_artifact:
+    type: async
+    module: src.main
+    args: [filename, request, user]
+    params:
+      returns: Response
+  get_avatar:
+    type: sync
+    module: src.rickbot_agent.personality
+    args: [name]
+    params:
+      returns: str
+  get_personalities:
+    type: sync
+    module: src.rickbot_agent.personality
+    params:
+      returns: dict
+  get_personas:
+    type: sync
+    module: src.main
+    args: [request, user]
+    params:
+      returns: list[Persona]
+  get_store:
+    type: sync
+    module: src.rickbot_agent.agent
+    args: [store_name]
+  heartbeat:
+    type: async
+    module: src.main
+  hit:
+    type: sync
+    module: src.streamlit_fe.st_utils
+    args: [self, key]
+    params:
+      returns: bool
+  initialize_adk_runner:
+    type: async
+    module: src.streamlit_fe.st_utils
+    args: [personality]
+    params:
+      returns: Runner
+  initialize_rate_limiter:
+    type: sync
+    module: src.streamlit_fe.app
+  main:
+    type: sync
+    module: src.streamlit_fe.app
+  on_file_change:
+    type: sync
+    module: src.streamlit_fe.chat
+    params:
+      returns: None
+  persona_access_denied_handler:
+    type: sync
+    module: src.main
+    args: [request, exc]
+    params:
+      returns: JSONResponse
+  process_llm_request:
+    type: async
+    module: src.rickbot_agent.tools_custom
+    args: [self]
+    params:
+      returns: None
+  push_events:
+    type: async
+    module: src.main
+  rate_limit_exceeded_handler:
+    type: sync
+    module: src.main
+    args: [request, exc]
+    params:
+      returns: JSONResponse
+  read_root:
+    type: sync
+    module: src.main
+    args: [request]
+  render_chat:
+    type: sync
+    module: src.streamlit_fe.chat
+    args: [rate_limiter, adk_runner]
+    params:
+      returns: None
+  render_login_screen:
+    type: sync
+    module: src.streamlit_fe.app
+    args: [mock_user, mock_user_email]
+    params:
+      returns: None
+  run_async:
+    type: async
+    module: src.rickbot_agent.tools_custom
+    args: [self]
+    params:
+      returns: str
+
+variables:
+  APP_NAME:
+    type: env
+    params:
+      caller: [getenv]
+      path: [src.main]
+  CORS_ALLOWED_ORIGINS:
+    type: env
+    params:
+      caller: [getenv]
+      path: [src.main]
+  GEMINI_API_KEY:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [src.rickbot_agent.agent]
+  GOOGLE_CLOUD_PROJECT:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [src.rickbot_agent.personality]
+  MOCK_AUTH_USER:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [src.streamlit_fe.chat, src.streamlit_fe.app]
+  RICKBOT_TEST_MODE:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [src.rickbot_agent.personality]
+
+files:
+  .txt:
+    type: literal
+    actions: [read]
+    params:
+      caller: [__post_init__]
+      path: [SCRIPT_DIR]
+  data/personalities.yaml:
+    type: literal
+    actions: [read]
+    params:
+      caller: [get_personalities]
+      path: [SCRIPT_DIR]
+  data/system_prompts:
+    type: literal
+    actions: [read]
+    params:
+      caller: [__post_init__]
+      path: [SCRIPT_DIR]
+  media/:
+    type: literal
+    actions: [read]
+    params:
+      caller: [get_avatar]
+      path: [SCRIPT_DIR]
+  rickbot_agent/media/morty.png:
+    type: literal
+    actions: [read]
+    params:
+      path: [ROOT_DIR]
+  system_prompt_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [os.path.exists, open]
+  yaml_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open, yaml.safe_load]
+      alias: [f]
