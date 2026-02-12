@@ -138,7 +138,7 @@ Each persona agent is actually a **Primary Agent** that manages a team of specia
 Rickbot adheres to ADK best practices by avoiding "Monolithic Agents".
 *   **Context Isolation**: By wrapping `google_search` and `FileSearchTool` in separate sub-agents, we prevent "Tool Confusion" where a primary agent might get bogged down with irrelevant technical outputs.
 *   **Hierarchical Retrieval**: The primary agent is instructed via a **Tool Usage Policy** to prioritize `RagAgent` before falling back to `SearchAgent`.
-*   **Portability**: The implementation uses `InMemorySessionService` and `InMemoryArtifactService` by default, but is architected to switch to persistent Cloud SQL/GCS drivers without modifying core agent logic.
+*   **Portability**: The implementation uses `InMemorySessionService` and `InMemoryArtifactService` by default, but is architected to switch to persistent drivers (e.g., Firestore for sessions, GCS for artifacts) without modifying core agent logic.
 
 ## Implementation Details
 
