@@ -9,6 +9,7 @@ Author: Darren Lester
 ## Table of Contents
 
 - [Repo Overview](#repo-overview)
+- [Quick Start: Local Development](#quick-start-local-development)
 - [Associated Articles](#associated-articles)
   - [Rickbot Articles](#rickbot-articles)
   - [Related ADK Articles](#related-adk-articles)
@@ -18,13 +19,10 @@ Author: Darren Lester
   - [Testing](#testing)
   - [Running ADK Dev Tools](#running-adk-dev-tools)
   - [Running in a Local Container](#running-in-a-local-container)
-- [Application Design](#application-design)
-  - [API Backend](#api-backend)
-  - [Streamlit UI](#streamlit-ui)
-  - [OAuth](#oauth)
-  - [Rate Limiting](#rate-limiting)
-  - [DNS](#dns)
-- [Deploying Infrastructure](#deploying-infrastructure)
+- [Application Design](docs/design.md)
+- [Container Architecture & Local Dev](docs/containers.md)
+- [Cloud Infrastructure & Deployment](deployment/README.md)
+- [Testing](docs/testing.md)
 - [Historical Notes About This Repo](#historical-notes-about-this-repo)
   - [Using Agent Starter Kit for Initial Project Setup](#using-agent-starter-kit-for-initial-project-setup)
 
@@ -38,6 +36,27 @@ The original _Rickbot_ repo is [here](https://github.com/derailed-dash/rickbot).
 - Creating the initial project folder, GitHub repo and CI/CD using the [Agent-Starter-Pack](https://googlecloudplatform.github.io/agent-starter-pack/).
 - Adding new capabilities to Rickbot.
 - Using [Gemini CLI](https://medium.com/google-cloud/give-gemini-cli-the-ability-to-generate-images-and-video-work-with-github-repos-and-use-other-482172571f99) to help with the overall migration journey.
+
+## Quick Start: Local Development
+
+To get the application running on your local machine, follow these three steps:
+
+1.  **Configure Environment**:
+    ```bash
+    source scripts/setup-env.sh
+    ```
+2.  **Start the Backend**:
+    In your first terminal:
+    ```bash
+    make api
+    ```
+3.  **Start the Frontend**:
+    In a second terminal:
+    ```bash
+    cd src/nextjs_fe && npm install && npm run dev
+    ```
+
+For advanced local setup (Docker, Streamlit, etc.), refer to the **[Container & Local Dev Guide](docs/containers.md)**.
 
 ## Associated Articles
 
@@ -153,50 +172,9 @@ uv run adk web src
 make install && make playground
 ```
 
-### Running in a Local Container
+### Running the Full Stack
 
-```bash
-# from project root directory
-
-# Get a unique version to tag our image
-export VERSION=$(git rev-parse --short HEAD)
-
-# To build as a container image
-docker build -t $SERVICE_NAME:$VERSION .
-
-# To run as a local container
-# We need to pass environment variables to the container
-# and the Google Application Default Credentials (ADC)
-docker run --rm -p 8080:8080 \
-  -e GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT -e GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION \
-  -e LOG_LEVEL=$LOG_LEVEL \
-  -e APP_NAME=$APP_NAME \
-  -e AGENT_NAME=$AGENT_NAME \
-  -e GOOGLE_GENAI_USE_VERTEXAI=$GOOGLE_GENAI_USE_VERTEXAI \
-  -e MODEL=$MODEL \
-  -e AUTH_REQUIRED=$AUTH_REQUIRED \
-  -e RATE_LIMIT=$RATE_LIMIT \
-  -e GOOGLE_APPLICATION_CREDENTIALS="/app/.config/gcloud/application_default_credentials.json" \
-  --mount type=bind,source=${HOME}/.config/gcloud,target=/app/.config/gcloud \
-   $SERVICE_NAME:$VERSION
-```
-
-### Running the Full Stack in Docker (Recommended)
-
-To run the complete application (FastAPI Backend and React UI) in Docker containers mimicking the production sidecar architecture:
-
-```bash
-# Start all services using Make
-make docker-front-and-back
-
-# OR manually with Docker Compose
-docker compose up -d --build backend frontend
-```
-
-To stop the services:
-```bash
-docker compose down
-```
+For detailed instructions on running individual components (Next.js, FastAPI, Streamlit) or the full orchestration in Docker, see the **[Container Architecture & Local Dev](docs/containers.md)** guide.
 
 ### Running the React UI
 
@@ -207,24 +185,8 @@ The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to t
 - Node.js (v18 or later)
 - Python backend running (`make api`)
 
-#### Running locally
-
-1.  **Start the Backend**:
-    In one terminal, launch the FastAPI server:
-    ```bash
-    make api
-    ```
-
-2.  **Start the Frontend**:
-    In a separate terminal, navigate to the frontend directory and start the dev server:
-    ```bash
-    cd src/nextjs_fe
-    npm install
-    npm run dev
-    ```
-
-3.  **Access the UI**:
-    Open your browser to `http://localhost:3000`.
+#### Accessing the UI
+Open your browser to `http://localhost:3000`.
 
 #### Key Features
 
@@ -233,122 +195,14 @@ The new React-based UI (Next.js) is located in `src/nextjs_fe`. It connects to t
 - **Interactive Tool Visibility**: Real-time visual feedback on agent actions, displaying specific tool usage (e.g., Google Search) with icons and status indicators.
 - **File Uploads**: Supports uploading images and text files for multimodal interactions.
 
-## Application Design
+## Application Design & Deployment
 
-See [docs/design.md](docs/design.md).
+Detailed information regarding the system architecture, design decisions, and cloud deployment procedures has been moved to specialized documentation:
 
-> [!NOTE]
-> During early development, the staging environment was protected using Identity-Aware Proxy (IAP) as an interim security measure. With the successful implementation and verification of the OAuth 2.0 flow, IAP is no longer required for staging and has been disabled.
-
-### OAuth Configuration
-
-Rickbot uses OAuth for securing the application. You must configure OAuth credentials for both Google and GitHub providers. It is recommended to create separate OAuth applications for Development (Dev) and Production (Prod) environments.
-
-#### 1. Google OAuth Setup
-
-1.  Go to the [Google Cloud Console > APIs & Services > Credentials](https://console.cloud.google.com/apis/credentials).
-2.  Click **Create Credentials** > **OAuth client ID**.
-3.  Select **Web application**.
-4.  **Dev Configuration:**
-    *   **Name:** `Rickbot-ADK-Dev`
-    *   **Authorized JavaScript origins:** `http://localhost:3000`
-    *   **Authorized redirect URIs:** `http://localhost:3000/api/auth/callback/google`
-5.  **Prod Configuration:**
-    *   **Name:** `Rickbot-ADK-Prod`
-    *   **Authorized JavaScript origins:** `https://your-production-domain.com`
-    *   **Authorized redirect URIs:** `https://your-production-domain.com/api/auth/callback/google`
-6.  Copy the **Client ID** and **Client Secret** for each.
-
-#### 2. GitHub OAuth Setup
-
-1.  Go to [GitHub Developer Settings > OAuth Apps](https://github.com/settings/developers).
-2.  Click **New OAuth App**.
-3.  **Dev Configuration:**
-    *   **Application Name:** `Rickbot-ADK-Dev`
-    *   **Homepage URL:** `http://localhost:3000`
-    *   **Authorization callback URL:** `http://localhost:3000/api/auth/callback/github`
-4.  **Prod Configuration:**
-    *   **Application Name:** `Rickbot-ADK-Prod`
-    *   **Homepage URL:** `https://your-production-domain.com`
-    *   **Authorization callback URL:** `https://your-production-domain.com/api/auth/callback/github`
-5.  Register the application and generate a **Client Secret**. Copy the **Client ID** and **Client Secret**.
-
-#### 3. Environment Variables & Secret Management
-
-The project uses two separate environment configuration files to maintain separation between the Backend and Frontend.
-
-##### Root Directory: `.env` (Python Backend)
-
-This file configures the FastAPI server. Use `source scripts/setup-env.sh` to load these into your shell, or rely on `load_dotenv()` in the code.
-
-| Variable | Purpose |
-| :--- | :--- |
-| `GOOGLE_CLIENT_ID` | Required to verify Google ID Tokens sent by the frontend. |
-| `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to accept mock tokens. |
-| `BACKEND_ALLOW_MOCK_AUTH` | Set to `true` to allow the backend to *verify* mock tokens. This bypasses real OAuth verification by accepting tokens in the format `mock:id:email:name`, which is essential for local development and testing different RBAC roles without real identity providers. **Must be kept out of prod.** |
-| `GOOGLE_CLOUD_PROJECT` | Used for ADK and Secret Manager access. |
-
-##### `src/nextjs_fe/.env.local` (Next.js Frontend)
-
-This file is used exclusively by the Next.js application.
-
-| Variable | Purpose |
-| :--- | :--- |
-| `NEXTAUTH_URL` | Base URL of your app (e.g., `http://localhost:3000`). |
-| `NEXTAUTH_SECRET` | Used by NextAuth to encrypt session cookies. |
-| `GOOGLE_CLIENT_ID` / `SECRET` | Credentials for Google OAuth. |
-| `GITHUB_CLIENT_ID` / `SECRET` | Credentials for GitHub OAuth. |
-| `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Enables the "Mock Login" provider in the UI (Frontend only). |
-| `MOCK_AUTH_USER` | (Optional) The email address assigned to the mock user identity. |
-| `NEXT_PUBLIC_API_URL` | URL of the backend API (e.g., `http://localhost:8000`). |
-
-> **Note on `MOCK_AUTH_USER`:** This is a frontend-only convenience variable. The frontend embeds this email into the mock token it generates. The backend simply reads whatever email is inside that token (if mock auth is enabled).
-
-**Production (Cloud Run):**
-
-For production deployment, avoid embedding secrets in the container image or environment variables directly. Instead, use **Google Secret Manager**.
-
-1.  **Create Secrets:** Store your client secrets in Google Secret Manager:
-    *   `rickbot-nextauth-secret` (The random string for encryption)
-    *   `rickbot-google-client-secret`
-    *   `rickbot-github-client-secret`
-2.  **Mount Secrets:** Configure your Cloud Run service (via Terraform or Console) to mount these secrets as environment variables:
-    *   `NEXTAUTH_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-nextauth-secret/versions/latest`
-    *   `GOOGLE_CLIENT_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-google-client-secret/versions/latest`
-    *   `GITHUB_CLIENT_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-github-client-secret/versions/latest`
-
-Non-sensitive values (Client IDs, URLs) can be set as standard environment variables in the Cloud Run configuration.
-
-### Rate Limiting
-
-The FastAPI backend implements rate limiting using `slowapi` to ensure stability and fair resource usage.
-
-- **Global Limit:** 60 requests per minute per user/IP across all endpoints.
-- **LLM Generation Limit:** 5 requests per minute per user/IP for `/chat` and `/chat_stream`.
-- **Identification:**
-    - **Authenticated users** are tracked by their unique User ID (extracted from JWT).
-    - **Unauthenticated users** are tracked by their IP address.
-- **Error Response:** Exceeding limits returns a `429 Too Many Requests` status code with a `Retry-After: 60` header and a descriptive JSON body.
-
-### DNS
-
-See [docs/design.md](docs/design.md) for details on DNS configuration.
-
-## Terraform
-
-The following commands describe how to run Terraform tasks, to deploy infrastructure. Note that I have now added a `terraform` target to my `Makefile`, so we can achieve the same result by simply running `make terraform` from the project root directory.
-
-```bash
-# Assuming we're in the project root folder
-cd deployment/terraform
-terraform init # One time initialisation
-
-# Create the TF plan
-terraform plan -var-file="vars/env.tfvars" -out out.tfplan
-
-# Check the TF plan then apply
-terraform apply "out.tfplan"
-```
+*   **[Application Design (docs/design.md)](docs/design.md)**: Architectural rationales, persona logic, and storage strategies.
+*   **[Deployment Guide (deployment/README.md)](deployment/README.md)**: Google Cloud infrastructure, CI/CD pipelines, Secret Manager, and environment variables.
+*   **[Container Technicals (docs/containers.md)](docs/containers.md)**: Docker build stages, local container execution, and troubleshooting.
+*   **[Testing (docs/testing.md)](docs/testing.md)**: Unit, integration, and UI testing procedures.
 
 ## Historical Notes About This Repo
 

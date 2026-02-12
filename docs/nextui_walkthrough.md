@@ -110,24 +110,38 @@ useEffect(() => {
 1.  We use the low-level `response.body.getReader()` API.
 2.  We enter a `while(true)` loop that reads chunks of raw bytes.
 3.  We pass these bytes through a `TextDecoder` to get strings.
-4.  We parse the custom SSE format (`data: {...}`) to extract the text tokens.
-5.  We append these tokens to `streamingText`, causing React to re-render the UI instantly.
+4.  We parse the custom SSE format (`data: {...}`) to extract text tokens, **session IDs**, and **tool-call events**.
+5.  We append tokens to `streamingText`, causing React to re-render the UI instantly.
 
-**Rationale**: This low-level approach gives us granular control over the network stream, allowing for sophisticated error handling and a "smooth" typing visual.
+#### Step 2E: Multimodal Support (File Uploads)
 
-#### Step 2E: Auto-Scrolling
+**Goal**: Allow users to upload documents (PDF, CSV, Images) for RAG or visual analysis.
 
-**The Challenge**: As new messages (or tokens) arrive, they push content off-screen. The user shouldn't have to manually scroll down.
-
-**Implementation**:
-*   We placed a dummy `div` (ref=`messagesEndRef`) at the bottom of the list.
-*   We used `useEffect` to trigger `messagesEndRef.current.scrollIntoView()` whenever `messages` or `streamingText` changes.
+*   **Implementation**:
+    1.  Uses a hidden `<input type="file" multiple />` triggered by a custom MUI `IconButton`.
+    2.  Files are stored in the local `files` state and displayed as chip-like previews.
+    3.  During `handleSendMessage`, we use a `FormData` object to send the prompt and file blobs to the backend as a `multipart/form-data` request.
+    4.  The API response is still streamed via SSE, allowing the UI to show progress while the files are being processed.
 
 ---
 
-## 3. UI/UX Design Decisions with Material UI
+## 3. Advanced Features & UI/UX Patterns
 
-*   **Dark Mode**: We implemented a dark theme (`ThemeProvider`) to match the sci-fi/Rick and Morty aesthetic.
-*   **Avatars**: We use MUI's `<Avatar>` component to display character images beside each message, providing instant visual recognition of who is speaking.
-*   **Responsive Layout**: The usage of MUI's `Box` with flexbox properties (`display: flex`, `flexDirection: column`) ensures the chat window consumes the full height of the viewport (`100vh`) and adapts to different screen sizes.
+### 3.1 Role-Based Access Control (RBAC) & Upgrades
+
+The system enforces persona restrictions directly in the UI. 
+*   **UPGRADE_REQUIRED**: If the backend returns a `403` with a specific `UPGRADE_REQUIRED` error code, the `Chat` component catches this and opens a themed **Upgrade Required Modal**.
+*   **Immersion**: The modal encourages users to "become a Supporter" to unlock restricted interdimensional personalities.
+
+### 3.2 Thinking & Tool Call Visualisation
+
+To bridge the gap between "Sent" and "Responding", the UI uses a dedicated `Thinking` component.
+*   **Stateful Feedback**: Uses the `botAction` and `activeTool` states to show what the agent is currently doing (e.g., "Using tool: GoogleSearch...", "Transferring to agent: RagAgent...").
+*   **Visual Continuity**: This ensures the user feels the system is active even during complex, multi-step agent operations like RAG retrieval.
+
+### 3.3 Portals & Immersion
+
+*   **Warm-up Screen**: To handle backend "Cold Starts" (loading heavy ML models), we implemented a "Heating up the portal gun..." screen with a pulsing animation.
+*   **Portal Animations**: The `PortalAnimation` component triggers a swirling green portal effect whenever a message is sent, maintaining the Rick & Morty aesthetic.
+*   **Dark Mode**: We implemented a dark theme (`ThemeProvider`) with a galaxy background to match the sci-fi tone.
 

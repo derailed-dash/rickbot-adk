@@ -7,7 +7,7 @@ This document details the containerization strategy for the Rickbot application,
 The application is composed of three main services when running locally or in production:
 
 1.  **Frontend (React/Next.js)**: The modern user interface.
-2.  **Backend (FastAPI)**: The central agent API.
+2.  **Backend (FastAPI)**: The central agent API and backend agentic system.
 3.  **Streamlit UI (Legacy)**: The original prototype interface (optional).
 
 We use **Docker** for containerization and **Docker Compose** for local orchestration.
@@ -51,13 +51,9 @@ This file builds the legacy Streamlit interface (and is also used by the ADK web
 
 This Dockerfile combines both the Frontend and Backend into a single image, providing a simplified deployment option.
 
-#### Design Philosophy
+#### Architectural Rationale
 
-The unified container was created to address several deployment scenarios:
-
-1.  **Simplified Cloud Run Deployment**: Cloud Run excels at running single containers. While multi-container deployments are possible via sidecars, a unified image simplifies configuration and reduces networking complexity.
-2.  **Local Development**: Developers can run the entire stack with a single `docker run` command or `make docker-unified`, without needing Docker Compose.
-3.  **Resource Efficiency**: Combining services reduces the overhead of running multiple containers and eliminates inter-container networking latency.
+The unified container provides a simplified deployment strategy by merging the Python and Node.js runtimes. For the high-level design decisions and cost-benefit analysis of this approach, see the [Container Strategy](file:///home/darren/localdev/python/rickbot-adk/docs/design.md#3-container-strategy) section in the Design Documentation.
 
 #### Build Strategy
 
@@ -182,33 +178,42 @@ The `docker-compose.yml` file orchestrates these services for a seamless local d
 
 ### Running the Environment
 
-To start the full stack:
+To start the full stack using Docker Compose:
 
 ```bash
+# Start backend and frontend in detached mode
 docker compose up -d --build backend frontend
 ```
 
-Alternatively, you can use the Makefile convenience command:
+Alternatively, use the Makefile convenience commands:
 
 ```bash
-make docker-front-and-back
-```
-
-You can also run services individually:
-
-```bash
-make docker-backend
-make docker-frontend
+make docker-front-and-back  # Launch both via Compose
+make docker-backend         # Launch only FastAPI
+make docker-frontend        # Launch only Next.js
 ```
 
 *   **Frontend**: Access at [http://localhost:3000](http://localhost:3000)
 *   **Backend API Docs**: Access at [http://localhost:8080/docs](http://localhost:8080/docs)
 
-### Troubleshooting
+### Running a Standalone Container
 
-*   **"Not Authenticated"**: Ensure you are logged in (Mock Login works locally).
-*   **API Connection Failed**: Check if the backend container is running (`docker ps`) and accessible at `http://localhost:8080`. If the frontend cannot reach it, ensure `NEXT_PUBLIC_API_URL` was correctly set during the build (try rebuilding with `--build`).
-*   **Permissions Errors**: If the backend logs show permission errors accessing Google Cloud resources (like Secret Manager), ensure your local Application Default Credentials are set up and that the `GOOGLE_CLOUD_PROJECT` environment variable in `.env` matches the project your credentials have access to.
+If you need to test a single image (e.g., the unified container) without Docker Compose:
+
+```bash
+# 1. Build the image
+export VERSION=$(git rev-parse --short HEAD)
+docker build -t $SERVICE_NAME:$VERSION .
+
+# 2. Run the container
+# Note: You must mount your Google Cloud ADC for Vertex AI access
+docker run --rm -p 8080:8080 \
+  -e GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT \
+  -e GOOGLE_GENAI_USE_VERTEXAI=true \
+  -e GOOGLE_APPLICATION_CREDENTIALS="/app/.config/gcloud/application_default_credentials.json" \
+  --mount type=bind,source=${HOME}/.config/gcloud,target=/app/.config/gcloud \
+  $SERVICE_NAME:$VERSION
+```
 
 ## Evolution & Troubleshooting: The Unified Container Journey
 
@@ -242,7 +247,7 @@ This introduction of the proxy layer revealed two critical issues that were mask
 #### 2. The "Hang" Problem (RAG Latency)
 
 *   **Symptom**: When the agent attempted to use the `RagAgent` (File Search), the request would simply hang for ~30 seconds and then silently drop or fail in the UI.
-*   **Cause**: RAG operations are time-intensive (retrieval, ranking, indexing). Our logs captured successful executions taking upwards of **47 seconds**. However, the Next.js proxy rewriter and standard HTTP clients often have a default timeout of 30 seconds. If the backend is "silent" while processing, the middleman assumes the connection is dead and closes it.
+*   **Cause**: RAG operations are time-intensive (retrieval, ranking, indexing). Our logs captured successful executions taking well over 30 seconds. However, the Next.js proxy rewriter and standard HTTP clients often have a default timeout of 30 seconds. If the backend is "silent" while processing, the middleman assumes the connection is dead and closes it.
 *   **Solution (SSE Heartbeat)**: Instead of arbitrarily increasing timeouts (which we tried and found insufficient in a complex proxied environment), we implemented an **SSE Heartbeat**.
     *   **Async Queue**: The `main.py` event generator now uses an `asyncio.Queue` to manage ADK events and heartbeats concurrently.
     *   **Keep-Alive Signals**: A background task sends a `: heartbeat` SSE comment every 15 seconds.

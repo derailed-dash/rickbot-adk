@@ -23,6 +23,7 @@ The application uses several Google Cloud services for data storage and state ma
 *   **Google Cloud Storage (GCS)**: Used for storing user-uploaded artifacts and session logs.
 *   **Google Firestore**: Serves as the source of truth for Role-Based Access Control (RBAC). It stores user roles and persona access requirements. 
     *   **PITR**: Point-in-Time Recovery is enabled, providing 7 days of data retention.
+    *   **Rationale**: See the [Storage Strategy (docs/design.md)](../docs/design.md#6-storage-strategy-firestore-vs-cloud-sql) for why we chose Firestore over Cloud SQL.
 
 #### Seeding Firestore
 
@@ -34,16 +35,50 @@ uv run python scripts/seed_firestore.py
 
 ### Mandatory Environment Variables and Secrets
 
-The following configurations are required for the application to function, particularly for authentication:
+The following configurations are required for the application to function, particularly for authentication. 
 
-| Variable/Secret | Type | Description |
-| :--- | :--- | :--- |
-| `NEXTAUTH_SECRET` | Secret | Random string for signing session cookies. |
-| `GOOGLE_CLIENT_ID` | Variable | OAuth Client ID from Google Cloud Console. |
-| `GOOGLE_CLIENT_SECRET` | Secret | OAuth Client Secret from Google Cloud Console. |
-| `GITHUB_CLIENT_ID` | Variable | OAuth Client ID from GitHub Developer settings. |
-| `GITHUB_CLIENT_SECRET` | Secret | OAuth Client Secret from GitHub Developer settings. |
-| `NEXTAUTH_URL` | Variable | The base URL of the application (e.g., `https://staging.rickbot.co.uk`). |
+#### OAuth Setup & Secret Management
+
+Rickbot uses OAuth for securing the application. You must configure OAuth credentials for both Google and GitHub providers. It is recommended to create separate OAuth applications for Development (Dev) and Production (Prod) environments.
+
+| Variable/Secret | Type | Source (Dev) | Source (Prod - Secret Manager) |
+| :--- | :--- | :--- | :--- |
+| `NEXTAUTH_SECRET` | Secret | Random string in `.env.local` | `rickbot-nextauth-secret` |
+| `GOOGLE_CLIENT_ID` | Variable | [GCP Console](https://console.cloud.google.com/apis/credentials) | [GCP Console](https://console.cloud.google.com/apis/credentials) |
+| `GOOGLE_CLIENT_SECRET` | Secret | [GCP Console](https://console.cloud.google.com/apis/credentials) | `rickbot-google-client-secret` |
+| `GITHUB_CLIENT_ID` | Variable | [GitHub Settings](https://github.com/settings/developers) | [GitHub Settings](https://github.com/settings/developers) |
+| `GITHUB_CLIENT_SECRET` | Secret | [GitHub Settings](https://github.com/settings/developers) | `rickbot-github-client-secret` |
+| `NEXTAUTH_URL` | Variable | `http://localhost:3000` | Automated via Terraform |
+
+#### Google Cloud Secret Manager (Production)
+
+For production deployment, avoid embedding secrets in the container image. Instead, mount secrets from **Google Secret Manager** directly as environment variables:
+
+1.  **Create Secrets**: Store `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_SECRET`, and `GITHUB_CLIENT_SECRET` in Secret Manager.
+2.  **Mount Secrets**: Configure the Cloud Run service (via Terraform or Console) to mount these:
+    *   `NEXTAUTH_SECRET` -> `projects/PROJECT_ID/secrets/rickbot-nextauth-secret/versions/latest`
+
+#### Environment Configuration Files
+
+The project maintain separation between Backend and Frontend configurations during development.
+
+##### 1. Backend: Root Directory `.env`
+Configures the FastAPI server. Loaded via `source scripts/setup-env.sh`.
+
+| Variable | Purpose |
+| :--- | :--- |
+| `GOOGLE_CLIENT_ID` | Verifies Google ID Tokens sent by the frontend. |
+| `BACKEND_ALLOW_MOCK_AUTH` | Enables bypass of real OAuth for local role testing. **Keep out of prod.** |
+| `GOOGLE_CLOUD_PROJECT` | Used for ADK and Secret Manager access. |
+
+##### 2. Frontend: `src/nextjs_fe/.env.local`
+Exclusively used by the Next.js application.
+
+| Variable | Purpose |
+| :--- | :--- |
+| `NEXT_PUBLIC_ALLOW_MOCK_AUTH` | Enables the "Mock Login" provider in the UI. |
+| `NEXT_PUBLIC_API_URL` | URL of the backend API (e.g., `http://localhost:8000`). |
+| `MOCK_AUTH_USER` | Email address assigned to the mock user identity. |
 
 #### `NEXTAUTH_URL` Management
 In the continuous deployment pipeline, `NEXTAUTH_URL` is automatically derived by Terraform from the `staging_app_domain_name` or `prod_app_domain_name` variables and passed as a Cloud Build substitution.
