@@ -23,7 +23,9 @@ graph TD
             Streamlit["Streamlit UI<br/>(Prototype)"]
             React["React/Next.js UI<br/>(Primary)"]
             API["FastAPI Backend"]
-            ADK["ADK Framework<br>Rickbot Agents"]
+            subgraph ADK["ADK Framework"]
+                Agents["Rickbot Agents"]
+            end
         end
         
         subgraph "Data & State"
