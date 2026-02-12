@@ -17,43 +17,39 @@ The solution is architected as a cloud-native application running on Google Clou
 graph TD
     User([User])
     
-    subgraph "Interfaces"
-        Streamlit[Streamlit UI\n(Prototype)]
-        React[React/Next.js UI\n(Primary)]
-    end
-    
     subgraph "Google Cloud Platform"
-        LB[Load Balancer / Ingress]
         
         subgraph "Cloud Run Services"
-            API[FastAPI Backend\n(Rickbot Agent)]
+            Streamlit["Streamlit UI<br/>(Prototype)"]
+            React["React/Next.js UI<br/>(Primary)"]
+            API["FastAPI Backend"]
+            subgraph ADK["ADK Framework"]
+                Agents["Rickbot Agents"]
+            end
         end
         
         subgraph "Data & State"
-            FileStore[(File Search\nStore (RAG))]
-            Firestore[(Google Firestore\nAccess Control)]
-            GCS[Cloud Storage\nArtifacts/Logs]
-            SecretMgr[Secret Manager\nOAuth Creds / API Keys]
+            FileStore[("File Search<br/>Store (RAG)")]
+            Firestore[("Google Firestore<br/>Access Control")]
+            GCS["Cloud Storage<br/>Artifacts/Logs"]
+            SecretMgr["Secret Manager<br/>OAuth Creds / API Keys"]
         end
         
         subgraph "AI Services"
-            Vertex[Vertex AI Agent Engine]
-            Gemini[Gemini 1.5 Pro/Flash]
+            Gemini[Gemini Flash]
         end
     end
 
     User --> Streamlit
     User --> React
     
-    Streamlit --> API
+    Streamlit --> ADK
     React --> API
     
-    API -->|ADK Framework| Vertex
-    API -->|Retrieve Context| FileStore
+    API --> ADK
+    ADK --> Gemini
+    ADK -->|Retrieve Context| FileStore
     API -->|Check Roles| Firestore
-    API -->|Fetch Secrets| SecretMgr
-    
-    Vertex -->|Inference| Gemini
 ```
 
 ### Container Architecture Strategy
