@@ -102,6 +102,46 @@ I evaluated three potential architectures for deploying the Rickbot Backend (Fas
     *   **Primary vs Prototype**: While **Streamlit** is used for internal Prototyping (due to its zero-overhead UI generation), **Next.js/React** was selected for the primary UI to allow for high-performance "Rich Chat" features, complex micro-animations (via Framer Motion), and fine-grained control over the "Thinking" state visualizations. Crucially, React offers total **Customisability**; unlike Streamlit, where interfaces often look generic and uniform, a bespoke React frontend allows us to create a unique, premium design that stands out.
     *   **Full-Stack Synergy**: Next.js’s ability to handle API rewrites and middleware makes it the perfect partner for the **Unified Container** strategy, allowing the frontend to act as a secure proxy to the FastAPI backend.
 
+## Application Flow: The Request Lifecycle
+
+Rickbot follows a decoupled request-response lifecycle managed by FastAPI and the ADK Runner:
+
+1.  **Request Entry**: The React UI sends a `multipart/form-data` POST request to `/chat` or `/chat_stream`.
+2.  **Authentication**: `AuthMiddleware` extracts and verifies the OAuth JWT. The user's role is validated via the `check_persona_access` dependency.
+3.  **Agent Retrieval**: The system calls `get_agent(personality_name)`, which retrieves a pre-configured instance from the **Persona Cache**.
+4.  **Session & Artifacts**:
+    *   `session_service` retrieves or creates the conversation history in Firestore.
+    *   `artifact_service` processes and stores any uploaded files as user-scoped artifacts.
+5.  **Execution Logic**: The `google.adk.runners.Runner` orchestrates the interaction. It feeds the user message, session history, and available tools to the agent.
+6.  **Streaming Output**: For `/chat_stream`, the `event_generator` yields ADK events (chunks, tool calls, transfers) as SSE packets, ensuring the UI reflects real-time "Thinking" states.
+
+## Persona Implementation & Caching
+
+Rickbot implements a sophisticated, multi-tier system for managing and retrieving agent personalities efficiently.
+
+### 1. Lazy Persona Caching
+
+Creating unique agent instances for every request would be computationally expensive. Rickbot uses a two-tier lazy loading strategy:
+*   **Tier 1: Configuration Cache**: `get_personalities()` uses `lru_cache` to load the `personalities.yaml` and system prompts from disk/Secrets once.
+*   **Tier 2: Instance Cache**: `get_agent()` uses `functools.cache` to store the fully instantiated `google.adk.agents.Agent` objects.
+*   **Result**: The first request for a persona (e.g. "Yoda") triggers its creation; all subsequent requests across all users reuse the same optimized instance.
+
+### 2. Hierarchical Agent Pattern
+
+Each persona agent is actually a **Primary Agent** that manages a team of specialized **Sub-Agents**. We use the **Agent-as-a-Tool** pattern to maintain high focus:
+*   **Primary Agent**: Handles the persona's voice and dialogue.
+*   **RagAgent**: A specialist tool-agent connected to a **File Search Store**. It returns raw facts only.
+*   **SearchAgent**: A fallback tool-agent with access to `google_search`.
+
+### 3. ADK Best Practices: Specialization
+
+Rickbot adheres to ADK best practices by avoiding "Monolithic Agents".
+*   **Context Isolation**: By wrapping `google_search` and `FileSearchTool` in separate sub-agents, we prevent "Tool Confusion" where a primary agent might get bogged down with irrelevant technical outputs.
+*   **Hierarchical Retrieval**: The primary agent is instructed via a **Tool Usage Policy** to prioritize `RagAgent` before falling back to `SearchAgent`.
+*   **Portability**: The implementation uses `InMemorySessionService` and `InMemoryArtifactService` by default, but is architected to switch to persistent Cloud SQL/GCS drivers without modifying core agent logic.
+
+## Implementation Details
+
 ---
 
 ## Reliability & Lessons Learned
