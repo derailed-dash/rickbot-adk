@@ -53,7 +53,7 @@ graph TD
 
 ### 1. Adopting the Agent Development Kit (ADK)
 *   **Decision**: Migrate from custom Python logic to the Google ADK.
-*   **Rationale**: ADK provides robust, standardised patterns for session handling, tool calling, and context management. The original ad-hoc state management was brittle; ADK makes the system easier to extend and maintain.
+*   **Rationale**: ADK provides robust, standardised patterns for session handling, tool calling, context management, and multi-agent orchestration. The original ad-hoc state management was brittle; ADK makes the system easier to extend and maintain.
 
 ### 2. Decoupling the API (FastAPI)
 *   **Decision**: Expose agent functionality via a standalone FastAPI service (`src/main.py`).
@@ -75,17 +75,29 @@ I evaluated three potential architectures for deploying the Rickbot Backend (Fas
 *   **Rationale**: Lowest possible TCO and minimal infrastructure complexity, behaving effectively like a "monolith" for deployment simplicity.
 
 ### 4. Hosting Environment: Cloud Run vs Agent Engine
+
 *   **Decision**: Use **Google Cloud Run** for the unified container hosting.
 *   **Rationale**: While **Vertex AI Agent Engine** provides a powerful managed runtime for agents, **Cloud Run** offers superior flexibility for hosting the "Unified Container" pattern. It allows us to manage the full-stack lifecycle (FastAPI + multiple UIs) in a single serverless service, which is more cost-effective and easier to troubleshoot for this project's reference implementation.
 
-### 5. Authentication & Security Transition
+### 5. Frontend Framework: React & Next.js
+
+*   **Decision**: Use **React** as the UI library and **Next.js** as the application framework.
+*   **Rationale**:
+    *   **The Ecosystem**: **React** serves as the component engine, providing the functional UI model required for a dynamic, stateful application. It manages the complex real-time states of AI conversations—including message history, file attachments, and "Thinking" state transitions—without requiring full-page reloads. **Next.js** acts as the application infrastructure, providing the routing, build optimization, and security middleware necessary to transform those components into a production-grade system.
+    *   **SSR vs CSR**: Next.js was chosen over a pure Client-Side React app (CSR) to leverage **Server-Side Rendering (SSR)**. This ensures faster "First Meaningful Paint" and better SEO, which is critical for a reference implementation aimed at production standards.
+    *   **Primary vs Prototype**: While **Streamlit** is used for internal Prototyping (due to its zero-overhead UI generation), **Next.js/React** was selected for the primary UI to allow for high-performance "Rich Chat" features, complex micro-animations (via Framer Motion), and fine-grained control over the "Thinking" state visualizations. Crucially, React offers total **Customisability**; unlike Streamlit, where interfaces often look generic and uniform, a bespoke React frontend allows us to create a unique, premium design that stands out.
+    *   **Full-Stack Synergy**: Next.js’s ability to handle **API rewrites** and server-side middleware makes it the perfect partner for the **Unified Container** strategy. It allows the frontend to act as a secure proxy to the FastAPI backend, routing `/api/*` requests to the local Python instance while abstracting away CORS issues and inter-service authentication complexities.
+
+### 6. Authentication & Security Transition
+
 *   **Decision**: Migrate from **Identity-Aware Proxy (IAP)** to a native **OAuth 2.0** flow using **NextAuth.js**.
 *   **Rationale**:
     *   **User Experience**: IAP provides a coarse-grained security layer suitable for internal tools but lacks the seamless "Social Login" experience required for a premium reference implementation.
     *   **Granular Control**: NextAuth.js allows the application to handle session management, persona-based access control (RBAC), and user profile synchronization directly within the app logic.
     *   **Standardization**: It is the standard authentication solution for Next.js, abstracting complex OAuth flows and secure cookie handling. This ensures the application can be deployed to any Cloud Run environment without depending on specific GCP project-level features like IAP.
 
-### 6. Storage Strategy: Firestore vs Cloud SQL
+### 7. Storage Strategy: Firestore vs Cloud SQL
+
 *   **Decision**: Use **Google Firestore** for structured state and RBAC.
 *   **Rationale**: While **Cloud SQL (Postgres)** was considered for its relational capabilities, **Firestore** was selected for its alignment with a serverless, low-maintenance architecture:
     *   **Cost Efficiency**: Firestore’s "pay-as-you-go" model is ideal for a reference implementation; unlike Cloud SQL, there is no cost for a constantly running instance.
@@ -93,14 +105,6 @@ I evaluated three potential architectures for deploying the Rickbot Backend (Fas
     *   **Suitability**: The project's data (RBAC roles and user metadata) is hierarchical and relatively simple, making it perfectly suited for a document-oriented database.
     *   **Availability**: Native multi-region availability and seamless integration with the Google Cloud identity stack.
 *   **Google Cloud Storage**: Leveraging the ADK `GcsArtifactService` allows the system to store user-uploaded files and agent logs reliably across container restarts without the overhead of a managed file system.
-
-### 7. Frontend Framework: React & Next.js
-*   **Decision**: Use **React** as the UI library and **Next.js** as the application framework.
-*   **Rationale**:
-    *   **The Ecosystem**: **React** provides the component-based architecture and "Functional UI" model, while **Next.js** provides the necessary infrastructure (routing, optimization, build system) to turn those components into a production-grade application.
-    *   **SSR vs CSR**: Next.js was chosen over a pure Client-Side React app (CSR) to leverage **Server-Side Rendering (SSR)**. This ensures faster "First Meaningful Paint" and better SEO, which is critical for a reference implementation aimed at production standards.
-    *   **Primary vs Prototype**: While **Streamlit** is used for internal Prototyping (due to its zero-overhead UI generation), **Next.js/React** was selected for the primary UI to allow for high-performance "Rich Chat" features, complex micro-animations (via Framer Motion), and fine-grained control over the "Thinking" state visualizations. Crucially, React offers total **Customisability**; unlike Streamlit, where interfaces often look generic and uniform, a bespoke React frontend allows us to create a unique, premium design that stands out.
-    *   **Full-Stack Synergy**: Next.js’s ability to handle API rewrites and middleware makes it the perfect partner for the **Unified Container** strategy, allowing the frontend to act as a secure proxy to the FastAPI backend.
 
 ## Application Flow: The Request Lifecycle
 
@@ -113,18 +117,18 @@ Rickbot follows a decoupled request-response lifecycle managed by FastAPI and th
     *   `session_service` retrieves or creates the conversation history in Firestore.
     *   `artifact_service` processes and stores any uploaded files as user-scoped artifacts.
 5.  **Execution Logic**: The `google.adk.runners.Runner` orchestrates the interaction. It feeds the user message, session history, and available tools to the agent.
-6.  **Streaming Output**: For `/chat_stream`, the `event_generator` yields ADK events (chunks, tool calls, transfers) as SSE packets, ensuring the UI reflects real-time "Thinking" states.
+6.  **Streaming Output**: For `/chat_stream`, the `event_generator` yields ADK events (chunks, tool calls, transfers) as **Server-Sent Events (SSE)**. This allows the React frontend to reflect real-time "Thinking" states and tool usage incrementally, ensuring a responsive and transparent user experience.
 
 ## Persona Implementation & Caching
 
 Rickbot implements a sophisticated, multi-tier system for managing and retrieving agent personalities efficiently.
 
-### 1. Lazy Persona Caching
+### 1. Lazy Root Agent Caching
 
-Creating unique agent instances for every request would be computationally expensive. Rickbot uses a two-tier lazy loading strategy:
-*   **Tier 1: Configuration Cache**: `get_personalities()` uses `lru_cache` to load the `personalities.yaml` and system prompts from disk/Secrets once.
-*   **Tier 2: Instance Cache**: `get_agent()` uses `functools.cache` to store the fully instantiated `google.adk.agents.Agent` objects.
-*   **Result**: The first request for a persona (e.g. "Yoda") triggers its creation; all subsequent requests across all users reuse the same optimized instance.
+Rather than a single static "root" agent, Rickbot implements a **Multiple, Cached Root Agent** pattern. Creating unique agent instances for every request would be computationally expensive, so the system uses a two-tier lazy loading strategy:
+*   **Tier 1: Configuration Cache**: `get_personalities()` in `src/rickbot_agent/personality.py` uses `lru_cache` to load the `personalities.yaml` and system prompts from disk/Secrets exactly once.
+*   **Tier 2: Agent Instance Cache**: `_get_cached_agent_for_personality()` in `src/rickbot_agent/agent.py` uses `@functools.cache` to store the fully instantiated `google.adk.agents.Agent` objects.
+*   **Lazy Loading**: Agents are not instantiated at server startup. Instead, the first request for a specific persona (e.g., "Yoda") triggers its creation and caching; all subsequent requests (across all users) reuse that pre-warmed instance. This ensures fast startup times and efficient memory usage.
 
 ### 2. Hierarchical Agent Pattern
 
