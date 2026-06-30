@@ -206,3 +206,8 @@ my_env.tfvars
 .gemini/
 working_docs/
 gha-creds-*.json
+
+# Secrets
+.env
+src/nextjs_fe/.env.local
+deployment/terraform/vars/env.tfvars
