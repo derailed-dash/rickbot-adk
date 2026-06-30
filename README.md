@@ -203,9 +203,3 @@ Detailed information regarding the system architecture, design decisions, and cl
 *   **[Deployment Guide (deployment/README.md)](deployment/README.md)**: Google Cloud infrastructure, CI/CD pipelines, Secret Manager, and environment variables.
 *   **[Container Technicals (docs/containers.md)](docs/containers.md)**: Docker build stages, local container execution, and troubleshooting.
 *   **[Testing (docs/testing.md)](docs/testing.md)**: Unit, integration, and UI testing procedures.
-
-## Historical Notes About This Repo
-
-### Using Agent Starter Kit for Initial Project Setup
-
-This project, its GitHub repo, and associated CI/CD pipeline were initially setup using the Agent Starter Kit. Much of the original template files have since been removed from the project.  But this section has been retained to provide an overview of this process. But do read [this article](https://medium.com/google-cloud/building-the-rickbot-multi-personality-agentic-application-using-gemini-cli-google-a48aed4bef24) for a more detailed walkthrough.
