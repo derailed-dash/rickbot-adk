@@ -25,7 +25,8 @@ resource "google_cloud_run_v2_service" "app_staging" {
           cpu    = "1"
           memory = "1Gi"
         }
-        cpu_idle = true
+        cpu_idle          = true
+        startup_cpu_boost = true
       }
     }
 
