@@ -7,8 +7,8 @@ fastapi run src/main.py --port 8000 --host 0.0.0.0 &
 
 # Wait for FastAPI to start
 echo "Waiting for FastAPI to be ready..."
-for i in {1..10}; do
-    if python3 -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/')" > /dev/null 2>&1; then
+for i in {1..30}; do
+    if python3 -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=2)" > /dev/null 2>&1; then
         echo "FastAPI is ready!"
         break
     fi
